@@ -1,0 +1,47 @@
+\section{Cel i zakres pracy}
+
+\subsection{Cel pracy}
+
+Celem niniejszej pracy inżynierskiej jest zaprezentowanie nowatorskiego podejścia do renderowania obiektów 3D w czasie rzeczywistym w przeglądarce internetowej z wykorzystaniem technologii WebGPU. Projekt zakłada zademonstrowanie możliwości tej technologii poprzez opracowanie komponentu renderującego, który efektywnie wykorzystuje kartę graficzną urządzenia, z kodem skompilowanym do formatu WebAssembly dla zapewnienia wysokiej wydajności. Komponent ten zostanie zintegrowany z uproszczonym systemem domu aukcyjnego, aby zilustrować jego praktyczne zastosowanie w kontekście aukcji online, zwiększając transparentność i zaufanie użytkowników do procesu zakupowego poprzez interaktywną wizualizację licytowanych przedmiotów.
+
+\subsection{Zakres pracy}
+
+Zakres pracy obejmuje następujące kluczowe elementy:
+\begin{enumerate}
+  \item Analiza rynku platform aukcyjnych online
+    \begin{itemize}
+      \item Badanie wiodących platform: Przeprowadzenie analizy głównych platform aukcyjnych, takich jak eBay, Sotheby’s, Christie’s oraz lokalnych, takich jak Allegro.pl, pod kątem stosowanych metod wizualizacji produktów.
+      \item Ocena technologii wizualizacji: Skupienie się na obecnych rozwiązaniach, takich jak zdjęcia 2D, filmy wideo oraz ewentualne zastosowanie technologii 3D. Badania wskazują, że większość platform nadal opiera się na tradycyjnych metodach, co podkreśla lukę w rynku dla zaawansowanych wizualizacji 3D (Market Research Future, 2025).
+      \item Identyfikacja potrzeb: Określenie ograniczeń istniejących rozwiązań, takich jak brak możliwości dokładnego obejrzenia przedmiotu z różnych perspektyw, oraz wskazanie, jak renderowanie 3D może poprawić doświadczenie użytkownika.
+    \end{itemize}
+  \item Wprowadzenie do technologii WebGPU i WebAssembly
+    \begin{itemize}
+      \item WebGPU: Omówienie architektury WebGPU, nowoczesnego API graficznego, które jest następcą WebGL. WebGPU oferuje lepszą wydajność, bezpośredni dostęp do nowoczesnych funkcji GPU oraz wsparcie dla obliczeń ogólnego przeznaczenia, co czyni je idealnym do renderowania 3D w przeglądarkach (MDN Web Docs, 2025).
+      \item WebAssembly: Wyjaśnienie roli WebAssembly jako formatu binarnego umożliwiającego wykonywanie kodu o wysokiej wydajności w przeglądarce, co jest kluczowe dla złożonych obliczeń graficznych (WebGPU Implementation Status, 2024).
+      \item Zalety technologiczne: Podkreślenie korzyści, takich jak zwiększona wydajność, lepsze zarządzanie zasobami sprzętowymi oraz kompatybilność międzyplatformowa, w porównaniu do starszych technologii, takich jak WebGL czy Adobe Flash Player, który został wycofany z powodu problemów z bezpieczeństwem i wydajnością.
+    \end{itemize}
+  \item Projekt i implementacja komponentu renderującego 3D
+    \begin{itemize}
+      \item Podejście techniczne: Szczegółowy opis projektowania i implementacji komponentu renderującego opartego na WebGPU, w tym użycie języka WGSL (WebGPU Shading Language) do definiowania efektów graficznych (W3C WebGPU Specification, 2025).
+      \item Kompilacja do WebAssembly: Wyjaśnienie procesu kompilacji kodu renderującego w C++ do WebAssembly, co pozwala na uzyskanie wydajności zbliżonej do natywnej w środowisku przeglądarkowym.
+      \item Wyzwania implementacyjne: Omówienie potencjalnych trudności, takich jak zapewnienie kompatybilności z różnymi przeglądarkami (np. Chrome i Edge od wersji 113, Safari od wersji 26, eksperymentalne wsparcie w Firefox (LambdaTest, 2023)), optymalizacja wydajności oraz dostosowanie do ograniczeń sprzętowych.
+    \end{itemize}
+  \item Integracja z systemem domu aukcyjnego
+    \begin{itemize}
+      \item Podejście techniczne: Opis i implementacja architektury klient-serwer z użyciem React po stronie frontendu i Express, Node.js i MongoDB po stronie backendu.
+      \item Architektura systemu: Nakreślenie struktury uproszczonego systemu aukcyjnego, który służy jako przypadek użycia dla komponentu renderującego. System obejmuje podstawowe funkcjonalności, takie jak przeglądanie przedmiotów, licytacja i wyświetlanie modeli 3D.
+      \item Integracja komponentu 3D: Opis sposobu włączenia komponentu renderującego do interfejsu użytkownika, w tym zarządzania danymi modeli 3D i interakcji użytkownika, takich jak obracanie czy przybliżanie obiektów.
+      \item Przykłady użycia: Zaprezentowanie scenariuszy, w których użytkownicy mogą wchodzić w interakcję z modelami 3D, np. oglądanie antyków lub dzieł sztuki z różnych kątów, co zwiększa pewność co do stanu licytowanego przedmiotu.
+    \end{itemize}
+  \item Ewaluacja i perspektywy rozwoju
+    \begin{itemize}
+      \item Testowanie wydajności: Przeprowadzenie testów komponentu renderującego pod kątem szybkości renderowania, zużycia zasobów i płynności interakcji użytkownika.
+      \item Ocena doświadczenia użytkownika: Analiza, jak wizualizacja 3D wpływa na postrzeganie platformy aukcyjnej przez użytkowników, w tym potencjalne zmniejszenie liczby zwrotów dzięki lepszemu zrozumieniu produktu (Market Report Analytics, 2025).
+      \item Przyszłe zastosowania: Dyskusja nad potencjalnym rozszerzeniem technologii na inne obszary e-commerce, takie jak sklepy internetowe z meblami czy modą, oraz dalszy rozwój w miarę zwiększania wsparcia dla WebGPU w przeglądarkach.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Podział pracy}
+\todo[inline]{Komentarz: Później}
+
+\newpage

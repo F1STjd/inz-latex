@@ -1,0 +1,210 @@
+\documentclass[12pt,a4paper]{article} 
+% Draft debuguje ale psuje obrazki
+%\showboxbreadth=\maxdimen % debug
+%\showboxdepth=\maxdimen % debug
+%\usepackage{lua-visual-debug} % debug
+
+\usepackage[a4paper,twoside,top=2.5cm,bottom=2cm,inner=3.5cm,outer=2cm]{geometry}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{fontspec} % Dla Arial na stronie tytułowej
+\newfontfamily\titlepagefont{Arial} % Ustalenie czcionki dla strony tytułowej
+%\setstretch{1.5} 
+
+\usepackage{newtxtext} % Czcionka New Times Roman
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage[utf8]{inputenc}
+\usepackage[english, polish]{babel}
+\babelprovide[transforms = oneletter.nobreak]{polish} 
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[backend=biber, defernumbers=true]{biblatex}
+\usepackage{tabularx}
+\usepackage{xltabular}
+\usepackage{multirow}
+\usepackage{stackengine}
+\usepackage{tocloft}
+\usepackage{enumitem}
+\usepackage{chngcntr}
+\usepackage{newfloat}
+\usepackage{float}
+\usepackage[font=normalsize]{caption}
+\usepackage[justification=centering]{caption}
+\usepackage{boldline}
+\usepackage{indentfirst}
+\usepackage{listings}
+\usepackage{csquotes}
+\usepackage{pdflscape}
+
+
+% komentarze
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage[breakable]{tcolorbox}
+\tcbuselibrary{breakable}
+\setlength{\marginparwidth}{2cm} % Fix todonotes margin warning
+\usepackage{todonotes}
+
+\tcbset{
+  colframe=red, % Color of the frame
+  colback=white, % Background color
+  boxrule=0.5mm, % Frame thickness
+  arc=2mm, % Rounded corners
+  boxsep=2pt, % Padding inside the box
+  left=2pt, % Left padding
+  right=2pt, % Right padding
+  top=2pt, % Top padding
+  bottom=2pt % Bottom padding
+}
+
+\newtcolorbox{komentarz}{
+  colframe=red, % Red frame
+  colback=white, % White background
+  boxrule=0.5mm, % Frame thickness
+  arc=2mm, % Rounded corners
+  boxsep=2pt, % Internal padding
+  left=2pt, right=2pt, top=2pt, bottom=2pt, % Padding adjustments
+  width=\linewidth, % Full width of text area
+  breakable % Allow breaking across pages
+}
+
+
+
+\DeclareFloatingEnvironment{graph}
+
+\addbibresource{bib/thesis.bib}
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash} m{#1} }
+\newcolumntype{?}{!{\vrule width 1.5pt}}
+
+\addto\captionsenglish{
+  \renewcommand{\figurename}{Rysunek}
+  \renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+  \renewcommand{\graphname}{Listing}
+  \renewcommand{\thegraph}{\arabic{section}.\arabic{graph}}
+  \renewcommand{\contentsname}{Spis treści}
+}
+
+
+\addto\captionsenglish{
+    \renewcommand{\figurename}{Rysunek}
+    \renewcommand{\graphname}{Listing}
+    \renewcommand{\thegraph}{\arabic{section}.\arabic{graph}}
+    \renewcommand{\contentsname}{Spis treści}
+}
+
+
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+
+\newcommand{\row}[1]{\hline #1 \\}
+\newcommand{\image}[2]{\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{#1}
+    \caption{#2}
+    \label{fig:image}
+\end{figure}
+\par}
+
+\newcommand{\img}[3]{\begin{figure}[#3]
+    \centering
+    \includegraphics[width=\linewidth]{#1}
+    \caption{#2}
+    \label{fig:image}
+\end{figure}
+\par}
+
+
+\newcommand{\lis}[3]{\begin{graph}[h!]
+    \centering
+    \caption{#2}
+    \includegraphics[#3]{#1}
+    \label{fig:graph}
+\end{graph}
+\par}
+
+\def\blankpage{%
+      \clearpage%
+      \thispagestyle{empty}%
+      \null%
+      \clearpage}
+
+\lstset{
+    basicstyle=\small\ttfamily, % Adjust the font size here
+   % framerule=0.5pt,
+}
+
+\newcommand{\newCharapter}[1]{\newpage \include{#1}}
+
+
+\begin{document}
+
+\counterwithin{figure}{section}
+\counterwithin{lstlisting}{section}
+\counterwithin{table}{section}
+
+\begin{titlepage}
+    \titlepagefont
+    \hspace*{-0.5cm}{\includegraphics[width=7cm]{img/title/weii-2.jpg}} \\
+    \vspace{4cm}
+    \break
+    \fontsize{1.4cm}{1.4cm}\titlepagefont {Praca dyplomowa} \\
+    \fontsize{1.4cm}{1.4cm}\titlepagefont {inżynierska} \\
+    \vspace{0.5cm}
+    \break
+    \normalsize{} na kierunku Informatyka \\
+    na specjalności Inżynieria oprogramowania \\
+    \vspace{1cm}
+    \break
+    \large
+    Aplikacja internetowa domu aukcyjnego z interaktywną wizualizacją obiektów 3D \\
+    \break
+    Auction house web application with interactive 3D object visualisation \\
+    \vspace{1.5cm}
+    \break
+    Konrad Tomasz Nowak \\
+    99640   \\[0.3cm]
+    Maciej Ołdakowski \\
+    99648   \\[0.3cm]
+    Patryk Kamil Nowacki \\
+    99638   \\[0.3cm]
+    \vspace{1.5cm}
+    \break
+    \normalsize{}
+    Promotor Dr Marcin Barszcz
+    \vspace*{\fill}
+    \begin{figure*}[bbp]
+        {\titlepagefont Lublin 2025}
+    \end{figure*}
+\end{titlepage}
+
+\onehalfspacing
+\blankpage
+
+\newCharapter{chapters/0abstract}
+\setcounter{figure}{0}
+\tableofcontents
+\newCharapter{chapters/1wstep}
+\setcounter{figure}{0}
+\newCharapter{chapters/2cel_zakres_pracy}
+\setcounter{figure}{0}
+\newCharapter{chapters/3analiza_rynku}
+\setcounter{figure}{0}
+\newCharapter{chapters/4technologie}
+\setcounter{figure}{0}
+\newCharapter{chapters/5projekt}
+% \setcounter{figure}{0}
+% \newCharapter{chapters/chapter6}
+% \setcounter{figure}{0}
+% \newCharapter{chapters/chapter7}
+% \setcounter{figure}{0}
+% \newCharapter{chapters/chapter8}
+
+\nocite{*}
+%\printbibliography[type=article,title={Źródła naukowe}]
+%\printbibliography[type=online,title={Źródła internetowe}]
+%\printbibliography[sorting=nyt, title={Bibliografia}]
+
+\end{document}

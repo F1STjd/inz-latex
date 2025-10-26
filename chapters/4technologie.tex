@@ -1,0 +1,53 @@
+\section{Użyte technologie i narzędzia}
+
+%–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+\subsection{Element renderujący}
+
+  \subsubsection{Język C++}
+  Wysokopoziomowy język programowania stworzony przez Bjarne Stroustrupa, jako dodatek do języka C. C++ jest szeroko używany w aplikacjach wymagających wysokiej wydajności, takich jak gry komputerowe, silniki gier komputerowych, aplikacje graficzne, aplikacje uczenia maszynowego i wiele innych, gdzie wydajność jest kluczowa. Perfekcyjnie wpasowuję się on w potrzebę stworzenia graficznego komponentu renderującego obiekty 3D.
+
+  W przedstawionym projekcie wykorzystywany jest C++ 23 (ISO/IEC 14882:2024), czyli aktualny otwarty standard języka. Ostateczna wersja dokumentu to N4950. Zawiera ona w sobie wiele nowych funkcji, oraz całą zawartość wcześniejszych standardów. 
+
+  \subsubsection{WebGPU}
+  Nowoczesny interfejs programowania aplikacji (API), który umożliwia wydajny dostęp do procesora graficznego (GPU) na różnych platformach. U podstawy działania wykorzystuje systemowe interfejsy: Vulkan, Metal, lub Direct3D 12. Zastępuje starszą technologię WebGL, jako nowy główny standard graficzny dla sieci.
+
+  \begin{komentarz}
+  \texttt{WebGPU} jest wspierane zarówno w Google Chrome, jak i Firefox. Mozilla używa własnej implementacji w języku Rust o nazwie \texttt{wgpu}. Google natomiast stworzyło \texttt{Dawn}, czyli implementację standardu \texttt{WebGPU} w Chromium za pomocą C++. 
+  \end{komentarz}
+  \todo[inline]{Komentarz: 
+  1. Czy należy zaznaczać nazwy bibliotek, czcionką monospace, tak jak powyżej? Jeżeli tak to czy tylko tych podrzędnych, skoro WebGPU jest główną technologią to zostawić Times New Roman?
+  2. Czy taka długość opisu wystarczy? Aktualnie jest krótki opis profilowany, aby nawiązywać do projektu.}
+ 
+  \subsubsection{WebGPU‑Cpp} 
+  Wrapper dla WebGPU napisany w C++, ponieważ obie implementacje udostępniają plik nagłówkowy w języku C z definicjami funkcji i struktur. Stworzony został przez użytkownika eliemichel i udostępniany jest na platformie Github.
+
+  \subsubsection{WebAssembly}
+  Otwarty standard, który definiuje przenośny format binarny i odpowiadający mu format tekstowy dla programów komputerowych. Głównym celem jest umożliwienie łatwiejszego tworzenia wielce wydajnych apliakcji w przeglądarkach na stronach internetowych. Jest niezależny od platformy oraz wspiera każdy język programowania. Kod wykonywany jest w wirtualnej maszynie stosowej.
+  
+  \subsubsection{Emscripten}
+  Całkowicie otwarty kompilator, który umożliwia kompilację kodu C i C++, lub innego języka używającego LLVM, do formatu WebAssembly. Emcc, czyli frontend kompilatora używa Clang, oraz LLVM. Pozwala on na bezproblemową konwersję praktycznie każdego projektu C i C++ do WebAssembly. Emscripten ma na koncie kilka udanych konwersji takich jak: Unreal Engine 4, Quake 3, czy Doom 3, wszystkie działające w przeglądarce.
+
+  \subsubsection{WGSL (WebGPU Shading Language)}
+  \begin{komentarz}
+  Wysokopoziomowy język shaderów dla WebGPU. Umożliwia on tworzenie shaderów, czyli programów wykonywanych na procesorze graficznym. Został stworzony przez W3C GPU for the Web Community Group, aby zapewnić nowoczesny, bezpieczny i przenośny sposób pisania shaderów dla WebGPU.
+  \end{komentarz}
+  \todo[inline]{Komentarz: 1. Czy tłumaczenie shading language jest poprawne? Nigdzie nie znalazłem innego, a język cieniowania brzmi groteskowo. 2. Ciężko jest więcej napisać bez potrzeby wyjaśniania kolejnych sformułowań, jak: możliwość kompilacji do SPIR-V}
+
+  \subsubsection{CMake}
+  Narzędzie do zarządzania budowaniem kodu źródłowego. Zdejmuje z użytkownika konieczkość pisania skomplikowanych plików potrzebnych systemom budowania. Jest szeroko używany w projektach C i C++.
+
+  \subsubsection{Ninja}
+  Lekki system budowania, skupiający się na szybkości. Jest zaprojektowany, aby pliki wejściowe były generowanie przez inne wysokopoziomowe narzędzie. Używany do budowania Google Chrome, czy części systemu Android.
+
+  \subsubsection{Biblioteki C++}
+    \paragraph{GLFW} Napisana w C wieloplatformowa biblioteka do tworzenia okien aplikacji używających OpenGL, OpenGL ES i Vulkan.
+    \paragraph{GLM (OpenGL Mathematics)} Napisana w C++ biblioteka matematyczna przeznaczona dla oprogramowania graficznego opartego na specyfikacjach języka OpenGL Shading Language (GLSL). Biblioteka ta doskonale współpracuje z OpenGL, ale zapewnia kompatybilność z innymi bibliotekami i zestawami SDK innych producentów. 
+    \paragraph{stb\_image} Biblioteka dla C/C++ umożliwiająca załadowywanie obrazów w różnych formatach, takich jak: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
+    \paragraph{tinyobjloader} Napisana w C++ biblioteka umożliwiająca załadowywanie modeli 3D w formacie OBJ stworzonym przez Wavefront Technologies.
+    \paragraph{Dear ImGui} Napisana w C++ biblioteka umożliwiająca tworzenie lekkich interfejsów graficznych z minimalnymi zależnościami.
+
+%–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+\subsection{System aukcyjny}
+
+  \tcbox{\dots}
+  \todo[inline]{Komentarz: Uzupełnione po implementacji}
