@@ -1,0 +1,63 @@
+# LaTeX intermediate and build files
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.synctex.gz
+*.fdb_latexmk
+*.bcf
+*.run.xml
+*.lof
+*.lot
+*.lol
+*.ilg
+*.ind
+*.idx
+*.maf
+*.mtc*
+*.mtc0
+
+# LaTeXmk / build directories
+_minted-*/
+_minted*/
+build/
+out/
+latex_build/
+tmp/
+
+# Optional: generated PDF (uncomment if you don't want PDFs in the repo)
+# *.pdf
+
+# Auxiliary and backup files
+*~
+*.bak
+*.swp
+*.lock
+*.orig
+*.rej
+.#*
+# Emacs/Vim temporary files
+.*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor directories and files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Other build or log files
+latexmk.log
+*.fls
+
+# Ensure we track bibliography source files; do NOT ignore .bib files
+# (keep your .bib files under version control)
