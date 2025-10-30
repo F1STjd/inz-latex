@@ -48,6 +48,9 @@
 \setlength{\marginparwidth}{2cm} % Fix todonotes margin warning
 \usepackage{todonotes}
 
+% justified
+% \usepackage[final]{microtype}
+
 \tcbset{
   colframe=red, % Color of the frame
   colback=white, % Background color
@@ -140,6 +143,8 @@
 
 
 \begin{document}
+\pagenumbering{gobble} % no page numbers before TOC
+
 
 \counterwithin{figure}{section}
 \counterwithin{lstlisting}{section}
@@ -185,6 +190,10 @@
 
 \newCharapter{chapters/0abstract}
 \setcounter{figure}{0}
+
+\clearpage
+\pagenumbering{arabic} % start numbering
+\setcounter{page}{1}   % make TOC page number 1
 \tableofcontents
 \newCharapter{chapters/1wstep}
 \setcounter{figure}{0}
