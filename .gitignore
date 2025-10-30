@@ -22,6 +22,8 @@
 *.maf
 *.mtc*
 *.mtc0
+*.log
+*.gz
 
 # LaTeXmk / build directories
 _minted-*/
