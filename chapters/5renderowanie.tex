@@ -1,0 +1,12 @@
+\section{Wprowadzenie do renderowania 3D}
+
+Rozpoczynając pracę z zaawansowanymi technikami renderowania 3D w C++, do wyboru są trzy główne biblioteki, które pozwalają na niskopoziomową komunikację z procesorem graficznym: Vulkan, Direct3D 12 oraz Metal. Tylko Vulkan pozwala pisać kod działający na różnych platformach. DirectX jest dostępny wyłącznie na systemie Windows, natomiast Metal jest specyficzny dla ekosystemu Apple. Jednak kod napisany z użyciem tych bibliotek nie może być bezpośrednio uruchomiony w przeglądarce internetowej.
+
+W 2016 roku firma Google zaproponowała stworzenie nowego standardu pozwalającego na komunikację z procesorem graficznym z poziomu przeglądarki internetowej. Miał być to następca WebGL, pozwalający na bardziej efektywne wykorzystanie nowoczesnych kart graficznych. W 2021 roku została opublikowana pierwsza oficjalna specyfikacja pod nazwą WebGPU. Aktualnie na koniec roku 2025 w dalszym ciągu jest to rekomendacja, a nie oficjalny standard W3C. WebGPU jest już wspierane przez większość nowoczesnych przeglądarek internetowych, w tym Google Chrome, Microsoft Edge, Mozilla Firefox oraz Safari. Implementacja WebGPU spaja ze sobą ww. trzy biblioteki, tworząc zunifikowany interfejs umożliwiający pisanie przenośnego kodu renderującego 3D.
+
+Istnieją dwie możliwości korzystania z WebGPU w aplikacjach webowych. Pierwsza z nich to użycie języka programowania JavaScript, które są natywnie obsługiwane przez przeglądarki internetowe. Druga możliwość to skorzystanie z interfejsu w języku C udostępnianego przez dwie istniejące implementacje:
+\begin{itemize}
+    \item \textbf{Dawn} – implementacja stworzona przez firmę Google, przy pomocy języka C++.
+    \item \textbf{wgpu} – implementacja stworzona przez firmę Mozilla, przy pomocy języka Rust.
+\end{itemize}
+Następnie napisany kod należy skompilować do formatu WebAssembly. Zaletą tego podejścia jest niemalże porównywalna wydajność aplikacji z wersją natywną, gdyż kod WebAssembly jest uruchamiany bezpośrednio przez silnik przeglądarki, a nie interpretowany jak w przypadku języka JavaScript. Ponadto istniejący już kod można skompilować także do typowego dla systemu operacyjnego formatu wykonywalnego, co pozwala na uruchomienie aplikacji zarówno w przeglądarce internetowej, jak i natywnie na komputerze.
