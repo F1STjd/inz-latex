@@ -136,8 +136,11 @@
 
 \lstset{
     basicstyle=\small\ttfamily, % Adjust the font size here
+    literate={\ }{{\copyablespace}}1, % Fix spaces in strings
    % framerule=0.5pt,
 }
+
+\newcommand{\copyablespace}{\ }
 
 \newcommand{\newCharapter}[1]{\newpage \include{#1}}
 
@@ -204,6 +207,8 @@
 \newCharapter{chapters/4technologie}
 \setcounter{figure}{0}
 \newCharapter{chapters/5renderowanie}
+\setcounter{figure}{0}
+\newCharapter{chapters/6renderowanie_implementacja}
 %\setcounter{figure}{0}
 %\newCharapter{chapters/5projekt}
 % \setcounter{figure}{0}

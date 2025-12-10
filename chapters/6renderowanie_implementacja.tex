@@ -1,0 +1,135 @@
+\section{Implementacja komponentu renderującego}
+% https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/n4950.pdf s. 745
+Implementację można podzielić w logiczny sposób na trzy główne etapy: inicializacja okna, inicializajcja WebGPU, oraz pętla główna aplikacji. Etapy inicjalizacji muszą być wykonywane w określonej kolejności, dlatego naturalnie układają się w potok. Jednak inaczej niż w typowym potoku zamiast przekazywać między etapami dane, będziemy przekazywać dostarczony przez standard C++ obiekt \texttt{std::expected<void, std::string>}, symbolizujący stan wykonania poprzedniego etapu: sukces, lub błąd. Następnie etapy zostaną połączone dzięki operacjom na monadach, znanych z programowania funkcyjnego.
+
+\begin{lstlisting}[language=C++, caption={Funkcja inicjalizująca komponent renderujący}, label={lst:initialize}]
+void
+initialize()
+{
+  auto result = init_window()
+    .and_then([ this ]() { return init_renderer(); })
+  
+  if (!result.has_value())
+  {
+    std::println(std::cerr, "Error occured:\n{}", result.error());
+    std::exit(1);
+  }
+}
+\end{lstlisting}
+
+\subsection{Okno apliakcji}
+Pierwszym etapem jest utworzenie okna aplikacji, w którym będzie wyświetlany renderowany obraz. W tym celu wykorzystano bibliotekę GLFW, która umożliwia tworzenie okien oraz obsługę zdarzeń wejściowych w sposób niezależny od platformy. Proces inicjalizacji okna obejmuje inicializację biblioteki, oraz stworzenie okna. Wskaźnik na utworzone okno jest zapisywany w klasie głównej aplikacji.
+\begin{lstlisting}[language=C++, caption={Część kodu odpowiedzialna za inicializację okna}, label={lst:init_window}]
+auto
+init_window() -> std::expected<void, std::string>
+{
+  if (glfwInit() == GLFW_FALSE)
+  {
+    return std::unexpected { "Failed to initialize GLFW" };
+  }
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+  p_window =
+    glfwCreateWindow(
+        initial_width, initial_height, 
+        "INZ", nullptr, nullptr);
+  if (p_window == nullptr)
+  {
+    return std::unexpected { "Failed to create window" };
+  }
+  glfwSetWindowUserPointer(p_window, this);
+  
+  // ...
+}
+\end{lstlisting}
+Dodatkowo zainicializowane zostały funkcje obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
+\begin{lstlisting}[language=C++, caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
+auto init_window() -> std::expected<void, std::string>
+{
+  // ...
+  
+  glfwSetCursorPosCallback(
+    p_window,
+    [](GLFWwindow* window, double x_pos, double y_pos)
+    {
+      if (
+        auto* app = 
+            reinterpret_cast<application*>(
+                glfwGetWindowUserPointer(window)); 
+        app != nullptr)
+      {
+        app->cursor_position_callback(x_pos, y_pos);
+      }
+    });
+  
+  // ...
+}
+\end{lstlisting}
+
+\subsection{WebGPU}
+Inicjalizacja WebGPU składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. Poniżej przedstawiono poszczególne kroki wraz z opisem ich funkcji.
+%init_renderer()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Adapter}
+%https://www.w3.org/TR/webgpu/#adapters
+Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje.
+%kod init_adapter()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Device}
+%https://www.w3.org/TR/webgpu/#devices
+Device to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących. W tym kroku aplikacja tworzy obiekt Device, który będzie używany do komunikacji z procesorem graifcznym.
+%kod init_device()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Command queue}
+%https://eliemichel.github.io/LearnWebGPU/next/getting-started/the-command-queue.html
+Skoro Device jest już utworzony, należy teraz stworzyć kolejkę poleceń (Command queue). Dzięki niej kod aplikacji wykonywany na CPU może wysyłać polecenia do GPU w sposób asynchroniczny. W tym kroku aplikacja tworzy obiekt Command queue.
+%kod init_queue()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Shader module}
+Podczas tego kroku aplikacja ładuje i kompiluje shadery, które będą używane w trakcie potoku renderującego. Shadery są napisane w języku WGSL i definiują sposób przetwarzania wierzchołków oraz obliczania koloru pikseli.
+%kode init_shader_module()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Depth texture}
+Jest to specjalny obiekt do przechowywania informacji o głębi sceny 3D. W tym kroku aplikacja tworzy teksturę głębi, która będzie używana do testów głębi podczas potoku renderującego.
+%kod init_depth_texture()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Bind group layout}
+%https://www.w3.org/TR/webgpu/#gpubindgrouplayout
+Bind group layout definiuje interfejs między zbiorem zasobów powiązanych w bind group (tworzony na końcu) a ich dostępnością w etapach shadera. Definiowane są tutaj typy zasobów, ich widoczność w poszczególnych shaderach.
+%kod init_bind_group_layout()
+\begin{lstlisting}[language=C++, caption={}, label={}]
+\end{lstlisting}
+
+\subsubsection{Pipeline}
+%https://www.w3.org/TR/webgpu/#gpurenderpipeline
+Głównym elementem procesu renderującego jest potok renderujący (Render Pipeline). W tym kroku aplikacja tworzy obiekt Pipeline, który definiuje wszystkie etapy przetwarzania danych. Korzystając z oficjalnego standardu WebGPU, można wyszczególnić następujące etapy etapy potoku renderującego:
+\begin{enumerate}
+    \item Vertex fetch                  % Pobieranie wierzchołków
+    \item Vertex shader                 % =
+    \item Primitive assembly            % Prymitywny Assembly
+    \item Rasterization                 % Rasteryzacja
+    \item Fragment shader               % =  
+    \item Stencil test and operation    % ???
+    \item Depth test and write          % Test głębi i zapis??? 
+    \item Output merging                % Scalanie przetworzonych danych
+\end{enumerate}
+\subsubsection{Sampler}
+\subsubsection{Textures}
+\subsubsection{Geometry}
+\subsubsection{Uniforms}
+\subsubsection{Lighting uniforms}
+\subsubsection{Bind group}
+
+\subsection{Pętla główna}
