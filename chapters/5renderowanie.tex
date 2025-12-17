@@ -12,9 +12,58 @@ Istnieją dwie możliwości korzystania z WebGPU w aplikacjach webowych. Pierwsz
 Następnie napisany kod należy skompilować do formatu WebAssembly. Zaletą tego podejścia jest niemalże porównywalna wydajność aplikacji z wersją natywną, gdyż kod WebAssembly jest uruchamiany bezpośrednio przez silnik przeglądarki, a nie interpretowany jak w przypadku języka JavaScript. Ponadto istniejący już kod można skompilować także do typowego dla systemu operacyjnego formatu wykonywalnego, co pozwala na uruchomienie aplikacji zarówno w przeglądarce internetowej, jak i natywnie na komputerze.
 
 \subsection{WebGPU}
-Najważniejsze w procesie renderowania jest przetworzenie danych przez potok renderujący, przy użyciu procesora graficznego. Komunikacja z procesorem graficznym za pomocą WebGPU odbywa się na dwa sposoby. Pierwszy z nich odbywa się za pomocą obiektów reprezentujących wewnętrzne zasoby GPU. Programista ma niewielki wpływ na ich działanie, jedynie jest w stanie wybrać konkretne, wcześniej zdefiniowane ustawienia, które są zawarte w specjalnych strukturach zwanych deskryptorami. Po zakończeniu działania, zasoby te należy manualnie zwolnić, aby zapobiec wyciekom pamięci. \[zdjecie Przykladowego Deskryptora\]
+Najważniejsze w procesie renderowania jest przetworzenie danych przez potok renderujący, przy użyciu procesora graficznego. Komunikacja z procesorem graficznym za pomocą WebGPU odbywa się na dwa sposoby. Pierwszy z nich odbywa się za pomocą obiektów reprezentujących wewnętrzne zasoby GPU. Programista ma niewielki wpływ na ich działanie, jedynie jest w stanie wybrać konkretne, wcześniej zdefiniowane ustawienia, które są zawarte w specjalnych strukturach zwanych deskryptorami. Po zakończeniu działania, zasoby te należy manualnie zwolnić, aby zapobiec wyciekom pamięci.
+\begin{lstlisting}[caption=Przykład deskrytora obiektu sampler, label=lst:webgpu_sampler]
+{
+    // ...
+
+    wgpu::SamplerDescriptor sampler_descriptor {};
+    sampler_descriptor.addressModeU = wgpu::AddressMode::Repeat;
+    sampler_descriptor.addressModeV = wgpu::AddressMode::Repeat;
+    sampler_descriptor.addressModeW = wgpu::AddressMode::Repeat;
+    sampler_descriptor.magFilter = wgpu::FilterMode::Linear;
+    sampler_descriptor.minFilter = wgpu::FilterMode::Linear;
+    sampler_descriptor.mipmapFilter = 
+        wgpu::MipmapFilterMode::Nearest;
+    sampler_descriptor.lodMinClamp = 0.0F;
+    sampler_descriptor.lodMaxClamp = 8.0F;
+    sampler_descriptor.compare = 
+        wgpu::CompareFunction::Undefined;
+    sampler_descriptor.maxAnisotropy = 1U;
+
+    // ...
+}
+\end{lstlisting}
 Drugim sposobem są shadery, czyli programy wykonywane bezpośrednio na procesorze graficznym. Shadery są napisane w specjalnych językach, dla WebGPU jest to WGSL (WebGPU Shading Language). Niezbędne dla prawidłowego działania potoku renderującego są dwa shadery: vertex shader oraz fragment shader. Vertex shader przetwarza dane wierzchołków, takie jak pozycja, kolor czy współrzędne tekstury. Fragment shader natomiast oblicza kolor każdego piksela na podstawie danych przekazanych z vertex shadera oraz dodatkowych informacji, takich jak oświetlenie czy tekstury.
-\[zdjecie Przykladowego Shadera\]
+\begin{lstlisting}[style=wgsl,caption=Przykład prostego vertex shadera w WGSL, label=lst:wgsl_vertex_shader]
+@vertex
+fn vs_main(in: vertex_input) -> vertex_output 
+{
+    var out: vertex_output;
+    let world_position = 
+        u_my_uniforms.model_matrix * 
+        vec4f(in.position, 1.0); 
+	out.position = 
+        u_my_uniforms.projection_matrix * 
+        u_my_uniforms.view_matrix * 
+        world_position;
+    out.tangent = 
+        (u_my_uniforms.model_matrix * 
+        vec4f(in.tangent, 0.0)).xyz;
+    out.bitangent = 
+        (u_my_uniforms.model_matrix * 
+        vec4f(in.bitangent, 0.0)).xyz;
+    out.normal = 
+        (u_my_uniforms.model_matrix * 
+        vec4f(in.normal, 0.0)).xyz;
+    out.color = in.color;
+	out.uv = in.uv;
+    out.view_direction = 
+        u_my_uniforms.camera_world_position - 
+        world_position.xyz;
+    return out;
+}
+\end{lstlisting}
 
 \subsection{WebAssembly}
 %caniuse.com/wasm

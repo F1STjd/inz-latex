@@ -1,0 +1,37 @@
+\section{Implementacja wyglądu serwisu aukcyjnego}
+
+\subsection{Koncepcja interfejsu użytkownika}
+
+Frontend aplikacji został zaprojektowany z myślą o nowoczesnym, minimalistycznym designie, który kładzie nacisk na prezentację wizualizacji 3D oferowanych obiektów. Interfejs wykorzystuje technologie React oraz Tailwind CSS, co pozwoliło na stworzenie responsywnego i intuicyjnego środowiska aukcyjnego z płynną nawigacją oraz estetycznym układem elementów.
+
+\subsection{Prezentacja poszczególnych widoków}
+
+\subsubsection{Strona główna}
+
+Strona główna została zaprojektowana jako wizytówka całej platformy, z charakterystycznym hero section prezentującym główną wartość aplikacji - możliwość przeglądania aukcji z wizualizacją 3D. W centralnej części ekranu znajduje się transparentny panel z nagłówkiem \enquote{Przyszłość aukcji z wizualizacją 3D} oraz krótkim opisem: \enquote{Odkryj unikalne przedmioty artystyczne w innowacyjny sposób. Zobacz aukcje z wizualizacją 3D zamiast zwykłych zdjęć.}
+
+\image{img/front/main-page.png}{Widok strony głównej aplikacji AuctionHub}
+
+Kluczowym elementem designu jest umieszczenie interaktywnego modelu 3D bezpośrednio na stronie głównej, co natychmiast komunikuje użytkownikowi unikalną funkcjonalność platformy. Panel zawiera dwa przyciski: \enquote{Przeglądaj aukcje} oraz \enquote{Zobacz demo 3D}, co pozwala użytkownikom od razu zaangażować się w eksplorację platformy.
+
+Poniżej hero section znajduje się sekcja \enquote{Aukcje na żywo} z aktualnie trwającymi licytacjami. Wykorzystano tutaj system kart z wizualizacjami 3D aukcji. Każda karta zawiera miniaturę wizualizacji, tytuł aukcji oraz krótki opis. Sekcja posiada również czerwony badge \enquote{Na żywo} z licznikiem aktywnych aukcji oraz link \enquote{Zobacz wszystkie} dla pełnego dostępu do ofert.
+
+Tło strony wykorzystuje delikatną teksturę marmuru w odcieniach szarości, co nadaje platformie elegancki, luksusowy charakter odpowiedni dla aukcji przedmiotów artystycznych.
+
+\subsubsection{Strona szczegółów aukcji}
+
+Widok szczegółowy aukcji dzieli ekran na dwie główne sekcje. Po lewej stronie znajduje się duży panel z wizualizacją 3D obiektu. Prawa kolumna zawiera pełne informacje o aukcji. Pod panelem wizualizacji znajdują się dwie sekcje informacyjne.
+
+\image{img/front/licytacja.png}{Widok szczegółów aukcji z wizualizacją 3D}
+
+\subsubsection{System nawigacji}
+
+Oba widoki zawierają identyczny, minimalistyczny pasek nawigacji z logo \enquote{AuctionHub} po lewej stronie oraz menu zawierające linki: \enquote{Strona Główna}, \enquote{Aukcje na żywo}, \enquote{Przeglądanie 3D}, \enquote{Kategorie}, \enquote{Domy Aukcyjne}. Po prawej stronie paska znajdują się przyciski \enquote{Zaloguj się} oraz wyróżniony przycisk \enquote{Zarejestruj się}.
+
+\subsubsection{Strony logowania i rejestracji}
+
+Aplikacja zawiera również dedykowane widoki do autoryzacji użytkowników. Strony logowania i rejestracji utrzymane są w spójnej stylistyce z resztą aplikacji, wykorzystując to samo tło marmurowe oraz transparentne panele formularzy. Formularze zawierają standardowe pola (email, hasło) oraz przyciski akcji w charakterystycznym niebieskim kolorze. Design tych stron jest minimalistyczny i skupiony na funkcjonalności, zapewniając użytkownikom szybki i bezproblemowy proces uwierzytelnienia.
+
+\image{img/front/login.png}{Widok strony logowania}
+
+\image{img/front/register.png}{Widok strony rejestracji}

@@ -134,10 +134,127 @@
       \null%
       \clearpage}
 
-\lstset{
-    basicstyle=\small\ttfamily, % Adjust the font size here
-    literate={\ }{{\copyablespace}}1, % Fix spaces in strings
-   % framerule=0.5pt,
+% Konfiguracja syntax highlighting dla C++
+\lstdefinestyle{cpp}{
+    language=C++,
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{orange!80!black},
+    numberstyle=\tiny\color{gray},
+    % Dodatkowe słowa kluczowe C++20/23
+    morekeywords={auto, nullptr, constexpr, noexcept, override, final, 
+                  concept, requires, co_await, co_return, co_yield,
+                  std, wgpu, glm, glfwInit, glfwCreateWindow},
+    % Typy z bibliotek
+    emph={expected, unexpected, string, vector, array, mat4x4, vec3, vec4,
+          Instance, Surface, Adapter, Device, Queue, ShaderModule,
+          Texture, TextureView, Sampler, Buffer, BindGroup, BindGroupLayout,
+          RenderPipeline, RenderPipelineDescriptor, BufferDescriptor,
+          SamplerDescriptor, DepthStencilState, FragmentState, BlendState,
+          ColorTargetState, DeviceDescriptor, RequestAdapterOptions,
+          TextureFormat, AddressMode, FilterMode, MipmapFilterMode,
+          CompareFunction, BufferUsage, GLFWwindow, filesystem, path},
+    emphstyle=\color{teal},
+    % Formatowanie
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{gray!50},
+    backgroundcolor=\color{gray!5},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+    showstringspaces=false,
+    captionpos=b,
+    aboveskip=10pt,
+    belowskip=10pt,
+    xleftmargin=15pt,
+    framexleftmargin=15pt,
+    % Obsługa UTF-8
+    literate={::}{{\textcolor{blue}{::}}}2
+             {->}{{\textcolor{blue}{->}}}2
+             {=>}{{\textcolor{blue}{=>}}}2
+             {<<}{{\textcolor{blue}{<<}}}2
+             {>>}{{\textcolor{blue}{>>}}}2
+             {&&}{{\textcolor{blue}{\&\&}}}2
+             {||}{{\textcolor{blue}{||}}}2
+             {!=}{{\textcolor{blue}{!=}}}2
+             {==}{{\textcolor{blue}{==}}}2
+             {<=}{{\textcolor{blue}{<=}}}2
+             {>=}{{\textcolor{blue}{>=}}}2
+             {\ }{{\copyablespace}}1,
+}
+
+\lstset{style=cpp}
+
+% Konfiguracja syntax highlighting dla WGSL
+\lstdefinestyle{wgsl}{
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{orange!80!black},
+    numberstyle=\tiny\color{gray},
+    % Słowa kluczowe WGSL
+    morekeywords={fn, var, let, const, struct, return, if, else, for, while, loop, break, continue,
+                  @vertex, @fragment, @compute, @binding, @group, @location, @builtin,
+                  @size, @align, @interpolate, @invariant,
+                  true, false, discard},
+    % Typy danych WGSL
+    emph={bool, i32, u32, f32, f16,
+          vec2f, vec3f, vec4f, vec2i, vec3i, vec4i, vec2u, vec3u, vec4u,
+          vec2h, vec3h, vec4h, vec2, vec3, vec4,
+          mat2x2f, mat2x3f, mat2x4f, mat3x2f, mat3x3f, mat3x4f, mat4x2f, mat4x3f, mat4x4f,
+          mat2x2, mat2x3, mat2x4, mat3x2, mat3x3, mat3x4, mat4x2, mat4x3, mat4x4,
+          texture_1d, texture_2d, texture_2d_array, texture_3d, texture_cube, texture_cube_array,
+          texture_multisampled_2d, texture_depth_2d, texture_depth_2d_array, texture_depth_cube,
+          texture_depth_cube_array, texture_depth_multisampled_2d, texture_storage_1d,
+          texture_storage_2d, texture_storage_2d_array, texture_storage_3d,
+          sampler, sampler_comparison, array, ptr, atomic},
+    emphstyle=\color{teal},
+    % Wbudowane funkcje
+    emph={[2]abs, acos, acosh, all, any, arrayLength, asin, asinh, atan, atan2, atanh,
+          ceil, clamp, cos, cosh, cross, degrees, determinant, distance, dot, exp, exp2,
+          faceForward, floor, fma, fract, frexp, inverseSqrt, ldexp, length, log, log2,
+          max, min, mix, modf, normalize, pow, radians, reflect, refract, reverseBits,
+          round, saturate, sign, sin, sinh, smoothstep, sqrt, step, tan, tanh, transpose,
+          trunc, dpdx, dpdxCoarse, dpdxFine, dpdy, dpdyCoarse, dpdyFine, fwidth,
+          fwidthCoarse, fwidthFine, textureSample, textureSampleBias, textureSampleCompare,
+          textureSampleGrad, textureSampleLevel, textureLoad, textureStore, textureDimensions,
+          textureNumLayers, textureNumLevels, textureNumSamples, atomicLoad, atomicStore,
+          atomicAdd, atomicSub, atomicMax, atomicMin, atomicAnd, atomicOr, atomicXor,
+          atomicExchange, atomicCompareExchangeWeak, pack4x8snorm, pack4x8unorm,
+          pack2x16snorm, pack2x16unorm, pack2x16float, unpack4x8snorm, unpack4x8unorm,
+          unpack2x16snorm, unpack2x16unorm, unpack2x16float, storageBarrier, workgroupBarrier},
+    emphstyle={[2]\color{purple}},
+    % Formatowanie
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{gray!50},
+    backgroundcolor=\color{gray!5},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+    showstringspaces=false,
+    captionpos=b,
+    aboveskip=10pt,
+    belowskip=10pt,
+    xleftmargin=15pt,
+    framexleftmargin=15pt,
+    % Operatory
+    literate={->}{{\textcolor{blue}{->}}}2
+             {=>}{{\textcolor{blue}{=>}}}2
+             {@}{{\textcolor{red}{@}}}1
+             {&&}{{\textcolor{blue}{\&\&}}}2
+             {||}{{\textcolor{blue}{||}}}2
+             {!=}{{\textcolor{blue}{!=}}}2
+             {==}{{\textcolor{blue}{==}}}2
+             {<=}{{\textcolor{blue}{<=}}}2
+             {>=}{{\textcolor{blue}{>=}}}2
+             {\ }{{\copyablespace}}1,
 }
 
 \newcommand{\copyablespace}{\ }
@@ -191,8 +308,8 @@
 \onehalfspacing
 \blankpage
 
-\newCharapter{chapters/0abstract}
-\setcounter{figure}{0}
+%\newCharapter{chapters/0abstract}
+%\setcounter{figure}{0}
 
 \clearpage
 \pagenumbering{arabic} % start numbering
@@ -209,6 +326,10 @@
 \newCharapter{chapters/5renderowanie}
 \setcounter{figure}{0}
 \newCharapter{chapters/6renderowanie_implementacja}
+\setcounter{figure}{0}
+\newCharapter{chapters/7frontend}
+\setcounter{figure}{0}
+\newCharapter{chapters/8backend}
 %\setcounter{figure}{0}
 %\newCharapter{chapters/5projekt}
 % \setcounter{figure}{0}

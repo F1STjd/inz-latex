@@ -1,0 +1,221 @@
+\section{Implementacja Bazy Danych oraz Logiki Biznesowej}
+
+\subsection{Model Aukcji (Auction)}
+
+Model Auction stanowi rdzeń systemu aukcyjnego i zawiera logikę biznesową związaną z zarządzaniem aukcjami.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole} & \textbf{Typ}  & \textbf{Opis}                                                                                                                                                 \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole} & \textbf{Typ}  & \textbf{Opis}                                                                                                                                                 \\ \hline
+  \endhead
+
+  title         & String        & Tytuł aukcji (3-100 znaków, wymagane)                                                                                                                         \\ \hline
+  description   & String        & Opis aukcji (10-5000 znaków, wymagane)                                                                                                                        \\ \hline
+  category      & Enum          & 12 kategorii: Sztuka, Antyki, Biżuteria, Monety i Banknoty, Książki, Militaria, Meble, Porcelana i Ceramika, Zegarki, Instrumenty Muzyczne, Elektronika, Inne \\ \hline
+  images        & Array[String] & Tablica URLi obrazów                                                                                                                                          \\ \hline
+  model3D       & String        & Opcjonalny model 3D (formaty: .obj, .gltf, .glb, .fbx)                                                                                                        \\ \hline
+  startingPrice & Number        & Cena wywoławcza (wymagana, $\geq 0$)                                                                                                                          \\ \hline
+  currentPrice  & Number        & Aktualna cena aukcji                                                                                                                                          \\ \hline
+  bidIncrement  & Number        & Minimalne podwyższenie (domyślnie: 100)                                                                                                                       \\ \hline
+  buyNowPrice   & Number        & Opcjonalna cena \enquote{Kup Teraz}                                                                                                                           \\ \hline
+  seller        & ObjectId      & Referencja do modelu User (wymagane, indeksowane)                                                                                                             \\ \hline
+  startTime     & Date          & Data rozpoczęcia aukcji                                                                                                                                       \\ \hline
+  endTime       & Date          & Data zakończenia aukcji                                                                                                                                       \\ \hline
+  status        & Enum          & Status: draft, active, completed, cancelled                                                                                                                   \\ \hline
+  winnerId      & ObjectId      & Zwycięzca aukcji (referencja do User)                                                                                                                         \\ \hline
+  condition     & Enum          & Stan przedmiotu: Nowy, Bardzo dobry, Dobry, Zadowalający, Do renowacji                                                                                        \\ \hline
+  timestamps    & Date          & Automatyczne pola: createdAt, updatedAt                                                                                                                       \\ \hline
+\end{longtable}
+
+Model zawiera również pola pomocnicze: \texttt{totalBids}, \texttt{watchers}, \texttt{watchersCount}, \texttt{views}, \texttt{featured}, \texttt{isDeleted}.
+
+\paragraph{Indeksy Bazy Danych}
+
+System wykorzystuje \textbf{9 strategicznych indeksów} dla optymalizacji zapytań, w tym indeksy złożone (\texttt{seller + status}, \texttt{endTime + status}, \texttt{category + status}) oraz indeks tekstowy na polach \texttt{title + description} dla full-text search.
+
+\paragraph{Kluczowe metody}
+
+\begin{itemize}
+  \item \textbf{placeBid(bidderId, amount)} --- główna metoda biznesowa do składania licytacji. Waliduje status aukcji, czas, własność i minimalną kwotę. Aktualizuje \texttt{currentPrice}, \texttt{winnerId} oraz \texttt{totalBids}.
+  \item \textbf{complete()} --- zamyka aukcję, ustawia zwycięzcę i aktualizuje statystyki użytkowników.
+  \item \textbf{closeExpiredAuctions()} --- metoda statyczna batch processing do automatycznego zamykania wygasłych aukcji, kompatybilna z cron jobs.
+\end{itemize}
+
+Pozostałe metody (\texttt{cancel}, \texttt{softDelete}, \texttt{addWatcher/removeWatcher}, \texttt{incrementViews}) działają analogicznie --- modyfikują odpowiednie pola modelu z walidacją.
+
+\subsection{Model Licytacji (Bid)}
+
+Model Bid reprezentuje pojedynczą licytację w systemie.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                 \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                 \\ \hline
+  \endhead
+
+  auction       & ObjectId     & Referencja do Auction (wymagane, indeksowane) \\ \hline
+  bidder        & ObjectId     & Referencja do User (wymagane, indeksowane)    \\ \hline
+  amount        & Number       & Kwota licytacji (wymagane, $\geq 0$)          \\ \hline
+  isWinning     & Boolean      & Czy to aktualnie wygrywająca licytacja        \\ \hline
+  status        & Enum         & Status: active, outbid, won, lost, cancelled  \\ \hline
+\end{longtable}
+
+\paragraph{Kluczowe metody}
+
+\begin{itemize}
+  \item \textbf{markLostBids(auctionId, winnerId)} --- batch update oznaczający wszystkie licytacje (oprócz zwycięskiej) jako przegrane po zakończeniu aukcji.
+  \item \textbf{getAuctionBids/getUserBids} --- metody pobierające historię licytacji z paginacją i filtrowaniem. Działają analogicznie dla aukcji i użytkownika.
+\end{itemize}
+
+\subsection{Model Użytkownika (User)}
+
+Model User zawiera dane użytkownika oraz system autentykacji.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
+  \endhead
+
+  username      & String       & Nazwa użytkownika (unikalne)                                                        \\ \hline
+  email         & String       & Adres email (unikalne)                                                              \\ \hline
+  password      & String       & Hasło (bcrypt hash)                                                                 \\ \hline
+  role          & Enum         & Rola: user, admin                                                                   \\ \hline
+  isActive      & Boolean      & Czy konto jest aktywne                                                              \\ \hline
+  stats         & Object       & Statystyki: totalAuctionsCreated, totalAuctionsWon, totalBidsPlaced, totalItemsSold \\ \hline
+\end{longtable}
+
+Model zawiera również pola profilu (\texttt{firstName}, \texttt{lastName}, \texttt{phone}, \texttt{avatar}, \texttt{address}) oraz tokeny autentykacji.
+
+\paragraph{Zabezpieczenia}
+
+\begin{itemize}
+  \item Hasło hashowane przez \textbf{bcrypt} (cost factor: 12)
+  \item Pole \texttt{password} wyłączone z domyślnych queries
+  \item JWT token z 7-dniowym czasem wygaśnięcia
+\end{itemize}
+
+\subsection{Strategia Walidacji}
+
+System implementuje \textbf{wielopoziomową walidację}:
+
+\begin{enumerate}
+  \item \textbf{Schema (Mongoose)} --- typy danych, wymagalność pól, ograniczenia długości, wartości enum
+  \item \textbf{Model (Business Logic)} --- metody instancji, middleware hooks, warunki złożone
+  \item \textbf{Kontroler (Authorization)} --- weryfikacja własności zasobów, sprawdzanie ról
+\end{enumerate}
+
+\subsection{Relacje między modelami}
+
+\begin{itemize}
+  \item \textbf{User $\rightarrow$ Auction} (1:N) --- pole \texttt{seller}
+  \item \textbf{User $\rightarrow$ Bid} (1:N) --- pole \texttt{bidder}
+  \item \textbf{Auction $\rightarrow$ Bid} (1:N) --- pole \texttt{auction}
+  \item \textbf{Auction $\leftrightarrow$ User} (N:M) --- tablica \texttt{watchers}
+\end{itemize}
+
+\newpage
+
+\subsection{Implementacja REST API}
+
+API implementuje standardy \textbf{RESTful}: GET (pobieranie), POST (tworzenie), PATCH (aktualizacja), DELETE (usuwanie).
+
+\subsubsection{Middleware Autentykacji}
+
+\begin{itemize}
+  \item \textbf{protect} --- ekstrakcja i weryfikacja JWT z nagłówka \texttt{Authorization: Bearer <token>}, pobranie użytkownika z bazy, sprawdzenie aktywności konta
+  \item \textbf{restrictTo(...roles)} --- kontrola dostępu RBAC, zwraca \texttt{403 Forbidden} dla nieuprawnionych ról
+\end{itemize}
+
+\subsubsection{Kluczowe endpointy API}
+
+\paragraph{Pobieranie aukcji (GET /api/auctions)}
+
+Endpoint publiczny z filtrowaniem (category, minPrice, maxPrice, status), sortowaniem i paginacją. Analogicznie działa \texttt{GET /api/auctions/search} z wyszukiwaniem full-text oraz \texttt{GET /api/auctions/:id} dla pojedynczej aukcji.
+
+\paragraph{Tworzenie aukcji (POST /api/auctions)}
+
+Endpoint chroniony (\texttt{protect}). Wymagane pola: title, description, category, startingPrice, bidIncrement, startTime, endTime, condition. Opcjonalne: images, model3D, reservePrice, buyNowPrice. Automatycznie przypisuje \texttt{seller} i aktualizuje statystyki.
+
+\paragraph{Składanie licytacji (POST /api/auctions/:id/bid)}
+
+Endpoint chroniony. Waliduje: aktywność aukcji, minimalną kwotę ($\geq$ currentPrice + bidIncrement), brak własności aukcji. Post-save hook automatycznie aktualizuje cenę aukcji, winnerId oraz oznacza poprzednie bidy jako \texttt{outbid}.
+
+\paragraph{Pozostałe endpointy}
+
+Endpointy \texttt{PATCH /api/auctions/:id} i \texttt{DELETE /api/auctions/:id} działają analogicznie z walidacją własności i ograniczeniami edycji w zależności od statusu aukcji. Endpointy watchlist (\texttt{POST/DELETE /api/auctions/:id/watch}) oraz historia licytacji (\texttt{GET /api/bids/me}, \texttt{GET /api/auctions/:id/bids}) działają w podobny sposób z odpowiednią autoryzacją.
+
+\subsubsection{Format odpowiedzi}
+
+\textbf{Sukces:}
+\begin{lstlisting}
+{
+  "success": true,
+  "data": { ... },
+  "results": 10,
+  "totalPages": 5,
+  "currentPage": 1
+}
+\end{lstlisting}
+
+\textbf{Błąd:}
+\begin{lstlisting}
+{
+  "success": false,
+  "error": {
+    "message": "Opis bledu",
+    "statusCode": 400
+  }
+}
+\end{lstlisting}
+
+Kody statusów: 200 (OK), 201 (Created), 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 500 (Internal Server Error).
+
+\subsubsection{Przepływ danych --- Złożenie licytacji}
+
+\begin{enumerate}
+  \item Użytkownik: \texttt{POST /api/auctions/:id/bid \{ amount \}}
+  \item Kontroler waliduje żądanie HTTP
+  \item \texttt{Auction.placeBid()} --- walidacja biznesowa (aktywność, kwota, własność)
+  \item Utworzenie dokumentu Bid
+  \item Post-save hook aktualizuje: \texttt{Auction.currentPrice}, \texttt{winnerId}, poprzednie bidy na \texttt{outbid}
+  \item Zwrot zaaktualizowanej licytacji
+\end{enumerate}
+
+Pozostałe scenariusze (zakończenie aukcji, wyszukiwanie) działają analogicznie z wykorzystaniem odpowiednich metod modeli.
+
+\section{Wymagania sprzętowe}
+
+Finalna aplikacja działa bez problemów na wszystkich przeglądarkach wspierających technologię WebGPU. Poniżej przedstawiono listę kompatybilnych przeglądarek wraz z minimalnymi wymaganiami:
+
+\subsection{Przeglądarki desktopowe}
+
+\begin{itemize}
+  \item \textbf{Google Chrome} --- wersja 113 i kolejne
+  \item \textbf{Microsoft Edge} --- wersja 113 i kolejne
+  \item \textbf{Opera} --- wersja 99 i kolejne
+  \item \textbf{Safari} --- wersja 26.0 i kolejne, wyłącznie na systemie macOS 26 Tahoe lub późniejszych
+  \item \textbf{Mozilla Firefox} --- wersja 141 i kolejne z następującymi zastrzeżeniami:
+        \begin{itemize}
+          \item Windows: dostępne bez dodatkowej konfiguracji od wersji 141
+          \item macOS 26 Tahoe lub późniejsze: dostępne bez konfiguracji od wersji 145
+          \item Pozostałe systemy: wymagane włączenie flagi \texttt{dom.webgpu.enabled} w ustawieniach przeglądarki
+        \end{itemize}
+\end{itemize}
+
+\subsection{Przeglądarki mobilne}
+
+\begin{itemize}
+  \item \textbf{Chrome dla Androida} --- wersja 142 i kolejne
+  \item \textbf{Safari oraz inne przeglądarki na iOS} --- wersja 26.0 i kolejne
+  \item \textbf{Samsung Internet} --- wersja 29 i kolejne
+  \item \textbf{Opera dla Androida} --- wersja 80 i kolejne
+\end{itemize}
+

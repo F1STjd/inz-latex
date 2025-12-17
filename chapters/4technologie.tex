@@ -43,5 +43,34 @@ Lekki system budowania, skupiający się na szybkości. Jest zaprojektowany, aby
 %–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 \subsection{System aukcyjny}
 
-\tcbox{\dots}
-\todo[inline]{Komentarz: Uzupełnione po implementacji}
+\subsubsection{Frontend}
+
+\textbf{React} - Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony.
+
+\textbf{React Router DOM} - Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. Pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki.
+
+\textbf{Tailwind CSS} - Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism.
+
+\textbf{TW Elements} - Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia).
+
+\subsubsection{Backend}
+
+\textbf{Node.js} - Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników.
+
+\textbf{Express.js} - Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja).
+
+\textbf{MongoDB} - Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze.
+
+\textbf{Mongoose} - Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych.
+
+\textbf{JWT (jsonwebtoken)} - Standard tworzenia tokenów uwierzytelniających. Odpowiada za bezpieczne logowanie użytkowników i utrzymywanie sesji bez przechowywania stanu na serwerze.
+
+\textbf{bcryptjs} - Biblioteka do hashowania haseł. Zapewnia bezpieczne przechowywanie haseł użytkowników poprzez jednokierunkowe szyfrowanie z solą.
+
+\textbf{CORS} - Middleware umożliwiający komunikację między domenami. Pozwala frontendowi (localhost:5173) komunikować się z backendem (inny port/domena) zgodnie z polityką bezpieczeństwa przeglądarek.
+
+\textbf{dotenv} - Narzędzie do zarządzania zmiennymi środowiskowymi. Przechowuje wrażliwe dane (klucze API, połączenie z bazą) poza kodem źródłowym w pliku .env.
+
+\textbf{validator} - Biblioteka do walidacji danych wejściowych. Sprawdza poprawność formatów (email, URL, numery telefonu) i zabezpiecza przed nieprawidłowymi danymi.
+
+

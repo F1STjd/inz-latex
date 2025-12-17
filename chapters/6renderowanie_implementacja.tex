@@ -2,7 +2,7 @@
 % https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/n4950.pdf s. 745
 Implementację można podzielić w logiczny sposób na trzy główne etapy: inicializacja okna, inicializajcja WebGPU, oraz pętla główna aplikacji. Etapy inicjalizacji muszą być wykonywane w określonej kolejności, dlatego naturalnie układają się w potok. Jednak inaczej niż w typowym potoku zamiast przekazywać między etapami dane, będziemy przekazywać dostarczony przez standard C++ obiekt \texttt{std::expected<void, std::string>}, symbolizujący stan wykonania poprzedniego etapu: sukces, lub błąd. Następnie etapy zostaną połączone dzięki operacjom na monadach, znanych z programowania funkcyjnego.
 
-\begin{lstlisting}[language=C++, caption={Funkcja inicjalizująca komponent renderujący}, label={lst:initialize}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca komponent renderujący}, label={lst:initialize}]
 void
 initialize()
 {
@@ -11,7 +11,8 @@ initialize()
   
   if (!result.has_value())
   {
-    std::println(std::cerr, "Error occured:\n{}", result.error());
+    std::println(
+      std::cerr, "Error occured:\n{}", result.error());
     std::exit(1);
   }
 }
@@ -19,7 +20,7 @@ initialize()
 
 \subsection{Okno apliakcji}
 Pierwszym etapem jest utworzenie okna aplikacji, w którym będzie wyświetlany renderowany obraz. W tym celu wykorzystano bibliotekę GLFW, która umożliwia tworzenie okien oraz obsługę zdarzeń wejściowych w sposób niezależny od platformy. Proces inicjalizacji okna obejmuje inicializację biblioteki, oraz stworzenie okna. Wskaźnik na utworzone okno jest zapisywany w klasie głównej aplikacji.
-\begin{lstlisting}[language=C++, caption={Część kodu odpowiedzialna za inicializację okna}, label={lst:init_window}]
+\begin{lstlisting}[caption={Część kodu odpowiedzialna za inicializację okna}, label={lst:init_window}]
 auto
 init_window() -> std::expected<void, std::string>
 {
@@ -43,7 +44,7 @@ init_window() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 Dodatkowo zainicializowane zostały funkcje obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
-\begin{lstlisting}[language=C++, caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
+\begin{lstlisting}[caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
 auto init_window() -> std::expected<void, std::string>
 {
   // ...
@@ -69,67 +70,398 @@ auto init_window() -> std::expected<void, std::string>
 \subsection{WebGPU}
 Inicjalizacja WebGPU składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. Poniżej przedstawiono poszczególne kroki wraz z opisem ich funkcji.
 %init_renderer()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca WebGPU, stworzona jako potok}, label={lst:init_renderer}]
+auto
+init_renderer() -> std::expected<void, std::string>
+{
+  return init_adapter()
+    .and_then([ this ] { return init_device(); })
+    .and_then([ this ] { return init_queue(); })
+    .and_then([ this ] { return init_shader_module(); })
+    .and_then([ this ] { return init_depth_texture(); })
+    .and_then([ this ] { return init_bind_group_layout(); })
+    .and_then([ this ] { return init_pipeline(); })
+    .and_then([ this ] { return init_sampler(); })
+    .and_then([ this ] { return init_textures(); })
+    .and_then([ this ] { return init_geometry(); })
+    .and_then([ this ] { return init_uniforms(); })
+    .and_then([ this ] { return init_lighting_uniforms(); })
+    .and_then([ this ] { return init_bind_group(); });
+}
 \end{lstlisting}
 
 \subsubsection{Adapter}
 %https://www.w3.org/TR/webgpu/#adapters
 Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje.
 %kod init_adapter()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt adapter}, label={lst:init_adapter}]
+auto
+init_adapter() -> std::expected<void, std::string>
+{
+  m_instance = wgpuCreateInstance(nullptr);
+  if (m_instance == nullptr)
+  {
+    return std::unexpected { "Failed to initialize WebGPU" };
+  }
+  m_surface = glfwCreateWindowWGPUSurface(m_instance, p_window);
+  if (m_surface == nullptr)
+  {
+    return std::unexpected { "Failed to initialize surface" };
+  }
+  wgpu::RequestAdapterOptions adapter_options {};
+  adapter_options.compatibleSurface = m_surface;
+  m_adapter = m_instance.requestAdapter(adapter_options);
+  if (m_adapter == nullptr)
+  {
+    return std::unexpected { "Failed to create adapter" };
+  }
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Device}
 %https://www.w3.org/TR/webgpu/#devices
 Device to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących. W tym kroku aplikacja tworzy obiekt Device, który będzie używany do komunikacji z procesorem graifcznym.
 %kod init_device()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt device}, label={lst:init_device}]
+auto
+init_device() -> std::expected<void, std::string>
+{
+  wgpu::DeviceDescriptor device_descriptor {};
+  // descriptor settings...
+
+  m_device = m_adapter.requestDevice(device_descriptor);
+  if (m_device == nullptr)
+  {
+    return std::unexpected { "Failed to create device" };
+  }
+  m_surface_format = wgpu::TextureFormat::BGRA8Unorm;
+  configure_surface();
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Command queue}
 %https://eliemichel.github.io/LearnWebGPU/next/getting-started/the-command-queue.html
 Skoro Device jest już utworzony, należy teraz stworzyć kolejkę poleceń (Command queue). Dzięki niej kod aplikacji wykonywany na CPU może wysyłać polecenia do GPU w sposób asynchroniczny. W tym kroku aplikacja tworzy obiekt Command queue.
 %kod init_queue()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt queue}, label={lst:init_queue}]
+auto
+init_queue() -> std::expected<void, std::string>
+{
+  m_queue = m_device.getQueue();
+  if (m_queue == nullptr)
+  {
+    return std::unexpected { "Failed to create queue" };
+  }
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Shader module}
 Podczas tego kroku aplikacja ładuje i kompiluje shadery, które będą używane w trakcie potoku renderującego. Shadery są napisane w języku WGSL i definiują sposób przetwarzania wierzchołków oraz obliczania koloru pikseli.
 %kode init_shader_module()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt shader module}, label={lst:init_shader_module}]
+auto
+init_shader_module() -> std::expected<void, std::string>
+{
+  m_shader_module =
+    load::shader_module(RESOURCE_DIR "/shader.wgsl", m_device);
+  if (m_shader_module == nullptr)
+  {
+    return std::unexpected { "Failed to create shader module" };
+  }
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Depth texture}
 Jest to specjalny obiekt do przechowywania informacji o głębi sceny 3D. W tym kroku aplikacja tworzy teksturę głębi, która będzie używana do testów głębi podczas potoku renderującego.
 %kod init_depth_texture()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt depth texture}, label={lst:init_depth_texture}]
+auto
+init_depth_texture() -> std::expected<void, std::string>
+{
+  auto depth_texture_descriptor = 
+    get_depth_texture_descriptor();
+  m_depth_texture = 
+    m_device.createTexture(depth_texture_descriptor);
+  if (m_depth_texture == nullptr)
+  {
+    return std::unexpected { "Failed to create depth texture" };
+  }
+  auto depth_texture_view_descriptor = 
+    get_depth_texture_view_descriptor();
+  m_depth_texture_view =
+    m_depth_texture.createView(depth_texture_view_descriptor);
+  if (m_depth_texture_view == nullptr)
+  {
+    return 
+      std::unexpected { "Failed to create depth texture view" };
+  }
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Bind group layout}
 %https://www.w3.org/TR/webgpu/#gpubindgrouplayout
 Bind group layout definiuje interfejs między zbiorem zasobów powiązanych w bind group (tworzony na końcu) a ich dostępnością w etapach shadera. Definiowane są tutaj typy zasobów, ich widoczność w poszczególnych shaderach.
 %kod init_bind_group_layout()
-\begin{lstlisting}[language=C++, caption={}, label={}]
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt bind group layout}, label={lst:init_bind_group_layout}]
+auto
+init_bind_group_layout() -> std::expected<void, std::string>
+{
+  auto binding_layout_entries = get_binding_layout_entries();
+  auto bind_group_layout_descriptor =
+    get_bind_group_layout_descriptor(binding_layout_entries);
+  m_bind_group_layout =
+    m_device.createBindGroupLayout(
+      bind_group_layout_descriptor);
+  if (m_bind_group_layout == nullptr)
+  {
+    return 
+      std::unexpected("Failed to create bind group layout");
+  }
+  return {};
+}
 \end{lstlisting}
 
 \subsubsection{Pipeline}
 %https://www.w3.org/TR/webgpu/#gpurenderpipeline
 Głównym elementem procesu renderującego jest potok renderujący (Render Pipeline). W tym kroku aplikacja tworzy obiekt Pipeline, który definiuje wszystkie etapy przetwarzania danych. Korzystając z oficjalnego standardu WebGPU, można wyszczególnić następujące etapy etapy potoku renderującego:
 \begin{enumerate}
-    \item Vertex fetch                  % Pobieranie wierzchołków
-    \item Vertex shader                 % =
-    \item Primitive assembly            % Prymitywny Assembly
-    \item Rasterization                 % Rasteryzacja
-    \item Fragment shader               % =  
-    \item Stencil test and operation    % ???
-    \item Depth test and write          % Test głębi i zapis??? 
-    \item Output merging                % Scalanie przetworzonych danych
+  \item Vertex fetch                  % Pobieranie wierzchołków
+  \item Vertex shader                 % =
+  \item Primitive assembly            % Prymitywny Assembly
+  \item Rasterization                 % Rasteryzacja
+  \item Fragment shader               % =  
+  \item Stencil test and operation    % ???
+  \item Depth test and write          % Test głębi i zapis??? 
+  \item Output merging                % Scalanie przetworzonych danych
 \end{enumerate}
+%kod init_pipeline()
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt pipeline}, label={lst:init_pipeline}]
+auto
+init_pipeline() -> std::expected<void, std::string>
+{
+  auto vertex_attributes = get_vertex_attributes();
+  auto vertex_buffer_layout = 
+    get_vertex_buffer_layout(vertex_attributes);
+  wgpu::RenderPipelineDescriptor pipeline_descriptor {};
+  fill_pipeline_descriptor_vertex_stage(
+    pipeline_descriptor, vertex_buffer_layout);
+  fill_pipeline_descriptor_primitive_stage(pipeline_descriptor);
+  wgpu::FragmentState fragment_state {};
+  wgpu::BlendState blend_state {};
+  wgpu::ColorTargetState color_target {};
+  fill_pipeline_descriptor_fragment_stage(
+    pipeline_descriptor, 
+    fragment_state, 
+    blend_state, color_target);
+  wgpu::DepthStencilState depth_stencil_state = wgpu::Default;
+  fill_pipeline_descriptor_depth_stencil_stage(
+    pipeline_descriptor, depth_stencil_state);
+  fill_pipeline_descriptor_multisampling_stage(
+    pipeline_descriptor);
+  auto pipeline_layout_descriptor = 
+    get_pipeline_layout_descriptor();
+  m_layout = 
+    m_device.createPipelineLayout(pipeline_layout_descriptor);
+  pipeline_descriptor.layout = m_layout;
+  m_pipeline = 
+    m_device.createRenderPipeline(pipeline_descriptor);
+  if (m_pipeline == nullptr)
+  {
+    return std::unexpected("Failed to create pipeline");
+  }
+  return {};
+}
+\end{lstlisting}
+
 \subsubsection{Sampler}
+%https://www.w3.org/TR/webgpu/#samplers
+Sampler zakodowywyuje transformacje i informacje dotyczące filtrowania, które mogą być wykorzystane w shaderach do interpretacji danych dotyczących zasobów tekstur. W tym kroku aplikacja tworzy obiekt Sampler, który będzie używany do próbkowania tekstur w shaderach.
+%kod init_sampler()
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt sampler}, label={lst:init_sampler}]
+auto
+init_sampler() -> std::expected<void, std::string>
+{
+  wgpu::SamplerDescriptor sampler_descriptor {};
+  sampler_descriptor.addressModeU = wgpu::AddressMode::Repeat;
+  sampler_descriptor.addressModeV = wgpu::AddressMode::Repeat;
+  sampler_descriptor.addressModeW = wgpu::AddressMode::Repeat;
+  sampler_descriptor.magFilter = wgpu::FilterMode::Linear;
+  sampler_descriptor.minFilter = wgpu::FilterMode::Linear;
+  sampler_descriptor.mipmapFilter = 
+    wgpu::MipmapFilterMode::Nearest;
+  sampler_descriptor.lodMinClamp = 0.0F;
+  sampler_descriptor.lodMaxClamp = 8.0F;
+  sampler_descriptor.compare = wgpu::CompareFunction::Undefined;
+  sampler_descriptor.maxAnisotropy = 1U;
+  std::println("Creating sampler...");
+  m_sampler = m_device.createSampler(sampler_descriptor);
+  if (m_sampler == nullptr)
+  {
+    return std::unexpected { "Failed to sampler" };
+  }
+  return {};
+}
+\end{lstlisting}
+
 \subsubsection{Textures}
+%https://www.w3.org/TR/webgpu/#textures
+Tekstura składa się z jednowymiarowych, dwuwymiarowych lub trójwymiarowych tablic danych, które mogą zawierać wiele wartości na element, aby reprezentować takie elementy jak kolory. W tym kroku aplikacja ładuje tekstury z plików oraz tworzy obiekty tekstur, które będą używane w shaderach do mapowania tekstur na modele 3D.
+%kod init_textures()
+\begin{lstlisting}[caption={Funkcja inicializująca obiekty tekstur}, label={lst:init_textures}]
+auto
+init_textures(
+  const std::filesystem::path& texture_path,
+  const std::filesystem::path& normal_path
+  ) -> std::expected<void, std::string>
+{
+  return
+    load::texture(texture_path, m_device)
+      .and_then(
+        [ this, &normal_path ](auto&& pair)
+        {
+          std::tie(m_base_texture, m_base_texture_view) =
+            std::forward<decltype(pair)>(pair);
+          return load::texture(normal_path, m_device);
+        })
+      .and_then(
+        [ this ](auto&& pair) 
+        -> std::expected<void, std::string>
+        {
+          std::tie(m_normal_texture, m_normal_texture_view) =
+            std::forward<decltype(pair)>(pair);
+          return {};
+        });
+}
+\end{lstlisting}
+
 \subsubsection{Geometry}
+%https://www.w3.org/TR/webgpu/#buffers
+W tym etapie załadowywane są wszystkie potrzebne dane odnośnie geoemtrii modeli. Dane są przesyłane do procesora graficznego za pomocą buforów. Bufor to blok pamięci, który można wykorzystać w operacjach GPU.
+%kod init_geometry()
+\begin{lstlisting}[caption={Funkcja inicializująca bufor wierzchołków}, label={lst:init_geometry}]
+auto
+init_geometry(
+  const std::filesystem::path& path
+  ) -> std::expected<void, std::string>
+{
+  return
+    load::geometry_obj(path, m_vertex_data)
+      .and_then(
+        [ this ]()
+        { return create_vertex_buffer(m_vertex_data.size()); })
+      .and_then(
+        [ this ]() -> std::expected<void, std::string>
+        {
+          m_queue.writeBuffer(
+            m_vertex_buffer, 0ULL, m_vertex_data.data(),
+            m_vertex_data.size() * 
+            sizeof(load::vertex_attributes));
+          return {};
+        });
+}
+\end{lstlisting}
+
 \subsubsection{Uniforms}
+W tym etapie tworzony zostaje bufor uniformów, który przechowuje dane takie jak macierze modelu, widoku i projekcji. Te dane są przesyłane do shaderów, aby umożliwić odpowiednie przekształcenia i renderowanie sceny 3D.
+%kod init_uniforms()
+\begin{lstlisting}[caption={Funkcja inicializująca bufor uniformów}, label={lst:init_uniforms}]
+auto
+init_uniforms() -> std::expected<void, std::string>
+{
+  wgpu::BufferDescriptor uniform_buffer_descriptor {};
+  uniform_buffer_descriptor.size = sizeof(my_uniforms);
+  uniform_buffer_descriptor.usage =
+    wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::Uniform;
+  uniform_buffer_descriptor.mappedAtCreation = 0U;
+  m_uniform_buffer = 
+    m_device.createBuffer(uniform_buffer_descriptor);
+  if (m_uniform_buffer == nullptr)
+  {
+    return 
+      std::unexpected { "Could not create uniform buffer" };
+  }
+  m_uniforms.model_matrix = glm::mat4x4(1.0);
+  m_uniforms.projection_matrix = glm::perspective(
+    45.0F * std::numbers::pi_v<float> / 180.0F, 
+    640.0F / 480.0F, 0.01F, 50000.0F);
+  m_queue.writeBuffer(
+    m_uniform_buffer, 0, &m_uniforms, sizeof(my_uniforms));
+  update_view_matrix();
+  return {};
+}
+\end{lstlisting}
 \subsubsection{Lighting uniforms}
+Teraz tworzony jest bufor uniformów oświetlenia, który przechowuje dane dotyczące źródeł światła w scenie. Te dane są przesyłane do shaderów, aby umożliwić odpowiednie oświetlenie modeli 3D.
+%kod init_lighting_uniforms()
+\begin{lstlisting}[caption={Funkcja inicializująca bufor uniformów oświetlenia}, label={lst:init_lighting_uniforms}]
+auto
+init_lighting_uniforms() -> std::expected<void, std::string>
+{
+// Create uniform buffer
+wgpu::BufferDescriptor buffer_descriptor {};
+buffer_descriptor.size = sizeof(lighting_uniforms);
+buffer_descriptor.usage =
+wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::Uniform;
+buffer_descriptor.mappedAtCreation = 0U;
+m_lighting_uniform_buffer = 
+    m_device.createBuffer(buffer_descriptor);
+if (m_lighting_uniform_buffer == nullptr)
+{
+  return 
+    std::unexpected { 
+      "Could not create lighting uniform buffer" };
+}
+m_lighting_uniforms.directions[ 0 ] = { ... };
+// ...
+m_lighting_uniforms.colors[ 0 ] = { ... };
+// ...
+m_lighting_uniforms_changed = true;
+update_lighting_uniforms();
+return {};
+}
+\end{lstlisting}
 \subsubsection{Bind group}
+%https://www.w3.org/TR/webgpu/#gpubindgroup
+Bind group definiuje zestaw zasobów, które mają być połączone w grupę, oraz sposób wykorzystania tych zasobów na etapach shadera.
+%kod init_bind_group()
+\begin{lstlisting}[caption={Funkcja inicializująca obiekt bind group}, label={lst:init_bind_group}]
+auto
+init_bind_group() -> std::expected<void, std::string>
+{
+  std::array<wgpu::BindGroupEntry, 5> bindings{
+    // inicializajca
+  };
+  wgpu::BindGroupDescriptor bind_group_descriptor {};
+  bind_group_descriptor.layout = m_bind_group_layout;
+  bind_group_descriptor.entryCount = bindings.size();
+  bind_group_descriptor.entries = bindings.data();
+  m_bind_group = 
+    m_device.createBindGroup(bind_group_descriptor);
+  if (m_bind_group == nullptr)
+  {
+    return std::unexpected { "Could not create bind group" };
+  }
+  return {};
+}
+\end{lstlisting}
 
 \subsection{Pętla główna}
+W pętli głównej wykonywane są ciągłe aktualizacje sceny oraz renderowanie obrazu. Pętla ta działa do momentu zamknięcia okna aplikacji. W każdej iteracji pętli wykonywane są następujące kroki:
+\begin{enumerate}
+  \item Obsługa zdarzeń okna
+  \item Aktualizacja danych uniformów
+  \item Zmiana rozmiaru powierzchni renderującej w przypadku zmiany rozmiaru okna
+  \item Pobranie następnego widoku tekstury powierzchni do renderowania i natychmiastowe przerwanie iteracji jeśli takowego nie ma.
+  \item Utworzenie enkodera poleceń używanego do nagrywania poleceń procesora graficznego.
+  \item Stworzenie obiektu render pass.
+        Każda instancja tego obiektu definiuje zestaw zasobów obrazów, zwanych załącznikami, wykorzystywanych podczas renderowania.
+  \item Ustawienie wcześniej zainicializowanych elementów: potoku renderujacego, bufora wierzchołkówo raz powiązań uniformów.
+  \item Wykonanie polecenia rysowania.
+  \item Zakończenie działania obiektu render pass.
+  \item Sfinalizowanie nagranych poleceń: przesłanie poleceń do kolejki procesora graficznego.
+\end{enumerate}

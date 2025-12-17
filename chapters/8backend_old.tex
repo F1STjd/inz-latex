@@ -1,0 +1,712 @@
+\section{Implementacja Bazy Danych oraz Logiki Biznesowej}
+
+\subsection{Implementacja Bazy Danych oraz Logiki Biznesowej}
+
+\subsubsection{Model Aukcji (Auction)}
+
+Model Auction stanowi rdzeń systemu aukcyjnego i zawiera logikę biznesową związaną z zarządzaniem aukcjami.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole} & \textbf{Typ}    & \textbf{Opis}                                                                                                                                                 \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole} & \textbf{Typ}    & \textbf{Opis}                                                                                                                                                 \\ \hline
+  \endhead
+
+  title         & String          & Tytuł aukcji (3-100 znaków, wymagane)                                                                                                                         \\ \hline
+  description   & String          & Opis aukcji (10-5000 znaków, wymagane)                                                                                                                        \\ \hline
+  category      & Enum            & 12 kategorii: Sztuka, Antyki, Biżuteria, Monety i Banknoty, Książki, Militaria, Meble, Porcelana i Ceramika, Zegarki, Instrumenty Muzyczne, Elektronika, Inne \\ \hline
+  images        & Array[String]   & Tablica URLi obrazów (walidowane URLe)                                                                                                                        \\ \hline
+  model3D       & String          & Opcjonalny model 3D (formaty: .obj, .gltf, .glb, .fbx)                                                                                                        \\ \hline
+  startingPrice & Number          & Cena wywoławcza (minimalna, wymagana, $\geq 0$)                                                                                                               \\ \hline
+  currentPrice  & Number          & Aktualna cena aukcji (wymagana, $\geq 0$)                                                                                                                     \\ \hline
+  bidIncrement  & Number          & Minimalne podwyższenie (wymagane, $> 0$, domyślnie: 100)                                                                                                      \\ \hline
+  reservePrice  & Number          & Opcjonalna cena minimalna do sprzedaży ($\geq$ startingPrice)                                                                                                 \\ \hline
+  buyNowPrice   & Number          & Opcjonalna cena "Kup Teraz" ($>$ startingPrice)                                                                                                               \\ \hline
+  seller        & ObjectId        & Referencja do modelu User (wymagane, indeksowane)                                                                                                             \\ \hline
+  startTime     & Date            & Data rozpoczęcia aukcji (wymagane, indeksowane)                                                                                                               \\ \hline
+  endTime       & Date            & Data zakończenia aukcji (wymagane, $>$ startTime, indeksowane)                                                                                                \\ \hline
+  status        & Enum            & Status: draft, active, completed, cancelled (domyślnie: draft, indeksowane)                                                                                   \\ \hline
+  winnerId      & ObjectId        & Zwycięzca aukcji (referencja do User)                                                                                                                         \\ \hline
+  winningBid    & Number          & Zwycięska oferta                                                                                                                                              \\ \hline
+  totalBids     & Number          & Liczba wszystkich licytacji (domyślnie: 0)                                                                                                                    \\ \hline
+  watchers      & Array[ObjectId] & Tablica obserwujących aukcję                                                                                                                                  \\ \hline
+  watchersCount & Number          & Liczba obserwujących (domyślnie: 0)                                                                                                                           \\ \hline
+  views         & Number          & Liczba wyświetleń (domyślnie: 0)                                                                                                                              \\ \hline
+  condition     & Enum            & Stan przedmiotu: Nowy, Bardzo dobry, Dobry, Zadowalający, Do renowacji                                                                                        \\ \hline
+  featured      & Boolean         & Czy aukcja jest wyróżniona (domyślnie: false)                                                                                                                 \\ \hline
+  isDeleted     & Boolean         & Flaga soft delete (domyślnie: false)                                                                                                                          \\ \hline
+  timestamps    & Date            & Automatyczne pola: createdAt, updatedAt                                                                                                                       \\ \hline
+\end{longtable}
+
+\paragraph{Indeksy Bazy Danych}
+
+System wykorzystuje \textbf{9 strategicznych indeksów} dla optymalizacji zapytań:
+
+\begin{itemize}
+  \item \textbf{Złożone:}
+        \begin{itemize}
+          \item \texttt{seller + status} --- zapytania o aukcje konkretnego sprzedawcy
+          \item \texttt{endTime + status} --- wyszukiwanie wygasających aukcji
+          \item \texttt{category + status} --- filtrowanie po kategorii
+          \item \texttt{featured + status} --- pobieranie wyróżnionych aukcji
+        \end{itemize}
+  \item \textbf{Pojedyncze:}
+        \begin{itemize}
+          \item \texttt{currentPrice} --- sortowanie po cenie
+          \item \texttt{createdAt} --- sortowanie po dacie utworzenia
+        \end{itemize}
+  \item \textbf{Tekstowy:}
+        \begin{itemize}
+          \item \texttt{title + description} --- full-text search w MongoDB
+        \end{itemize}
+\end{itemize}
+
+\paragraph{Pola Wirtualne}
+
+\begin{itemize}
+  \item \texttt{bids} --- relacja wirtualna z modelem Bid (populacja licytacji)
+  \item \texttt{timeRemaining} --- oblicza milisekundy pozostałe do końca aukcji
+  \item \texttt{isActive} --- zwraca true, jeśli aukcja jest aktywna w danym momencie
+  \item \texttt{reserveMet} --- sprawdza, czy osiągnięto cenę rezerwową
+\end{itemize}
+
+\paragraph{Metody Instancji}
+\begin{enumerate}
+  \item incrementViews()
+        Inkrementuje licznik wyświetleń aukcji bez uruchamiania walidacji. Wykorzystywane przy każdym otwarciu szczegółów aukcji.
+  \item addWatcher(userId)
+        Dodaje użytkownika do listy obserwujących (watchlist). Sprawdza duplikaty przed dodaniem. Automatycznie aktualizuje pole \texttt{watchersCount}.
+  \item removeWatcher(userId)
+        Usuwa użytkownika z listy obserwujących. Wykorzystuje metodę \texttt{filter()} z porównaniem ObjectId przez \texttt{equals()}.
+  \item placeBid(bidderId, amount)
+        Kluczowa metoda biznesowa do składania licytacji. Przeprowadza  walidację:
+        \begin{itemize}
+          \item Czy aukcja ma status \texttt{active}
+          \item Czy aukcja nie przekroczyła \texttt{endTime}
+          \item Czy licytujący nie jest właścicielem aukcji
+          \item Czy kwota $\geq$ \texttt{currentPrice + bidIncrement}
+        \end{itemize}
+
+        Po walidacji aktualizuje:
+        \begin{itemize}
+          \item \texttt{currentPrice} = amount
+          \item \texttt{winnerId} = bidderId
+          \item \texttt{totalBids++}
+        \end{itemize}
+
+  \item complete()
+        Zamyka aukcję i zmienia status na \texttt{completed}. Jeśli istnieje zwycięzca:
+        \begin{itemize}
+          \item Ustawia \texttt{winningBid} = \texttt{currentPrice}
+          \item Aktualizuje statystyki sprzedawcy: \texttt{stats.totalItemsSold++}
+          \item Aktualizuje statystyki zwycięzcy: \texttt{stats.totalAuctionsWon++}
+        \end{itemize}
+  \item cancel(reason)
+        Anuluje aukcję (jeśli status $\neq$ \texttt{completed}). Zmienia status na \texttt{cancelled}.
+  \item softDelete()
+        Miękkie usunięcie --- ustawia flagę \texttt{isDeleted = true}, zachowując dane w bazie dla celów historycznych i audytu.
+\end{enumerate}
+
+\paragraph{Metody Statyczne}
+\begin{enumerate}
+  \item findActive(options)
+        Wyszukuje aktywne aukcje z zaawansowanym filtrowaniem.
+        \begin{itemize}
+          \item Paginacja: page, limit
+          \item Filtrowanie: category, minPrice, maxPrice
+          \item Sortowanie: sortBy, sortOrder (domyślnie: endTime, asc
+        \end{itemize})
+        Automatycznie populuje pole \texttt{seller} (username, rating, avatar).
+  \item searchAuctions(query, options)
+        Implementuje \textbf{full-text search} wykorzystując indeks tekstowy MongoDB:
+        \begin{itemize}
+          \item Operator \texttt{\$text: \{ \$search: query \}}
+          \item Sortowanie po \texttt{relevance score} (meta: textScore)
+          \item Filtrowanie jak w \texttt{findActive()}
+          \item Zwraca: aukcje, totalPages, currentPage, total
+        \end{itemize}
+  \item closeExpiredAuctions()
+        Metoda \textbf{batch processing} do automatycznego zamykania aukcji. Wyszukuje wszystkie aukcje gdzie:
+        \begin{itemize}
+          \item \texttt{status = 'active'}
+          \item \texttt{endTime $\leq$ Date.now()}
+        \end{itemize}
+        Wywołuje metodę \texttt{complete()} na każdej znalezionej aukcji. Zwraca liczbę zamkniętych aukcji. Kompatybilna z cron jobs.
+  \item getFeatured(limit)
+        Pobiera wyróżnione aukcje (\texttt{featured = true}) o statusie \texttt{active}, sortowane od najnowszych (\texttt{createdAt DESC}).
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Model Licytacji (Bid)}
+
+Model Bid reprezentuje pojedynczą licytację w systemie i zawiera logikę walidacji oraz automatycznej aktualizacji powiązanych dokumentów.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                    \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                    \\ \hline
+  \endhead
+
+  auction       & ObjectId     & Referencja do Auction (wymagane, indeksowane)                    \\ \hline
+  bidder        & ObjectId     & Referencja do User (wymagane, indeksowane)                       \\ \hline
+  amount        & Number       & Kwota licytacji (wymagane, $\geq 0$)                             \\ \hline
+  previousBid   & Number       & Poprzednia cena aukcji (domyślnie: null)                         \\ \hline
+  bidType       & Enum         & Typ: manual, auto, buyNow (domyślnie: manual)                    \\ \hline
+  isWinning     & Boolean      & Czy to aktualnie wygrywająca licytacja (domyślnie: false)        \\ \hline
+  status        & Enum         & Status: active, outbid, won, lost, cancelled (domyślnie: active) \\ \hline
+  ipAddress     & String       & Adres IP (do detekcji nadużyć)                                   \\ \hline
+  userAgent     & String       & User agent (śledzenie urządzenia)                                \\ \hline
+  timestamps    & Date         & createdAt, updatedAt                                             \\ \hline
+\end{longtable}
+
+\paragraph{Indeksy Bazy Danych}
+
+System wykorzystuje \textbf{5 indeksów strategicznych}:
+
+\begin{itemize}
+  \item \textbf{Złożone:}
+        \begin{itemize}
+          \item \texttt{auction + bidder} --- sprawdzanie czy użytkownik już licytował
+          \item \texttt{auction + amount (desc)} --- szybkie wyszukiwanie najwyższych ofert
+          \item \texttt{bidder + createdAt} --- historia licytacji użytkownika
+          \item \texttt{auction + isWinning} --- aktualne wygrywające licytacje
+        \end{itemize}
+  \item \textbf{Pojedyncze:}
+        \begin{itemize}
+          \item \texttt{createdAt} --- sortowanie chronologiczne
+        \end{itemize}
+\end{itemize}
+
+\paragraph{Pola Wirtualne}
+
+\begin{itemize}
+  \item \texttt{bidIncrease} --- oblicza wzrost kwoty względem poprzedniej licytacji: \texttt{amount - previousBid}
+\end{itemize}
+
+\paragraph{Metody Instancji}
+
+\begin{enumerate}
+  \item cancel(reason)
+        Anuluje aktywną licytację (tylko status \texttt{active}). Ustawia \texttt{status = 'cancelled'} i \texttt{isWinning = false}.
+
+  \item markAsWon()
+        Oznacza licytację jako wygraną: \texttt{status = 'won'}, \texttt{isWinning = true}.
+
+  \item markAsLost()
+        Oznacza licytację jako przegraną: \texttt{status = 'lost'}, \texttt{isWinning = false}.
+\end{enumerate}
+
+\paragraph{Metody Statyczne}
+\begin{enumerate}
+  \item getAuctionBids(auctionId, options)
+        Pobiera historię wszystkich licytacji dla konkretnej aukcji z paginacją (domyślnie: limit 50, sortowanie po \texttt{createdAt DESC}).
+
+  \item getUserBids(userId, options)
+        Pobiera historię licytacji konkretnego użytkownika z możliwością filtrowania po statusie i paginacją.
+
+  \item getHighestBid(auctionId)
+        Zwraca najwyższą licytację dla danej aukcji (sortowanie po \texttt{amount DESC}, limit 1).
+
+  \item getUserActiveBids(userId)
+        Pobiera obecnie wygrywające licytacje użytkownika (\texttt{isWinning = true} AND \texttt{status = 'active'}).
+
+  \item markLostBids(auctionId, winnerId)
+        \textbf{Batch update} --- oznacza wszystkie licytacje (oprócz zwycięskiej) jako przegrane po zakończeniu aukcji:
+        \begin{lstlisting}
+updateMany(
+  { auction: auctionId,
+    bidder: { $ne: winnerId },
+    status: { $in: ['active', 'outbid'] } },
+  { status: 'lost', isWinning: false }
+)
+\end{lstlisting}
+\end{enumerate}
+
+\subsection{Model Użytkownika (User)}
+
+Model User zawiera podstawowe informacje o użytkowniku oraz system autentykacji.
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+  \hline
+  \textbf{Pole}  & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Pole}  & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
+  \endhead
+
+  username       & String       & Nazwa użytkownika (unikalne, indeksowane)                                           \\ \hline
+  email          & String       & Adres email (unikalne, indeksowane)                                                 \\ \hline
+  password       & String       & Hasło (bcrypt hash, nie zwracane w response)                                        \\ \hline
+  firstName      & String       & Imię                                                                                \\ \hline
+  lastName       & String       & Nazwisko                                                                            \\ \hline
+  phone          & String       & Telefon                                                                             \\ \hline
+  avatar         & String       & URL avatara                                                                         \\ \hline
+  address        & Object       & Obiekt: street, city, postalCode, country                                           \\ \hline
+  rating         & Number       & Średnia ocena użytkownika                                                           \\ \hline
+  ratingCount    & Number       & Liczba ocen                                                                         \\ \hline
+  accountBalance & Number       & Saldo konta                                                                         \\ \hline
+  role           & Enum         & Rola: user, admin                                                                   \\ \hline
+  isActive       & Boolean      & Czy konto jest aktywne                                                              \\ \hline
+  isVerified     & Boolean      & Czy email zweryfikowany                                                             \\ \hline
+  stats          & Object       & Statystyki: totalAuctionsCreated, totalAuctionsWon, totalBidsPlaced, totalItemsSold \\ \hline
+  tokens         & Object       & Tokeny: jwt, verification, passwordReset                                            \\ \hline
+\end{longtable}
+
+\paragraph{Zabezpieczenia}
+
+\begin{itemize}
+  \item Hasło hashowane przez \textbf{bcrypt} (cost factor: 12)
+  \item Pole \texttt{password} wyłączone z domyślnych queries (\texttt{select: false})
+  \item JWT token z 7-dniowym czasem wygaśnięcia
+  \item Weryfikacja aktywności konta (\texttt{isActive = true})
+  \item Możliwość blokowania użytkowników przez administratora
+\end{itemize}
+
+\subsection{Strategia Walidacji}
+
+System implementuje \textbf{wielopoziomową walidację} danych:
+
+\paragraph{Poziom 1: Schema (Mongoose)}
+\begin{itemize}
+  \item Typy danych (String, Number, Date, Boolean)
+  \item Wymagalność pól (\texttt{required})
+  \item Ograniczenia długości (\texttt{minlength}, \texttt{maxlength})
+  \item Wartości enum
+  \item Custom validators (np. walidacja URL, formatów plików)
+\end{itemize}
+
+\paragraph{Poziom 2: Model (Business Logic)}
+\begin{itemize}
+  \item Metody instancji z logiką biznesową
+  \item Middleware hooks (pre/post save)
+  \item Sprawdzanie relacji między encjami
+  \item Warunki złożone (np. \texttt{buyNowPrice > startingPrice})
+\end{itemize}
+
+\paragraph{Poziom 3: Kontroler (Authorization)}
+\begin{itemize}
+  \item Weryfikacja własności zasobów
+  \item Sprawdzanie ról użytkownika (user/admin)
+  \item Kontrola dostępu do operacji
+\end{itemize}
+
+\subsection{Integralność Danych}
+
+\paragraph{Relacje i Referencje}
+\begin{itemize}
+  \item \textbf{User $\rightarrow$ Auction} (1:N) --- pole \texttt{seller}
+  \item \textbf{User $\rightarrow$ Bid} (1:N) --- pole \texttt{bidder}
+  \item \textbf{Auction $\rightarrow$ Bid} (1:N) --- pole \texttt{auction}
+  \item \textbf{Auction $\leftrightarrow$ User} (N:M) --- tablica \texttt{watchers}
+\end{itemize}
+
+\newpage
+
+\subsection{Implementacja Ścieżek API}
+
+\subsubsection{Architektura REST API}
+
+API implementuje standardy \textbf{RESTful} z następującymi konwencjami:
+\begin{itemize}
+  \item \textbf{GET} --- pobieranie zasobów
+  \item \textbf{POST} --- tworzenie zasobów
+  \item \textbf{PATCH} --- częściowa aktualizacja zasobów
+  \item \textbf{DELETE} --- usuwanie zasobów
+\end{itemize}
+
+\subsubsection{Middleware Autentykacji}
+
+System wykorzystuje dwa główne middleware do kontroli dostępu.
+
+\paragraph{Middleware protect}
+
+\textbf{Funkcjonalność:}
+\begin{enumerate}
+  \item Ekstrakcja JWT z nagłówka \texttt{Authorization: Bearer <token|}
+  \item Weryfikacja podpisu tokena (klucz: \texttt{JWT\_SECRET})
+  \item Pobranie użytkownika z bazy danych po \texttt{userId} z tokena
+  \item Sprawdzenie czy konto aktywne (\texttt{isActive = true})
+  \item Walidacja czy hasło nie zostało zmienione po wydaniu tokena
+  \item Dołączenie obiektu \texttt{user} do \texttt{req.user}
+  \item Zwrot \texttt{401 Unauthorized} dla brakujących/nieprawidłowych tokenów
+\end{enumerate}
+
+\paragraph{Middleware restrictTo(...roles)}
+
+\textbf{Funkcjonalność:}
+\begin{itemize}
+  \item Kontrola dostępu oparta na rolach (\textbf{RBAC --- Role-Based Access Control})
+  \item Akceptuje zmienną liczbę dozwolonych ról jako parametry
+  \item Zwrot \texttt{403 Forbidden} jeśli rola użytkownika nie znajduje się na liście
+  \item Używane dla endpointów wymagających uprawnień administratora
+\end{itemize}
+
+\textbf{Przykład użycia:}
+\begin{lstlisting}
+router.post('/admin/close-expired',
+  protect,
+  restrictTo('admin'),
+  AuctionController.closeExpiredAuctions
+);
+\end{lstlisting}
+
+\subsubsection{API Aukcji}
+
+\paragraph{Endpointy Publiczne (bez autoryzacji)}
+
+\begin{enumerate}
+  \item \textbf{GET /api/auctions}
+
+        \textbf{Opis:} Pobieranie listy aukcji z filtrowaniem i paginacją.
+
+        \textbf{Query parametry:}
+        \begin{itemize}
+          \item \texttt{page} --- numer strony (domyślnie: 1)
+          \item \texttt{limit} --- liczba wyników na stronę (domyślnie: 10)
+          \item \texttt{category} --- filtrowanie po kategorii
+          \item \texttt{minPrice, maxPrice} --- zakres cenowy
+          \item \texttt{sortBy} --- pole sortowania (createdAt, currentPrice, endTime)
+          \item \texttt{sortOrder} --- kierunek (asc/desc)
+          \item \texttt{status} --- status aukcji (draft, active, completed, cancelled)
+        \end{itemize}
+
+        \textbf{Response:}
+        \begin{lstlisting}
+{
+  success: true,
+  results: Number,
+  totalPages: Number,
+  currentPage: Number,
+  auctions: [Auction]
+}
+\end{lstlisting}
+
+  \item \textbf{GET /api/auctions/search}
+
+        \textbf{Opis:} Wyszukiwanie full-text w tytułach i opisach aukcji.
+
+        \textbf{Query parametry:}
+        \begin{itemize}
+          \item \texttt{q} --- zapytanie tekstowe (wymagane)
+          \item \texttt{page, limit} --- paginacja
+          \item \texttt{category, minPrice, maxPrice} --- filtrowanie
+          \item \texttt{status} --- status aukcji
+          \item \texttt{sortBy} --- domyślnie: relevance score
+        \end{itemize}
+
+        \textbf{Implementacja:} Wykorzystuje indeks tekstowy MongoDB (\texttt{\$text: \{ \$search: query \}}) z sortowaniem po \texttt{textScore}.
+
+  \item \textbf{GET /api/auctions/:id}
+
+        \textbf{Opis:} Szczegóły pojedynczej aukcji. Automatycznie inkrementuje licznik \texttt{views}.
+
+        \textbf{Response:} Aukcja z populowanymi polami \texttt{seller} i \texttt{winner}.
+
+        \textbf{Błędy:}
+        \begin{itemize}
+          \item \texttt{404} --- Aukcja nie znaleziona lub usunięta
+        \end{itemize}
+
+  \item \textbf{GET /api/auctions/:id/bids}
+
+        \textbf{Opis:} Historia licytacji dla konkretnej aukcji.
+
+        \textbf{Query parametry:} page, limit, sortBy, sortOrder
+\end{enumerate}
+
+\paragraph{Endpointy Chronione (wymagana autentykacja)}
+
+\begin{enumerate}
+  \item \textbf{POST /api/auctions}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Utworzenie nowej aukcji.
+
+        \textbf{Body (wymagane pola):}
+        \begin{lstlisting}
+{
+  title: String (3-100 znakow),
+  description: String (10-5000 znakow),
+  category: String (jedna z 12 kategorii),
+  startingPrice: Number (> 0),
+  bidIncrement: Number (> 0),
+  startTime: Date (>= now),
+  endTime: Date (> startTime),
+  condition: String (enum)
+}
+\end{lstlisting}
+
+        \textbf{Pola opcjonalne:}
+        \begin{itemize}
+          \item \texttt{images} --- tablica URLi obrazów
+          \item \texttt{model3D} --- URL modelu 3D
+          \item \texttt{reservePrice} --- cena minimalna
+          \item \texttt{buyNowPrice} --- cena "Kup Teraz"
+        \end{itemize}
+
+        \textbf{Automatyzacja:}
+        \begin{itemize}
+          \item \texttt{seller = req.user.\_id}
+          \item \texttt{user.stats.totalAuctionsCreated++}
+        \end{itemize}
+
+        \textbf{Błędy:}
+        \begin{itemize}
+          \item \texttt{400} --- Błędy walidacji
+          \item \texttt{401} --- Brak autoryzacji
+        \end{itemize}
+
+  \item \textbf{PATCH /api/auctions/:id}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Aktualizacja aukcji (tylko właściciel lub admin).
+
+        \textbf{Ograniczenia edycji:}
+        \begin{itemize}
+          \item \textbf{Aukcje draft:} można edytować wszystkie pola
+          \item \textbf{Aukcje active bez bidów:} można edytować description, images
+          \item \textbf{Aukcje active z bidami:} brak możliwości edycji
+          \item \textbf{Aukcje completed/cancelled:} brak możliwości edycji
+        \end{itemize}
+
+        \textbf{Błędy:}
+        \begin{itemize}
+          \item \texttt{403} --- Brak uprawnień (nie właściciel)
+          \item \texttt{400} --- Edycja aktywnej aukcji z bidami zabroniona
+          \item \texttt{404} --- Aukcja nie znaleziona
+        \end{itemize}
+
+  \item \textbf{DELETE /api/auctions/:id}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Soft delete aukcji (tylko właściciel lub admin).
+
+        \textbf{Ograniczenia:}
+        \begin{itemize}
+          \item Nie można usunąć active auction z bidami
+        \end{itemize}
+
+  \item \textbf{POST /api/auctions/:id/bid}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Złożenie licytacji.
+
+        \textbf{Body:}
+        \begin{lstlisting}
+{
+  amount: Number (>= currentPrice + bidIncrement)
+}
+\end{lstlisting}
+
+        \textbf{Walidacja:}
+        \begin{itemize}
+          \item Aukcja musi być aktywna (\texttt{status = active}, \texttt{startTime $\leq$ now $\leq$ endTime})
+          \item Kwota $\geq$ \texttt{currentPrice + bidIncrement}
+          \item Nie można licytować własnej aukcji
+          \item Użytkownik nie może przelicytować samego siebie
+        \end{itemize}
+
+        \textbf{Automatyzacja (post-save hook):}
+        \begin{itemize}
+          \item \texttt{auction.currentPrice = amount}
+          \item \texttt{auction.winnerId = bidderId}
+          \item \texttt{auction.totalBids++}
+          \item Poprzednie bidy: \texttt{status = outbid}
+          \item \texttt{user.stats.totalBidsPlaced++}
+        \end{itemize}
+
+        \textbf{Błędy:}
+        \begin{itemize}
+          \item \texttt{400} --- Kwota za niska
+          \item \texttt{403} --- Licytacja własnej aukcji
+          \item \texttt{404} --- Aukcja nie znaleziona
+          \item \texttt{400} --- Aukcja nieaktywna
+        \end{itemize}
+
+  \item \textbf{GET /api/auctions/me/auctions}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Lista aukcji utworzonych przez użytkownika z możliwością filtrowania po statusie.
+
+  \item \textbf{POST /api/auctions/:id/watch}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Dodanie aukcji do watchlist.
+
+        \textbf{Automatyzacja:}
+        \begin{itemize}
+          \item \texttt{auction.watchers.push(userId)}
+          \item \texttt{auction.watchersCount++}
+        \end{itemize}
+
+  \item \textbf{DELETE /api/auctions/:id/watch}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Usunięcie aukcji z watchlist.
+\end{enumerate}
+
+\subsubsection{API Licytacji}
+
+\paragraph{Endpointy Publiczne}
+
+\begin{enumerate}
+  \item \textbf{GET /api/bids/auction/:auctionId/stats}
+
+        \textbf{Opis:} Statystyki agregowane dla aukcji (MongoDB aggregation pipeline).
+
+        \textbf{Response:}
+        \begin{lstlisting}
+{
+  success: true,
+  stats: {
+    totalBids: Number,
+    uniqueBidders: Number,
+    averageBid: Number,
+    minBid: Number,
+    maxBid: Number
+  }
+}
+\end{lstlisting}
+\end{enumerate}
+
+\paragraph{Endpointy Chronione}
+
+\begin{enumerate}
+  \item \textbf{GET /api/bids/me}
+
+        \textbf{Middleware:} \texttt{protect}
+
+        \textbf{Opis:} Historia licytacji użytkownika z możliwością filtrowania po statusie.
+
+  \item \textbf{PATCH /api/bids/:id/cancel}
+
+        \textbf{Middleware:} \texttt{protect, restrictTo('admin')}
+
+        \textbf{Opis:} Anulowanie licytacji (tylko admin).
+
+        \textbf{Body:}
+        \begin{lstlisting}
+{
+  reason: String (opcjonalne)
+}
+\end{lstlisting}
+
+        \textbf{Ograniczenia:}
+        \begin{itemize}
+          \item Tylko admin może anulować
+          \item Nie można anulować bidów ze statusem won/lost
+        \end{itemize}
+
+        \textbf{Błędy:}
+        \begin{itemize}
+          \item \texttt{403} --- Brak uprawnień administratora
+          \item \texttt{400} --- Bid nie może być anulowany (completed)
+        \end{itemize}
+\end{enumerate}
+
+\subsubsection{Kody Statusów HTTP}
+
+\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \hline
+  \textbf{Kod} & \textbf{Nazwa}        & \textbf{Użycie}                             \\ \hline
+  \endfirsthead
+  \hline
+  \textbf{Kod} & \textbf{Nazwa}        & \textbf{Użycie}                             \\ \hline
+  \endhead
+
+  200          & OK                    & Sukces dla GET/PATCH                        \\ \hline
+  201          & Created               & Sukces dla POST (utworzenie zasobu)         \\ \hline
+  400          & Bad Request           & Błędy walidacji lub logiki biznesowej       \\ \hline
+  401          & Unauthorized          & Brak lub nieprawidłowy token JWT            \\ \hline
+  403          & Forbidden             & Brak uprawnień do operacji (rola, własność) \\ \hline
+  404          & Not Found             & Zasób nie istnieje                          \\ \hline
+  500          & Internal Server Error & Błędy serwera                               \\ \hline
+\end{longtable}
+
+\subsubsection{Format Odpowiedzi}
+
+\paragraph{Sukces}
+\begin{lstlisting}
+{
+  "success": true,
+  "data": { ... },
+  "results": 10,
+  "totalPages": 5,
+  "currentPage": 1
+}
+\end{lstlisting}
+
+\paragraph{Błąd}
+\begin{lstlisting}
+{
+  "success": false,
+  "error": {
+    "message": "Opis bledu",
+    "statusCode": 400
+  }
+}
+\end{lstlisting}
+
+W trybie deweloperskim błędy zawierają dodatkowo \texttt{stack trace}.
+
+\subsubsection{Przepływ Danych --- Kluczowe Scenariusze}
+
+\paragraph{Scenariusz 1: Złożenie Licytacji}
+
+\begin{enumerate}
+  \item Użytkownik: \texttt{POST /api/auctions/:id/bid \{ amount \}}
+  \item \texttt{AuctionController.placeBid()} --- walidacja żądania HTTP
+  \item \texttt{Auction.placeBid(bidderId, amount)} --- walidacja biznesowa:
+        \begin{itemize}
+          \item Czy aukcja aktywna?
+          \item Czy kwota wystarczająca?
+          \item Czy nie własna aukcja?
+        \end{itemize}
+  \item Utworzenie dokumentu Bid
+  \item \textbf{Bid pre-save hook} --- ponowna walidacja na poziomie modelu
+  \item \textbf{Bid post-save hook} --- automatyzacja:
+        \begin{itemize}
+          \item \texttt{Auction.currentPrice = amount}
+          \item \texttt{Auction.winnerId = bidderId}
+          \item Poprzednie bidy: \texttt{status = outbid}, \texttt{isWinning = false}
+          \item \texttt{User.stats.totalBidsPlaced++}
+        \end{itemize}
+  \item Zwrot zaaktualizowanej licytacji do klienta
+\end{enumerate}
+
+\paragraph{Scenariusz 2: Zakończenie Aukcji}
+
+\begin{enumerate}
+  \item Wywołanie \texttt{Auction.complete()} (ręcznie lub przez cron)
+  \item Zmiana \texttt{status = 'completed'}
+  \item Jeśli istnieje \texttt{winnerId}:
+        \begin{itemize}
+          \item \texttt{winningBid = currentPrice}
+          \item \texttt{Seller.stats.totalItemsSold++}
+          \item \texttt{Winner.stats.totalAuctionsWon++}
+        \end{itemize}
+  \item Zapis do bazy danych
+  \item Wywołanie \texttt{Bid.markLostBids()} dla pozostałych licytacji
+\end{enumerate}
+
+\paragraph{Scenariusz 3: Wyszukiwanie Full-Text}
+
+\begin{enumerate}
+  \item Użytkownik: \texttt{GET /api/auctions/search?q=query}
+  \item \texttt{AuctionController.searchAuctions()} --- ekstrakcja parametrów
+  \item \texttt{Auction.searchAuctions(query)} --- użycie indeksu tekstowego MongoDB
+  \item Sortowanie wyników po relevance score (\texttt{\$meta: 'textScore'})
+  \item Paginacja i zwrot do klienta
+\end{enumerate}
