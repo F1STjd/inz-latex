@@ -1,7 +1,7 @@
 \section{Użyte technologie i narzędzia}
 
 %–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-\subsection{Element renderujący}
+\subsection{Komponent renderujący}
 
 \subsubsection{Język C++}
 Wysokopoziomowy język programowania stworzony przez Bjarne Stroustrupa, jako dodatek do języka C. C++ jest szeroko używany w aplikacjach wymagających wysokiej wydajności, takich jak gry komputerowe, silniki gier komputerowych, aplikacje graficzne, aplikacje uczenia maszynowego i wiele innych, gdzie wydajność jest kluczowa. Perfekcyjnie wpasowuję się on w potrzebę stworzenia graficznego komponentu renderującego obiekty 3D.
@@ -41,36 +41,47 @@ Lekki system budowania, skupiający się na szybkości. Jest zaprojektowany, aby
 \end{itemize}
 
 %–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-\subsection{System aukcyjny}
+\subsection{System aukcyjny - Frontend}
 
-\subsubsection{Frontend}
+\subsubsection{React}
+Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony.
 
-\textbf{React} - Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony.
+\subsubsection{React Router DOM}
+Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. Pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki.
 
-\textbf{React Router DOM} - Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. Pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki.
+\subsubsection{Tailwind CSS}
+Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism.
 
-\textbf{Tailwind CSS} - Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism.
+\subsubsection{TW Elements}
+Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia).
 
-\textbf{TW Elements} - Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia).
+\subsection{System aukcyjny - Backend}
 
-\subsubsection{Backend}
+\subsubsection{Node.js}
+Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników.
 
-\textbf{Node.js} - Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników.
+\subsubsection{Express.js}
+Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja).
 
-\textbf{Express.js} - Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja).
+\subsubsection{MongoDB}
+Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze.
 
-\textbf{MongoDB} - Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze.
+\subsubsection{Mongoose}
+Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych.
 
-\textbf{Mongoose} - Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych.
+\subsubsection{JWT (jsonwebtoken)}
+Standard tworzenia tokenów uwierzytelniających. Odpowiada za bezpieczne logowanie użytkowników i utrzymywanie sesji bez przechowywania stanu na serwerze.
 
-\textbf{JWT (jsonwebtoken)} - Standard tworzenia tokenów uwierzytelniających. Odpowiada za bezpieczne logowanie użytkowników i utrzymywanie sesji bez przechowywania stanu na serwerze.
+\subsubsection{bcryptjs}
+Biblioteka do hashowania haseł. Zapewnia bezpieczne przechowywanie haseł użytkowników poprzez jednokierunkowe szyfrowanie z solą.
 
-\textbf{bcryptjs} - Biblioteka do hashowania haseł. Zapewnia bezpieczne przechowywanie haseł użytkowników poprzez jednokierunkowe szyfrowanie z solą.
+\subsubsection{CORS}
+Middleware umożliwiający komunikację między domenami. Pozwala frontendowi (\texttt{localhost:5173}) komunikować się z backendem (inny port/domena) zgodnie z polityką bezpieczeństwa przeglądarek.
 
-\textbf{CORS} - Middleware umożliwiający komunikację między domenami. Pozwala frontendowi (localhost:5173) komunikować się z backendem (inny port/domena) zgodnie z polityką bezpieczeństwa przeglądarek.
+\subsubsection{dotenv}
+Narzędzie do zarządzania zmiennymi środowiskowymi. Przechowuje wrażliwe dane (klucze API, połączenie z bazą) poza kodem źródłowym w pliku .env.
 
-\textbf{dotenv} - Narzędzie do zarządzania zmiennymi środowiskowymi. Przechowuje wrażliwe dane (klucze API, połączenie z bazą) poza kodem źródłowym w pliku .env.
-
-\textbf{validator} - Biblioteka do walidacji danych wejściowych. Sprawdza poprawność formatów (email, URL, numery telefonu) i zabezpiecza przed nieprawidłowymi danymi.
+\subsubsection{validator}
+Biblioteka do walidacji danych wejściowych. Sprawdza poprawność formatów (email, URL, numery telefonu) i zabezpiecza przed nieprawidłowymi danymi.
 
 
