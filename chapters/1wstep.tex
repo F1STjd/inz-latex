@@ -1,65 +1,10 @@
-\section{Zespół wykonujący projekt i harmonogram prac}
-\subsection{Członkowie zespołu}
-\begin{itemize}
-  \item Maciej Ołdakowski, nr albumu 99638 - kierownik
-  \item Konrad Tomasz Nowak, nr albumu 99640
-\end{itemize}
-\subsection{Harmonogram prac}
-\begin{xltabular}{\textwidth}{|c|X|X|}
-  \caption{Harmonogram realizacji projektu} \label{tab:harmonogram_prac} \\
-  \hline
-  \multicolumn{1}{|c|}{\textbf{Data}} & \multicolumn{1}{c|}{\textbf{Opis prac}} & \multicolumn{1}{c|}{\textbf{Odpowiedzialny}} \\ \hline
-  \endfirsthead
+\section{Wstęp}
+Z roku na rok rynek e-commerce dynamicznie się rozwija, przyciągając coraz większą liczbę użytkowników. Według badania \enquote{E-commerce w Polsce 2024} szacuje się, że w 2024 roku aż 75\% internautów dokonuje zakupów w polskich sklepach internetowych, a 36\% korzysta z zagranicznych platform e-commerce. Pandemia Covid-19 znacząco przyspieszyła ten trend - w 2020 roku wartość sprzedaży online w Polsce podwoiła się w porównaniu z rokiem poprzednim. Wraz z rozwojem rynku użytkownicy oczekują coraz bardziej innowacyjnych rozwiązań, które zwiększają ich zaufanie do zakupów online i poprawiają jakość doświadczeń zakupowych.
 
-  \multicolumn{3}{c}%
-  {Tabela \thetable: Harmonogram realizacji projektu (ciąg dalszy)} \\
-  \hline \multicolumn{1}{|c|}{\textbf{Data}} & \multicolumn{1}{c|}{\textbf{Opis prac}} & \multicolumn{1}{c|}{\textbf{Odpowiedzialny}} \\ \hline
-  \endhead
+Jednym z kluczowych wyzwań w handlu internetowym, w szczególności w sektorze aukcji online, jest zapewnienie kupującym możliwości dokładnego zapoznania się ze stanem oferowanego przedmiotu. Tradycyjne platformy aukcyjne, takie jak desa.pl, allegro.pl czy the-saleroom.com opierają się głównie na zdjęciach i opisach, które nie zawsze w pełni oddają rzeczywisty stan produktu. Brak możliwości szczegółowego obejrzenia przedmiotu może prowadzić do nieporozumień i obniżać zaufanie kupujących. Rozwiązaniem tego problemu może być zastosowanie nowoczesnych technologii wizualizacji, które umożliwiają interaktywne przedstawienie produktów w trójwymiarowej przestrzeni.
 
-  \hline \multicolumn{3}{|r|}{{\textit{Dalsza część tabeli na następnej stronie}}} \\ \hline
-  \endfoot
+W pracy inżynierskiej opisane zostanie wykorzystanie technologii WebGPU, użytej do przedstawienia trójwymiarowych obiektów. Obecnie najpowszechniejszym stosowanym standardem do renderowania grafiki 3D w przeglądarkach jest WebGL, na którym opiera się zdecydowana większość istniejących rozwiązań – od prostych wizualizacji produktów w sklepach internetowych po zaawansowane aplikacje typu konfiguratory 3D czy przeglądarki modeli w branżach takich jak motoryzacja, meblarstwo i sztuka. Na WebGL bazują popularne biblioteki i silniki, m.in. Three.js, Babylon.js, PlayCanvas czy Potree, które znacznie upraszczają tworzenie złożonych scen 3D.
 
-  \hline
-  \endlastfoot
-
-  08.10.2025 & Zainicjalizowanie zdalnego repozytorium, podział obowiązków. & Konrad Tomasz Nowak i Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{15.10.2025} & Przygotowanie środowiska IDE, kompilacja prostego programu WebGPU. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Przygotowanie środowiska IDE, stworzenie prostego programu w szkielecie React. & Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{22.10.2025} & Podstawowe renderowanie 3D: ładowanie obiektów. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Praca nad graficzną częścią strony internetowej, tworzenie componentów w szkielecie React. & Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{29.10.2025} & Podstawowe renderowanie 3D: praca nad uniformami. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Finalna praca nad frontendową częścią strony internetowej, testowanie frontendowej części strony. & Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{05.11.2025} & Podstawowe renderowanie 3D: macierze transformacji i projekcji. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Rozpoczęcie pracy nad backendową częścią strony internetowej, inicjalizacja bazy danych. & Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{12.11.2025} & Podstawowe renderowanie 3D: nakładanie tekstur. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Praca nad bazą danych. & Maciej Ołdakowski \\
-  \hline
-
-  \multirow{2}{*}{19.11.2025} & Podstawowe renderowanie 3D: Interakcja użytkownika z systemem -- kontrola kamery. & Konrad Tomasz Nowak \\
-  \cline{2-3}
-  & Tworzenie API. & Maciej Ołdakowski \\
-  \hline
-
-  26.11.2025 & Zaawansowane renderowanie 3D: oświetlenie, mapa normalnych. & Konrad Tomasz Nowak \\
-  \hline
-
-  03.12.2025 & Wprowadzenie ogólnych poprawek, finalizacja pracy nad projektem. & Konrad Tomasz Nowak i Maciej Ołdakowski \\
-  \hline
-\end{xltabular}
-
+%https://caniuse.com/webgpu
+Aktualnie powstaje próba wprowadzenia nowego standardu WebGPU - następcy WebGL, który oferuję dostęp do nowoczesnych interfejsów programistycznych (Vulkan, Metal, Direct3D 12) pozwalających na komunikację z procesorami graficznymi, znacznie wyższą wydajność, lepszą kontrolę nad pamięcią GPU oraz możliwość wykorzystywania shaderów obliczeniowych (\texttt{compute shaders}). W grudniu 2025 roku WebGPU jest już stabilnie wspierany w przeglądarkach opartych o silnik Chromium (Chrome, Edge, Opera) oraz w Firefoxie - w sumie w 80.71\% przeglądarek. Dzięki temu możliwe staje się osiąganie jakości i płynności renderowania dotychczas zarezerwowanej dla aplikacji natywnych, przy jednoczesnym zachowaniu pełnej kompatybilności z ekosystemem webowym. Wykorzystanie WebGPU otwiera nowe możliwości tworzenia fotorealistycznych i wysoce interaktywnych wizualizacji przedmiotów aukcyjnych bezpośrednio w przeglądarce, bez konieczności instalowania dodatkowego oprogramowania.
 \newpage
