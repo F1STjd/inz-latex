@@ -10,6 +10,7 @@
 *.nav
 *.snm
 *.synctex.gz
+*.synctex(busy)
 *.fdb_latexmk
 *.bcf
 *.run.xml
@@ -22,7 +23,6 @@
 *.maf
 *.mtc*
 *.mtc0
-*.log
 *.gz
 
 # LaTeXmk / build directories
@@ -33,7 +33,7 @@ out/
 latex_build/
 tmp/
 
-# Optional: generated PDF (uncomment if you don't want PDFs in the repo)
+# Generated PDF files (uncomment if you don't want PDFs in the repo)
 # *.pdf
 
 # Auxiliary and backup files
@@ -44,8 +44,10 @@ tmp/
 *.orig
 *.rej
 .#*
+
 # Emacs/Vim temporary files
 .*.swp
+*.swo
 
 # OS files
 .DS_Store
@@ -57,9 +59,9 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
-# Other build or log files
+# LaTeX-specific temporary files
 latexmk.log
-*.fls
+pdflatex*.fls
 
-# Ensure we track bibliography source files; do NOT ignore .bib files
-# (keep your .bib files under version control)
+# Do NOT ignore these source files (bibliography)
+# .bib files are source files and should be tracked
