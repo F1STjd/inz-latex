@@ -165,7 +165,7 @@ QuoteStyle = Logical
 # intervals are supported.
 #
 
-TabSize = 8
+TabSize = 2
 
 #####################################################################
 #
