@@ -2,66 +2,81 @@
 
 Rozpoczynając pracę z zaawansowanymi technikami renderowania 3D w C++, do wyboru są trzy główne biblioteki, które pozwalają na niskopoziomową komunikację z procesorem graficznym: Vulkan, Direct3D 12 oraz Metal. Tylko Vulkan pozwala pisać kod działający na różnych platformach. DirectX jest dostępny wyłącznie na systemie Windows, natomiast Metal jest specyficzny dla ekosystemu Apple. Jednak kod napisany z użyciem tych bibliotek nie może być bezpośrednio uruchomiony w przeglądarce internetowej.
 
-W 2016 roku firma Google zaproponowała stworzenie nowego standardu pozwalającego na komunikację z procesorem graficznym z poziomu przeglądarki internetowej. Miał być to następca WebGL, pozwalający na bardziej efektywne wykorzystanie nowoczesnych kart graficznych. W 2021 roku została opublikowana pierwsza oficjalna specyfikacja pod nazwą WebGPU. Aktualnie na koniec roku 2025 w dalszym ciągu jest to rekomendacja, a nie oficjalny standard W3C. WebGPU jest już wspierane przez większość nowoczesnych przeglądarek internetowych, w tym Google Chrome, Microsoft Edge, Mozilla Firefox oraz Safari. Implementacja WebGPU spaja ze sobą ww. trzy biblioteki, tworząc zunifikowany interfejs umożliwiający pisanie przenośnego kodu renderującego 3D.
+W 2016 roku firma Google zaproponowała stworzenie nowego standardu pozwalającego na komunikację z procesorem graficznym z poziomu przeglądarki internetowej. Miał być to następca WebGL, pozwalający na bardziej efektywne wykorzystanie nowoczesnych kart graficznych. W 2021 roku została opublikowana pierwsza oficjalna specyfikacja pod nazwą WebGPU. Aktualnie na koniec roku 2025 w dalszym ciągu jest to propozycja, czekająca na standaryzację, a nie oficjalny standard W3C. WebGPU jest już wspierane przez większość nowoczesnych przeglądarek internetowych, w tym Google Chrome, Microsoft Edge, Mozilla Firefox oraz Safari. Implementacja WebGPU spaja ze sobą ww. trzy biblioteki, tworząc ujednolicony interfejs programistyczny umożliwiający pisanie przenośnego kodu.
 
-Istnieją dwie możliwości korzystania z WebGPU w aplikacjach webowych. Pierwsza z nich to użycie języka programowania JavaScript, które są natywnie obsługiwane przez przeglądarki internetowe. Druga możliwość to skorzystanie z interfejsu w języku C udostępnianego przez dwie istniejące implementacje:
+Istnieją dwie możliwości korzystania z WebGPU w aplikacjach webowych. Pierwsza z nich to użycie języka programowania JavaScript, które są natywnie obsługiwane przez przeglądarki internetowe. Druga możliwość to skorzystanie z interfejsu programistycznego w języku C udostępnianego przez dwie istniejące implementacje:
 \begin{itemize}
-    \item \textbf{Dawn} – implementacja stworzona przez firmę Google, przy pomocy języka C++.
-    \item \textbf{wgpu} – implementacja stworzona przez firmę Mozilla, przy pomocy języka Rust.
+  \item \textbf{Dawn} – implementacja stworzona przez firmę Google, przy pomocy języka C++ - używana w przeglądarkach opartych na silniku Chromium.
+  \item \textbf{wgpu} – implementacja stworzona przez firmę Mozilla, przy pomocy języka Rust - używana w przeglądarce Mozilla Firefox.
 \end{itemize}
 Następnie napisany kod należy skompilować do formatu WebAssembly. Zaletą tego podejścia jest niemalże porównywalna wydajność aplikacji z wersją natywną, gdyż kod WebAssembly jest uruchamiany bezpośrednio przez silnik przeglądarki, a nie interpretowany jak w przypadku języka JavaScript. Ponadto istniejący już kod można skompilować także do typowego dla systemu operacyjnego formatu wykonywalnego, co pozwala na uruchomienie aplikacji zarówno w przeglądarce internetowej, jak i natywnie na komputerze.
 
 \subsection{WebGPU}
-Najważniejsze w procesie renderowania jest przetworzenie danych przez potok renderujący, przy użyciu procesora graficznego. Komunikacja z procesorem graficznym za pomocą WebGPU odbywa się na dwa sposoby. Pierwszy z nich odbywa się za pomocą obiektów reprezentujących wewnętrzne zasoby GPU. Programista ma niewielki wpływ na ich działanie, jedynie jest w stanie wybrać konkretne, wcześniej zdefiniowane ustawienia, które są zawarte w specjalnych strukturach zwanych deskryptorami. Po zakończeniu działania, zasoby te należy manualnie zwolnić, aby zapobiec wyciekom pamięci.
-\begin{lstlisting}[caption=Przykład deskrytora obiektu sampler, label=lst:webgpu_sampler]
+% renderować - przedstawiać na ekranie pewne dane przetworzone przez specjalny potok (potok renderowania), przy pomocy procesora graficznego.
+Najważniejsze w procesie renderowania jest stworzenie potoku renderowania, dostarczenie do niego danych, oraz przetworznie ich używając procesora graficznego. Komunikacja z procesorem graficznym za pomocą WebGPU odbywa się na dwa sposoby. Pierwszy z nich odbywa się za pomocą obiektów reprezentujących wewnętrzne zasoby GPU. Programista ma niewielki wpływ na ich działanie, jedynie jest w stanie wybrać konkretne, wcześniej zdefiniowane ustawienia, które są zawarte w specjalnych strukturach zwanych deskryptorami. uzupełniony deskryptor następnie przekazywany jest jako argument do odpowiedniej funkcji tworzącej zasób. Po zakończeniu działania, zasoby te należy manualnie zwolnić, aby zapobiec wyciekom pamięci.
+\begin{lstlisting}[caption=Deskrytor obiektu \texttt{WGPUSampler}\, oraz przekazanie go do funkcji, label=lst:webgpu_sampler]
 {
-    // ...
+  // ...
 
-    wgpu::SamplerDescriptor sampler_descriptor {};
-    sampler_descriptor.addressModeU = wgpu::AddressMode::Repeat;
-    sampler_descriptor.addressModeV = wgpu::AddressMode::Repeat;
-    sampler_descriptor.addressModeW = wgpu::AddressMode::Repeat;
-    sampler_descriptor.magFilter = wgpu::FilterMode::Linear;
-    sampler_descriptor.minFilter = wgpu::FilterMode::Linear;
-    sampler_descriptor.mipmapFilter = 
-        wgpu::MipmapFilterMode::Nearest;
-    sampler_descriptor.lodMinClamp = 0.0F;
-    sampler_descriptor.lodMaxClamp = 8.0F;
-    sampler_descriptor.compare = 
-        wgpu::CompareFunction::Undefined;
-    sampler_descriptor.maxAnisotropy = 1U;
+  wgpu::SamplerDescriptor sampler_descriptor {};
+  sampler_descriptor.addressModeU = wgpu::AddressMode::Repeat;
+  sampler_descriptor.addressModeV = wgpu::AddressMode::Repeat;
+  sampler_descriptor.addressModeW = wgpu::AddressMode::Repeat;
+  sampler_descriptor.magFilter = wgpu::FilterMode::Linear;
+  sampler_descriptor.minFilter = wgpu::FilterMode::Linear;
+  sampler_descriptor.mipmapFilter =
+    wgpu::MipmapFilterMode::Nearest;
+  sampler_descriptor.lodMinClamp = 0.0F;
+  sampler_descriptor.lodMaxClamp = 8.0F;
+  sampler_descriptor.compare = wgpu::CompareFunction::Undefined;
+  sampler_descriptor.maxAnisotropy = 1U;
 
-    // ...
+  m_sampler = m_device.createSampler(sampler_descriptor);
+  if (m_sampler == nullptr)
+  {
+    return std::unexpected { "Failed to create sampler" };
+  }
+
+  // ...
 }
 \end{lstlisting}
-Drugim sposobem są shadery, czyli programy wykonywane bezpośrednio na procesorze graficznym. Shadery są napisane w specjalnych językach, dla WebGPU jest to WGSL (WebGPU Shading Language). Niezbędne dla prawidłowego działania potoku renderującego są dwa shadery: vertex shader oraz fragment shader. Vertex shader przetwarza dane wierzchołków, takie jak pozycja, kolor czy współrzędne tekstury. Fragment shader natomiast oblicza kolor każdego piksela na podstawie danych przekazanych z vertex shadera oraz dodatkowych informacji, takich jak oświetlenie czy tekstury.
-\begin{lstlisting}[style=wgsl,caption=Przykład prostego vertex shadera w WGSL, label=lst:wgsl_vertex_shader]
-@vertex
-fn vs_main(in: vertex_input) -> vertex_output 
-{
-    var out: vertex_output;
-    let world_position = 
-        u_my_uniforms.model_matrix * 
-        vec4f(in.position, 1.0); 
-	out.position = 
-        u_my_uniforms.projection_matrix * 
-        u_my_uniforms.view_matrix * 
-        world_position;
-    out.tangent = 
-        (u_my_uniforms.model_matrix * 
-        vec4f(in.tangent, 0.0)).xyz;
-    out.bitangent = 
-        (u_my_uniforms.model_matrix * 
-        vec4f(in.bitangent, 0.0)).xyz;
-    out.normal = 
-        (u_my_uniforms.model_matrix * 
-        vec4f(in.normal, 0.0)).xyz;
-    out.color = in.color;
-	out.uv = in.uv;
-    out.view_direction = 
-        u_my_uniforms.camera_world_position - 
-        world_position.xyz;
-    return out;
+Drugim sposobem są shadery, czyli programy wykonywane bezpośrednio na procesorze graficznym. Shadery są napisane w specjalnych językach, dla WebGPU jest to WGSL (WebGPU Shading Language). Niezbędne dla prawidłowego działania potoku renderowania są dwa rodzaje: shader wierzchołków (\texttt{vertex shader}) oraz shader fragmentów (\texttt{fragment shader}). Pierwszy z nich przetwarza dane wierzchołków, takie jak pozycja, kolor czy współrzędne tekstury. Shader fragmentów natomiast obliczaja kolor i inne atrybuty każdego fragmentu, czyli danych niezbędnych do wygenerowania wartości jednego piksela. Poniżej znajduje się shader fragmentów napisany w języku WGSL. Shader próbkowuje tekstury (koloru i normalnych), rekonstruuje normalną w przestrzeni świata z użyciem macierzy TBN i miesza ją z normalną geometryczną, oblicza oświetlenie rozproszone i zwierciadlane od czterech świateł kierunkowych na podstawie współczynników \(k_d\), \(k_s\) i twardości, wykonuje korekcję gamma i zwraca końcowy kolor z kanałem alfa z uniformu.
+\begin{lstlisting}[style=wgsl,caption=Shadera fragmentów w WGSL, label=lst:wgsl_fragment_shader]
+@fragment
+fn fs_main(in: vertex_output) -> @location(0) vec4f {
+  let normal_map_strength = 1.0;
+  let encoded_normal = textureSample(
+    normal_texture, texture_sampler, in.uv).rgb;
+  let local_normal = encoded_normal * 2.0 - 1.0;
+  let local_to_world = mat3x3f(
+    normalize(in.tangent),
+    normalize(in.bitangent),
+    normalize(in.normal),
+  );
+  let world_normal = local_to_world * local_normal;
+  let N = mix(in.normal, world_normal, normal_map_strength);
+  var V = normalize(in.view_direction);
+
+  let base_color = textureSample(
+    base_color_texture, texture_sampler, in.uv).rgb;
+  let kd = u_lighning.kd;
+  let ks = u_lighning.ks;
+  let hardness = u_lighning.hardness;
+
+  var color = vec3f(0.0);
+  for (var i: i32 = 0; i < 4; i++)
+  {
+    let light_color = u_lighning.colors[i].xyz;
+    let L = normalize(u_lighning.directions[i].xyz);
+    let R = reflect(-L, N);
+    let diffuse = max(0.0, dot(L, N)) * light_color;
+    let RoV = max(0.0, dot(R, V));
+    let specular = pow(RoV, hardness);
+    color += base_color * (kd * diffuse) + (ks * specular);
+  }
+
+  let corrected_color = pow(color, vec3f(2.2));
+  return vec4f(corrected_color, u_my_uniforms.color.a);
 }
 \end{lstlisting}
 
