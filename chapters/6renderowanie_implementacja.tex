@@ -60,7 +60,7 @@ auto init_window() -> std::expected<void, std::string>
 \end{lstlisting}
 
 \subsection{WebGPU}
-Inicjalizacja WebGPU składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. Poniżej przedstawiono poszczególne kroki wraz z opisem ich funkcji.
+Inicjalizacja WebGPU składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. Poniżej przedstawiono poszczególne kroki wraz z opisem ich funkcji. W praktyce są one łączone w potok oparty na \texttt{std::expected} i operacjach \texttt{and\_then}, co umożliwia natychmiastowe przerwanie przy pierwszym błędzie oraz czytelne przesłanie komunikatu o niepowodzeniu.
 %cos dodac
 %init_renderer()
 \begin{lstlisting}[caption={Funkcja inicializująca WebGPU, stworzona jako potok}, label={lst:init_renderer}]
