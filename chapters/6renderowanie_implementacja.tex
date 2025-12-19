@@ -85,8 +85,7 @@ init_renderer() -> std::expected<void, std::string>
 
 \subsubsection{Adapter}
 %https://www.w3.org/TR/webgpu/#adapters
-Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje.
-%cos dodac
+Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje. Aby móc uzyskać adapter, należy najpierw utworzyć instancję WebGPU (\texttt{WGPUInstance}), która stanowi globalny punkt wejścia do interfejsu WebGPU i reprezentuje implementację tego API w systemie. Następnie tworzona jest powierzchnia renderująca (\texttt{WGPUSurface}), która stanowi abstrakcję powiązaną z wcześniej zainicjalizowanym oknem GLFW i umożliwia prezentację wyrenderowanych obrazów użytkownikowi. Powierzchnia ta jest przekazywana jako parametr opcji adaptera (\texttt{compatibleSurface}), dzięki czemu wybierany adapter będzie kompatybilny z docelową powierzchnią renderowania. Dopiero po utworzeniu instancji i powierzchni możliwe jest wysłanie zapytania o adapter spełniający określone kryteria kompatybilności.
 %kod init_adapter()
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt adapter}, label={lst:init_adapter}]
 auto
@@ -113,16 +112,17 @@ init_adapter() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 
-\subsubsection{Device}
+\subsubsection{Urządzenie}
 %https://www.w3.org/TR/webgpu/#devices
-Device to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących. W tym kroku aplikacja tworzy obiekt Device, który będzie używany do komunikacji z procesorem graifcznym.
+Urządzenie to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących. W tym kroku aplikacja tworzy obiekt \texttt{WGPUDevice}, który będzie używany do komunikacji z procesorem graficznym. Przed jego utworzeniem z adaptera odczytywane są wspierane limity (\texttt{WGPULimits}), a następnie definiowany jest zestaw wymaganych limitów przekazywany w deskryptorze urządzenia. Limity te określają oczekiwania aplikacji względem: organizacji geometrii (np. liczby i struktury atrybutów oraz buforów wierzchołków), poprawnych przesunięć dla operacji na pamięci, przepływu danych między etapami shadera (uniformy), a także modelu powiązań zasobów. Obejmują również ograniczenia dotyczące tekstur i samplerów (wymiary oraz liczebność na etap), tak aby odpowiadały realnym wymaganiom potoku i używanych materiałów. Dzięki zastosowaniu limitów urządzenie jest tworzone tylko wtedy, gdy implementacja WebGPU gwarantuje parametry wystarczające do bezpiecznego i wydajnego działania. W \texttt{WGPUDeviceDescriptor} ustawiane są ponadto etykiety, wskaźnik do wymaganych limitów, opis domyślnej kolejki oraz funkcje zwrotne dla utraty urządzenia i błędów nieprzechwyconych, które służą diagnostyce. Po utworzeniu urządzenia dobierany jest format powierzchni (\texttt{BGRA8Unorm}) i wykonywana jest konfiguracja (\texttt{configure\_surface()}), aby zapewnić poprawne wyświetlanie na utworzonej wcześniej powierzchni.
 %kod init_device()
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt device}, label={lst:init_device}]
 auto
 init_device() -> std::expected<void, std::string>
 {
+  auto required_limits = get_limits(m_adapter);
   wgpu::DeviceDescriptor device_descriptor {};
-  // descriptor settings...
+  // ...
 
   m_device = m_adapter.requestDevice(device_descriptor);
   if (m_device == nullptr)
