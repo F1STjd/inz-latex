@@ -135,9 +135,9 @@ init_device() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 
-\subsubsection{Command queue}
+\subsubsection{Kolejka poleceń}
 %https://eliemichel.github.io/LearnWebGPU/next/getting-started/the-command-queue.html
-Skoro Device jest już utworzony, należy teraz stworzyć kolejkę poleceń (Command queue). Dzięki niej kod aplikacji wykonywany na CPU może wysyłać polecenia do GPU w sposób asynchroniczny. W tym kroku aplikacja tworzy obiekt Command queue.
+Skoro urządzenie jest już utworzone, należy teraz stworzyć kolejkę poleceń (\texttt{WGPUQueue}), dzięki której kod aplikacji wykonywany na procesorze komputera może wysyłać polecenia do procesora graficznego w sposób asynchroniczny.
 %kod init_queue()
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt queue}, label={lst:init_queue}]
 auto
