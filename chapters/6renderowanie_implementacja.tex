@@ -193,7 +193,8 @@ init_pipeline() -> std::expected<void, std::string>
   wgpu::DepthStencilState depth_stencil_state = wgpu::Default;
   // Fill depth-stencil and multisampling stage
   auto pipeline_layout_desc = get_pipeline_layout_desc();
-  m_layout = m_device.createPipelineLayout(pipeline_layout_desc);
+  m_layout = 
+    m_device.createPipelineLayout(pipeline_layout_desc);
   pipeline_desc.layout = m_layout;
   m_pipeline = m_device.createRenderPipeline(pipeline_desc);
   if (m_pipeline == nullptr)
