@@ -170,73 +170,32 @@ init_depth_texture() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 
-\subsubsection{Bind group layout}
-%https://www.w3.org/TR/webgpu/#gpubindgrouplayout
-Bind group layout definiuje interfejs między zbiorem zasobów powiązanych w bind group (tworzony na końcu) a ich dostępnością w etapach shadera. Definiowane są tutaj typy zasobów, ich widoczność w poszczególnych shaderach.
-%kod init_bind_group_layout()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt bind group layout}, label={lst:init_bind_group_layout}]
-auto
-init_bind_group_layout() -> std::expected<void, std::string>
-{
-  auto binding_layout_entries = get_binding_layout_entries();
-  auto bind_group_layout_descriptor =
-    get_bind_group_layout_descriptor(binding_layout_entries);
-  m_bind_group_layout =
-    m_device.createBindGroupLayout(
-      bind_group_layout_descriptor);
-  if (m_bind_group_layout == nullptr)
-  {
-    return 
-      std::unexpected("Failed to create bind group layout");
-  }
-  return {};
-}
-\end{lstlisting}
+\paragraph{Układ grupy powiązań}
+Układ grupy powiązań definiuje interfejs między zbiorem zasobów a ich dostępnością w poszczególnych etapach shadera. W deskryptorze określane są typy zasobów (bufory uniformów, tekstury, samplery), ich indeksy powiązań oraz widoczność w shaderach wierzchołków i fragmentów. Jest to schemat określający, jakie zasoby będą dostępne dla shaderów, ale nie zawiera jeszcze konkretnych instancji tych zasobów.
 
-\subsubsection{Pipeline}
-%https://www.w3.org/TR/webgpu/#gpurenderpipeline
-Głównym elementem procesu renderującego jest potok renderujący (Render Pipeline). W tym kroku aplikacja tworzy obiekt Pipeline, który definiuje wszystkie etapy przetwarzania danych. Korzystając z oficjalnego standardu WebGPU, można wyszczególnić następujące etapy etapy potoku renderującego:
-\begin{enumerate}
-  \item Vertex fetch                  % Pobieranie wierzchołków
-  \item Vertex shader                 % =
-  \item Primitive assembly            % Prymitywny Assembly
-  \item Rasterization                 % Rasteryzacja
-  \item Fragment shader               % =  
-  \item Stencil test and operation    % ???
-  \item Depth test and write          % Test głębi i zapis??? 
-  \item Output merging                % Scalanie przetworzonych danych
-\end{enumerate}
-%kod init_pipeline()
+\paragraph{Układ potoku i potok renderowania}
+Potok renderowania jest kluczowym elementem procesu renderowania, definiującym wszystkie etapy przetwarzania danych graficznych. Według standardu WebGPU obejmuje on następujące etapy: pobieranie wierzchołków (vertex fetch), shader wierzchołków (vertex shader), składanie prymitywów (primitive assembly), rasteryzacja (rasterization), shader fragmentów(fragment shader), test szablonu i operacje (stencil test and operation), test głębi i zapis (depth test and write), oraz scalanie wyjścia (output merging).
+
+Tworzenie potoku renderowania jest bardziej złożone niż innych zasobów i wymaga wielu struktur konfiguracyjnych. Najpierw tworzony jest układ potoku (\texttt{WGPUPipelineLayout}), który określa ogólną organizację zasobów dostępnych dla shaderów, bazując na wcześniej utworzonym \texttt{WGPUBindGroupLayout}. Następnie wypełniany jest deskryptor potoku renderowania (\texttt{WGPURenderPipelineDescriptor}), który zawiera konfigurację wszystkich wyżej wymienionych etapów. W implementacji poszczególne etapy konfigurowane są przez dedykowane.
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt pipeline}, label={lst:init_pipeline}]
 auto
 init_pipeline() -> std::expected<void, std::string>
 {
-  auto vertex_attributes = get_vertex_attributes();
+  auto vertex_attribs = get_vertex_attributes();
   auto vertex_buffer_layout = 
-    get_vertex_buffer_layout(vertex_attributes);
-  wgpu::RenderPipelineDescriptor pipeline_descriptor {};
-  fill_pipeline_descriptor_vertex_stage(
-    pipeline_descriptor, vertex_buffer_layout);
-  fill_pipeline_descriptor_primitive_stage(pipeline_descriptor);
+    get_vertex_buffer_layout(vertex_attribs);
+  wgpu::RenderPipelineDescriptor pipeline_desc {};
+  // Fill vertex and primitive stage
   wgpu::FragmentState fragment_state {};
   wgpu::BlendState blend_state {};
   wgpu::ColorTargetState color_target {};
-  fill_pipeline_descriptor_fragment_stage(
-    pipeline_descriptor, 
-    fragment_state, 
-    blend_state, color_target);
+  // Fill fragment stage
   wgpu::DepthStencilState depth_stencil_state = wgpu::Default;
-  fill_pipeline_descriptor_depth_stencil_stage(
-    pipeline_descriptor, depth_stencil_state);
-  fill_pipeline_descriptor_multisampling_stage(
-    pipeline_descriptor);
-  auto pipeline_layout_descriptor = 
-    get_pipeline_layout_descriptor();
-  m_layout = 
-    m_device.createPipelineLayout(pipeline_layout_descriptor);
-  pipeline_descriptor.layout = m_layout;
-  m_pipeline = 
-    m_device.createRenderPipeline(pipeline_descriptor);
+  // Fill depth-stencil and multisampling stage
+  auto pipeline_layout_desc = get_pipeline_layout_desc();
+  m_layout = m_device.createPipelineLayout(pipeline_layout_desc);
+  pipeline_desc.layout = m_layout;
+  m_pipeline = m_device.createRenderPipeline(pipeline_desc);
   if (m_pipeline == nullptr)
   {
     return std::unexpected("Failed to create pipeline");
