@@ -136,57 +136,29 @@ init_device() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 
-\subsubsection{Kolejka poleceń}
-%https://eliemichel.github.io/LearnWebGPU/next/getting-started/the-command-queue.html
-Skoro urządzenie jest już utworzone, należy teraz stworzyć kolejkę poleceń (\texttt{WGPUQueue}), dzięki której kod aplikacji wykonywany na procesorze komputera może wysyłać polecenia do procesora graficznego w sposób asynchroniczny.
-%kod init_queue()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt queue}, label={lst:init_queue}]
-auto
-init_queue() -> std::expected<void, std::string>
-{
-  m_queue = m_device.getQueue();
-  if (m_queue == nullptr)
-  {
-    return std::unexpected { "Failed to create queue" };
-  }
-  return {};
-}
-\end{lstlisting}
+\subsubsection{Zasoby tworzone przez urządzenie}
+Po utworzeniu urządzenia (\texttt{WGPUDevice}) większość pozostałych zasobów procesora graficznego jest tworzona za jego pomocą. Proces inicjalizacji tych zasobów podąża za wspólnym wzorcem: najpierw tworzony jest obiekt deskryptora, który zawiera szczegółową konfigurację zasobu, następnie wywoływana jest odpowiednia funkcja, która zwraca gotowy zasób. Takie podejście zapewnia spójność i czytelność kodu, a także ułatwia diagnostykę problemów poprzez sprawdzenie, czy zwrócony wskaźnik nie jest pustym wskaźnikiem.
 
-\subsubsection{Shader module}
-Podczas tego kroku aplikacja ładuje i kompiluje shadery, które będą używane w trakcie potoku renderującego. Shadery są napisane w języku WGSL i definiują sposób przetwarzania wierzchołków oraz obliczania koloru pikseli.
-%kode init_shader_module()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt shader module}, label={lst:init_shader_module}]
-auto
-init_shader_module() -> std::expected<void, std::string>
-{
-  m_shader_module =
-    load::shader_module(RESOURCE_DIR "/shader.wgsl", m_device);
-  if (m_shader_module == nullptr)
-  {
-    return std::unexpected { "Failed to create shader module" };
-  }
-  return {};
-}
-\end{lstlisting}
+\paragraph{Kolejka poleceń (Queue)}
+Kolejka poleceń (\texttt{WGPUQueue}) jest uzyskiwana bezpośrednio z urządzenia bez potrzeby tworzenia deskryptora. Dzięki kolejce kod aplikacji wykonywany na procesorze komputera może wysyłać polecenia do procesora graficznego w sposób asynchroniczny.
 
-\subsubsection{Depth texture}
-Jest to specjalny obiekt do przechowywania informacji o głębi sceny 3D. W tym kroku aplikacja tworzy teksturę głębi, która będzie używana do testów głębi podczas potoku renderującego.
-%kod init_depth_texture()
+\paragraph{Moduł shaderów}
+Moduł shaderów zawiera skompilowany kod shaderów napisanych w języku WGSL. Shadery definiują sposób przetwarzania wierzchołków (vertex shader) oraz obliczania koloru pikseli (fragment shader). W implementacji kod shaderu jest ładowany z pliku za pomocą funkcji pomocniczej \texttt{load::shader\_module()}, która wewnętrznie wykorzystuje \texttt{device.createShaderModule()}.
+
+\paragraph{Tekstura głębi}
+Tekstura głębi to specjalny zasób do przechowywania informacji o odległości każdego piksela od kamery w scenie 3D. Jest używana podczas testów głębi w potoku renderowania, aby określić, które fragmenty są widoczne, a które zasłonięte przez bliższe obiekty. W deskryptorze tekstury kluczowe są parametry: \texttt{format} (\texttt{Depth24Plus} - 24-bitowa precyzja głębi), \texttt{usage} (\texttt{RenderAttachment} - użycie jako załącznik renderowania), oraz wymiary odpowiadające wymiarom okna. Po utworzeniu tekstury, tworzony jest także widok tekstury (\texttt{TextureView}) poprzez wywołanie \texttt{texture.createView()}, który jest używany w potoku renderowania.
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt depth texture}, label={lst:init_depth_texture}]
 auto
 init_depth_texture() -> std::expected<void, std::string>
 {
-  auto depth_texture_descriptor = 
-    get_depth_texture_descriptor();
+  wgpu::TextureDescriptor depth_texture_descriptor = //...
   m_depth_texture = 
     m_device.createTexture(depth_texture_descriptor);
   if (m_depth_texture == nullptr)
   {
     return std::unexpected { "Failed to create depth texture" };
   }
-  auto depth_texture_view_descriptor = 
-    get_depth_texture_view_descriptor();
+  auto depth_texture_view_descriptor = //...
   m_depth_texture_view =
     m_depth_texture.createView(depth_texture_view_descriptor);
   if (m_depth_texture_view == nullptr)
