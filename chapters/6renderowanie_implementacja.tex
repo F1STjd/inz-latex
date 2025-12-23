@@ -139,7 +139,7 @@ init_device() -> std::expected<void, std::string>
 \subsubsection{Zasoby tworzone przez urządzenie}
 Po utworzeniu urządzenia (\texttt{WGPUDevice}) większość pozostałych zasobów procesora graficznego jest tworzona za jego pomocą. Proces inicjalizacji tych zasobów podąża za wspólnym wzorcem: najpierw tworzony jest obiekt deskryptora, który zawiera szczegółową konfigurację zasobu, następnie wywoływana jest odpowiednia funkcja, która zwraca gotowy zasób. Takie podejście zapewnia spójność i czytelność kodu, a także ułatwia diagnostykę problemów poprzez sprawdzenie, czy zwrócony wskaźnik nie jest pustym wskaźnikiem.
 
-\paragraph{Kolejka poleceń (Queue)}
+\paragraph{Kolejka poleceń}
 Kolejka poleceń (\texttt{WGPUQueue}) jest uzyskiwana bezpośrednio z urządzenia bez potrzeby tworzenia deskryptora. Dzięki kolejce kod aplikacji wykonywany na procesorze komputera może wysyłać polecenia do procesora graficznego w sposób asynchroniczny.
 
 \paragraph{Moduł shaderów}
