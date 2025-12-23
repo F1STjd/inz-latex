@@ -41,9 +41,10 @@ init_window() -> std::expected<void, std::string>
   // ...
 }
 \end{lstlisting}
-Reszta kodu w tej funkcji odpowiada za Ustawienie asynchronicznych funkcji obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
+Reszta kodu w tej funkcji odpowiada za ustawienie asynchronicznych funkcji obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
 \begin{lstlisting}[caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
-auto init_window() -> std::expected<void, std::string>
+auto
+init_window() -> std::expected<void, std::string>
 {
   // ...
   glfwSetCursorPosCallback(
