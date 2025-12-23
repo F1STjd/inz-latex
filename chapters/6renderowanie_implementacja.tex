@@ -204,177 +204,22 @@ init_pipeline() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 
-\subsubsection{Sampler}
-%https://www.w3.org/TR/webgpu/#samplers
-Sampler zakodowywyuje transformacje i informacje dotyczące filtrowania, które mogą być wykorzystane w shaderach do interpretacji danych dotyczących zasobów tekstur. W tym kroku aplikacja tworzy obiekt Sampler, który będzie używany do próbkowania tekstur w shaderach.
-%kod init_sampler()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt sampler}, label={lst:init_sampler}]
-auto
-init_sampler() -> std::expected<void, std::string>
-{
-  wgpu::SamplerDescriptor sampler_descriptor {};
-  sampler_descriptor.addressModeU = wgpu::AddressMode::Repeat;
-  sampler_descriptor.addressModeV = wgpu::AddressMode::Repeat;
-  sampler_descriptor.addressModeW = wgpu::AddressMode::Repeat;
-  sampler_descriptor.magFilter = wgpu::FilterMode::Linear;
-  sampler_descriptor.minFilter = wgpu::FilterMode::Linear;
-  sampler_descriptor.mipmapFilter = 
-    wgpu::MipmapFilterMode::Nearest;
-  sampler_descriptor.lodMinClamp = 0.0F;
-  sampler_descriptor.lodMaxClamp = 8.0F;
-  sampler_descriptor.compare = wgpu::CompareFunction::Undefined;
-  sampler_descriptor.maxAnisotropy = 1U;
-  std::println("Creating sampler...");
-  m_sampler = m_device.createSampler(sampler_descriptor);
-  if (m_sampler == nullptr)
-  {
-    return std::unexpected { "Failed to sampler" };
-  }
-  return {};
-}
-\end{lstlisting}
+\paragraph{Sampler}
+Sampler koduje informacje dotyczące filtrowania i adresowania tekstur, które są wykorzystywane w shaderach podczas próbkowania (sampling) tekstur. W deskryptorze określane są tryby adresowania dla każdej osi (\texttt{Repeat} - powtarzanie tekstury), filtry powiększania i pomniejszania (\texttt{Linear} - interpolacja liniowa dla gładszego wyglądu), oraz parametry poziomów szczegółowości (LOD).
 
-\subsubsection{Textures}
-%https://www.w3.org/TR/webgpu/#textures
-Tekstura składa się z jednowymiarowych, dwuwymiarowych lub trójwymiarowych tablic danych, które mogą zawierać wiele wartości na element, aby reprezentować takie elementy jak kolory. W tym kroku aplikacja ładuje tekstury z plików oraz tworzy obiekty tekstur, które będą używane w shaderach do mapowania tekstur na modele 3D.
-%kod init_textures()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekty tekstur}, label={lst:init_textures}]
-auto
-init_textures(
-  const std::filesystem::path& texture_path,
-  const std::filesystem::path& normal_path
-  ) -> std::expected<void, std::string>
-{
-  return
-    load::texture(texture_path, m_device)
-      .and_then(
-        [ this, &normal_path ](auto&& pair)
-        {
-          std::tie(m_base_texture, m_base_texture_view) =
-            std::forward<decltype(pair)>(pair);
-          return load::texture(normal_path, m_device);
-        })
-      .and_then(
-        [ this ](auto&& pair) 
-        -> std::expected<void, std::string>
-        {
-          std::tie(m_normal_texture, m_normal_texture_view) =
-            std::forward<decltype(pair)>(pair);
-          return {};
-        });
-}
-\end{lstlisting}
+\paragraph{Bufory}
+Bufor to blok pamięci procesora graficznego, który może przechowywać różnorodne dane wykorzystywane w operacjach graficznych. Wszystkie bufory tworzone są według tego samego wzorca: w deskryptorze określany jest rozmiar bufora, sposób jego użycia (\texttt{usage}) oraz czy ma być mapowany przy tworzeniu. W implementacji używane są trzy rodzaje buforów:
+\begin{itemize}
+  \item \textbf{Bufor wierzchołków} - przechowuje dane geometrii modeli 3D (pozycje, normalne, współrzędne tekstur). Dane są najpierw ładowane z pliku do pamięci CPU, a następnie przesyłane do bufora procesora graficznego funkcją \texttt{queue.writeBuffer()}. Parametr \texttt{usage}: \texttt{CopyDst | Vertex}.
+  \item \textbf{Bufor uniformów transformacji} - przechowuje macierze transformacji (model, widok, projekcja), pozycję kamery oraz dodatkowe parametry renderowania. Jest aktualizowany w każdej klatce, gdy zmienia się perspektywa kamery lub rotacja modelu. Parametr \texttt{usage}: \texttt{CopyDst | Uniform}.
+  \item \textbf{Bufor uniformów oświetlenia} - zawiera informacje o źródłach światła w scenie: kierunki świateł, ich kolory oraz parametry modelu oświetlenia (\texttt{kd}, \texttt{ks}, \texttt{hardness}). Parametr \texttt{usage}: \texttt{CopyDst | Uniform}.
+\end{itemize}
 
-\subsubsection{Geometry}
-%https://www.w3.org/TR/webgpu/#buffers
-W tym etapie załadowywane są wszystkie potrzebne dane odnośnie geoemtrii modeli. Dane są przesyłane do procesora graficznego za pomocą buforów. Bufor to blok pamięci, który można wykorzystać w operacjach GPU.
-%kod init_geometry()
-\begin{lstlisting}[caption={Funkcja inicializująca bufor wierzchołków}, label={lst:init_geometry}]
-auto
-init_geometry(
-  const std::filesystem::path& path
-  ) -> std::expected<void, std::string>
-{
-  return
-    load::geometry_obj(path, m_vertex_data)
-      .and_then(
-        [ this ]()
-        { return create_vertex_buffer(m_vertex_data.size()); })
-      .and_then(
-        [ this ]() -> std::expected<void, std::string>
-        {
-          m_queue.writeBuffer(
-            m_vertex_buffer, 0ULL, m_vertex_data.data(),
-            m_vertex_data.size() * 
-            sizeof(load::vertex_attributes));
-          return {};
-        });
-}
-\end{lstlisting}
+\paragraph{Tekstury materiałów}
+Tekstury to wielowymiarowe tablice danych reprezentujące informacje wizualne, takie jak kolory czy mapy normalnych. W implementacji tekstury są ładowane z plików graficznych za pomocą funkcji pomocniczej \texttt{load::texture()}, która wewnętrznie używa \texttt{device.createTexture()} oraz tworzy odpowiedni widok tekstury.
 
-\subsubsection{Uniforms}
-W tym etapie tworzony zostaje bufor uniformów, który przechowuje dane takie jak macierze modelu, widoku i projekcji. Te dane są przesyłane do shaderów, aby umożliwić odpowiednie przekształcenia i renderowanie sceny 3D.
-%kod init_uniforms()
-\begin{lstlisting}[caption={Funkcja inicializująca bufor uniformów}, label={lst:init_uniforms}]
-auto
-init_uniforms() -> std::expected<void, std::string>
-{
-  wgpu::BufferDescriptor uniform_buffer_descriptor {};
-  uniform_buffer_descriptor.size = sizeof(my_uniforms);
-  uniform_buffer_descriptor.usage =
-    wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::Uniform;
-  uniform_buffer_descriptor.mappedAtCreation = 0U;
-  m_uniform_buffer = 
-    m_device.createBuffer(uniform_buffer_descriptor);
-  if (m_uniform_buffer == nullptr)
-  {
-    return 
-      std::unexpected { "Could not create uniform buffer" };
-  }
-  m_uniforms.model_matrix = glm::mat4x4(1.0);
-  m_uniforms.projection_matrix = glm::perspective(
-    45.0F * std::numbers::pi_v<float> / 180.0F, 
-    640.0F / 480.0F, 0.01F, 50000.0F);
-  m_queue.writeBuffer(
-    m_uniform_buffer, 0, &m_uniforms, sizeof(my_uniforms));
-  update_view_matrix();
-  return {};
-}
-\end{lstlisting}
-\subsubsection{Lighting uniforms}
-Teraz tworzony jest bufor uniformów oświetlenia, który przechowuje dane dotyczące źródeł światła w scenie. Te dane są przesyłane do shaderów, aby umożliwić odpowiednie oświetlenie modeli 3D.
-%kod init_lighting_uniforms()
-\begin{lstlisting}[caption={Funkcja inicializująca bufor uniformów oświetlenia}, label={lst:init_lighting_uniforms}]
-auto
-init_lighting_uniforms() -> std::expected<void, std::string>
-{
-// Create uniform buffer
-wgpu::BufferDescriptor buffer_descriptor {};
-buffer_descriptor.size = sizeof(lighting_uniforms);
-buffer_descriptor.usage =
-wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::Uniform;
-buffer_descriptor.mappedAtCreation = 0U;
-m_lighting_uniform_buffer = 
-    m_device.createBuffer(buffer_descriptor);
-if (m_lighting_uniform_buffer == nullptr)
-{
-  return 
-    std::unexpected { 
-      "Could not create lighting uniform buffer" };
-}
-m_lighting_uniforms.directions[ 0 ] = { ... };
-// ...
-m_lighting_uniforms.colors[ 0 ] = { ... };
-// ...
-m_lighting_uniforms_changed = true;
-update_lighting_uniforms();
-return {};
-}
-\end{lstlisting}
-\subsubsection{Bind group}
-%https://www.w3.org/TR/webgpu/#gpubindgroup
-Bind group definiuje zestaw zasobów, które mają być połączone w grupę, oraz sposób wykorzystania tych zasobów na etapach shadera.
-%kod init_bind_group()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt bind group}, label={lst:init_bind_group}]
-auto
-init_bind_group() -> std::expected<void, std::string>
-{
-  std::array<wgpu::BindGroupEntry, 5> bindings{
-    // inicializajca
-  };
-  wgpu::BindGroupDescriptor bind_group_descriptor {};
-  bind_group_descriptor.layout = m_bind_group_layout;
-  bind_group_descriptor.entryCount = bindings.size();
-  bind_group_descriptor.entries = bindings.data();
-  m_bind_group = 
-    m_device.createBindGroup(bind_group_descriptor);
-  if (m_bind_group == nullptr)
-  {
-    return std::unexpected { "Could not create bind group" };
-  }
-  return {};
-}
-\end{lstlisting}
+\paragraph{Grupa powiązań}
+Grupa powiązań łączy konkretne instancje zasobów (bufory, tekstury, samplery) z ich deklaracjami w układzie grupy powiązań. W deskryptorze określany jest wcześniej utworzony obiekt \texttt{WGPUBindGroupLayout} oraz tablica wpisów (\texttt{WGPUBindGroupEntry}), z których każdy przypisuje konkretny zasób do odpowiedniego indeksu powiązania, co umożliwia shaderom dostęp do tych zasobów podczas renderowania.
 
 \subsection{Pętla główna}
 W pętli głównej wykonywane są ciągłe aktualizacje sceny oraz renderowanie obrazu. Pętla ta działa do momentu zamknięcia okna aplikacji. W każdej iteracji pętli wykonywane są następujące kroki:
