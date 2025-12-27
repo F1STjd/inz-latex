@@ -1,0 +1,252 @@
+\section{Integracja}
+
+Proces integracji obejmuje kilka warstw technicznych: kompilację kodu natywnego do formatu WebAssembly przy użyciu kompilatora Emscripten, zaprojektowanie architektury komponentów React umożliwiającej efektywne zarządzanie pojedynczą instancją komponentu renderującego oraz implementację mechanizmów komunikacji między kodem JavaScript a skompilowanym kodem C++.
+
+\subsection{Kompilacja do WebAssembly}
+
+Kompilacja komponentu renderującego do formatu WebAssembly wymaga odpowiedniej konfiguracji systemu budowania CMake oraz użycia toolchaina Emscripten. Proces ten przekształca kod źródłowy C++ w pliki wykonywalne w środowisku przeglądarki internetowej.
+
+\subsubsection{Konfiguracja CMake dla Emscripten}
+
+Konfiguracja projektu dla Emscripten wymaga zdefiniowania specyficznych flag kompilacji, które umożliwiają integrację z WebGPU oraz eksport funkcji dostępnych z poziomu JavaScript. Najważniejsze flagi kompilacji to:
+
+\begin{itemize}
+  \item \texttt{-sUSE\_WEBGPU=1} - włączenie wsparcia dla API WebGPU w skompilowanym module,
+  \item \texttt{-sASYNCIFY} - umożliwienie asynchronicznego wykonywania kodu, niezbędne dla operacji WebGPU,
+  \item \texttt{-sEXPORTED\_FUNCTIONS} - lista funkcji C++ eksportowanych do JavaScript,
+  \item \texttt{-sEXPORTED\_RUNTIME\_METHODS} - metody runtime Emscripten dostępne z poziomu JavaScript,
+  \item \texttt{-sFETCH} - wsparcie dla asynchronicznego pobierania zasobów,
+  \item \texttt{-sALLOW\_MEMORY\_GROWTH=1} - dynamiczne rozszerzanie pamięci WebAssembly.
+\end{itemize}
+
+\subsubsection{Generowane pliki wyjściowe}
+
+Proces kompilacji generuje dwa główne pliki:
+
+\begin{itemize}
+  \item \texttt{main.wasm} - binarny moduł WebAssembly zawierający skompilowany kod C++,
+  \item \texttt{main.js} - kod JavaScript pozwalający na wywoływanie formatu WebAssembly. Odpowiedzialny za inicjalizację modułu, zarządzanie pamięcią oraz mostkowanie wywołań między JavaScript a WebAssembly.
+\end{itemize}
+
+Plik \texttt{main.js} definiuje globalny obiekt \texttt{Module}, który stanowi interfejs komunikacji z kodem WebAssembly. Obiekt ten zawiera atrybutamy, które kod wygenerowany przez Emscripten wywołuje w różnych momentach swojego działania.
+
+\subsection{Architektura integracji w React}
+
+Integracja komponentu WebGPU z aplikacją React opiera się na wzorcu Provider, który zapewnia współdzielenie pojedynczej instancji komponentu renderującego między wieloma komponentami interfejsu użytkownika. Architektura ta rozwiązuje problem ponownej inicjalizacji kosztownego kontekstu WebGPU przy nawigacji między widokami aplikacji.
+
+\subsubsection{Wzorzec Provider}
+
+Komponent \texttt{WebGPUCanvasProvider} implementuje wzorzec Provider z React Context API. Działa jako singleton zarządzający cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
+
+\begin{lstlisting}[style=javascript, caption={Struktura komponentu Provider}, label={lst:provider}]
+export function WebGPUCanvasProvider({ children }) {
+  const [moduleReady, setModuleReady] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [currentModel, setCurrentModel] = useState('fourareen')
+
+  // ... logika zarzadzania modulem WASM
+  return (
+    <WebGPUCanvasContext.Provider value={contextValue}>
+      {children}
+      {/* Wspoldzielony canvas renderowany przez Portal */}
+    </WebGPUCanvasContext.Provider>
+  )
+}
+\end{lstlisting}
+
+\subsubsection{Hooki dostępu do API}
+
+Dostęp do funkcjonalności komponentu renderującego z komponentów potomnych realizowany jest przez dedykowane hooki React:
+
+\begin{itemize}
+  \item \texttt{useWebGPUCanvas()} - publiczny hook zwracający API do kontroli komponentu renderującego (zmiana modelu, status ładowania, informacje o błędach),
+  \item \texttt{useWebGPUCanvasInternal()} - wewnętrzny hook używany przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
+\end{itemize}
+
+\begin{lstlisting}[style=javascript, caption={Publiczne API komponentu renderującego}, label={lst:api}]
+const publicApi = {
+  moduleReady,    // czy modul WASM jest zainicjalizowany
+  isLoading,      // czy trwa ladowanie
+  error,          // komunikat bledu (jesli wystapil)
+  currentModel,   // nazwa aktualnie wyswietlanego modelu
+  changeModel,    // funkcja zmiany modelu 3D
+  modelNames      // lista dostepnych modeli
+}
+\end{lstlisting}
+
+\subsection{Mechanizm React Portals}
+
+Kluczowym elementem architektury jest wykorzystanie mechanizmu React Portals do dynamicznego przenoszenia elementu canvas między różnymi miejscami w strukturze DOM. Pozwala to na wyświetlanie tego samego komponentu renderującego 3D w różnych sekcjach aplikacji bez konieczności reinicjalizacji kontekstu WebGPU.
+
+\subsubsection{Zasada działania}
+
+React Portal umożliwia renderowanie komponentu potomnego do węzła DOM znajdującego się poza hierarchią rodzica. W przypadku integracji WebGPU, współdzielony canvas jest renderowany przez Portal do aktualnie aktywnego \enquote{slotu} - kontenera DOM wskazanego przez komponent \texttt{WebGPUCanvas}.
+
+\begin{lstlisting}[style=javascript, caption={Renderowanie canvas przez Portal}, label={lst:portal}]
+{hostNode
+  ? createPortal(
+      <SharedWebGPUCanvas
+        options={presentationOptions}
+        isLoading={isLoading}
+        error={error}
+        moduleReady={moduleReady}
+      />,
+      hostNode
+    )
+  : null}
+\end{lstlisting}
+
+\subsubsection{Zarządzanie slotami}
+
+System slotów pozwala komponentom \texttt{WebGPUCanvas} rezerwować miejsce wyświetlania komponentu renderującego. Gdy komponent jest montowany, rejestruje swój kontener jako aktywny slot. Gdy jest odmontowywany, slot jest zwalniany, a canvas może zostać przeniesiony do innego miejsca lub ukryty w fallbackowym kontenerze.
+
+Funkcje zarządzania slotami:
+\begin{itemize}
+  \item \texttt{attachSlot(slotId, container, options)} - rejestracja nowego slotu z opcjami wyświetlania (wymiary, model),
+  \item \texttt{detachSlot(slotId)} - zwolnienie slotu przy odmontowaniu komponentu.
+\end{itemize}
+
+\subsection{Ładowanie modułu WebAssembly}
+
+Inicjalizacja modułu WebAssembly odbywa się asynchronicznie podczas pierwszego montowania komponentu canvas. Proces ten obejmuje wstrzyknięcie skryptu \texttt{main.js}, konfigurację obiektu \texttt{Module} oraz obsługę stanów ładowania.
+
+\subsubsection{Konfiguracja obiektu Module}
+
+Przed załadowaniem skryptu Emscripten, konfigurowany jest globalny obiekt \texttt{window.Module} z callbackami obsługującymi zdarzenia cyklu życia:
+
+\begin{lstlisting}[style=javascript, caption={Konfiguracja obiektu Module}, label={lst:module}]
+const moduleConfig = {
+  canvas: canvasRef.current,
+  
+  onRuntimeInitialized: () => {
+    setModuleReady(true)
+    setIsLoading(false)
+  },
+  
+  onAbort: (what) => {
+    setError('WebAssembly initialization failed')
+    setIsLoading(false)
+  },
+  
+  print: (text) => console.log('WASM:', text),
+  printErr: (text) => console.error('WASM Error:', text)
+}
+
+window.Module = moduleConfig
+\end{lstlisting}
+
+\subsubsection{Asynchroniczne wstrzykiwanie skryptu}
+
+Skrypt \texttt{main.js} jest dynamicznie dodawany do dokumentu HTML. Mechanizm zapewnia, że skrypt jest ładowany tylko raz, niezależnie od liczby montowań komponentu:
+
+\begin{lstlisting}[style=javascript, caption={Dynamiczne ładowanie skryptu Emscripten}, label={lst:script}]
+if (!globalState.scriptAppended) {
+  const script = document.createElement('script')
+  script.src = '/main.js'
+  script.async = true
+  script.onerror = () => {
+    setError('Failed to load WebAssembly runtime')
+    setIsLoading(false)
+  }
+  
+  document.body.appendChild(script)
+  globalState.scriptAppended = true
+}
+\end{lstlisting}
+
+\subsection{Wirtualny system plików}
+
+Emscripten udostępnia wirtualny system plików (VFS), który emuluje operacje plikowe w środowisku przeglądarki. Integracja wykorzystuje IDBFS - backend oparty na IndexedDB - do persystentnego przechowywania zasobów między sesjami użytkownika.
+
+\subsubsection{Montowanie systemu plików}
+
+Podczas fazy \texttt{preRun} konfigurowane są punkty montowania dla persystentnych danych:
+
+\begin{lstlisting}[style=javascript, caption={Konfiguracja IDBFS}, label={lst:idbfs}]
+moduleConfig.preRun.push(() => {
+  const FS = window.FS
+  const IDBFS = window.IDBFS
+  
+  // Katalog na baze danych modeli
+  FS.mkdir('/database')
+  FS.mount(IDBFS, {}, '/database')
+  
+  // Katalog na cache zasobow
+  FS.mkdir('/resources_cache')
+  FS.mount(IDBFS, {}, '/resources_cache')
+})
+\end{lstlisting}
+
+Synchronizacja z IndexedDB wykonywana jest przez funkcję \texttt{FS.syncfs()}, która może działać w trybie odczytu (z IndexedDB do VFS) lub zapisu (z VFS do IndexedDB).
+
+\subsection{Komunikacja JavaScript-C++}
+
+Komunikacja między warstwą JavaScript a skompilowanym kodem C++ odbywa się przez funkcje eksportowane z modułu WebAssembly. Funkcje te są dostępne jako metody obiektu \texttt{window.Module}.
+
+\subsubsection{Eksportowane funkcje}
+
+Komponent renderujący eksportuje następujące funkcje:
+
+\begin{itemize}
+  \item \texttt{change\_model(modelName)} - zmiana wyświetlanego modelu 3D,
+  \item \texttt{resize\_canvas(width, height)} - aktualizacja wymiarów renderowania,
+  \item \texttt{set\_resource\_base(path)} - konfiguracja ścieżki bazowej dla zasobów.
+\end{itemize}
+
+\begin{lstlisting}[style=javascript, caption={Wywołanie funkcji eksportowanej z C++}, label={lst:changemodel}]
+const changeModel = useCallback((modelName) => {
+  if (!moduleReady) {
+    console.warn('WebGPU module not ready yet.')
+    return false
+  }
+
+  if (typeof window.Module.change_model !== 'function') {
+    setError('WebAssembly module missing required function')
+    return false
+  }
+
+  try {
+    window.Module.change_model(modelName)
+    setCurrentModel(modelName)
+    return true
+  } catch (err) {
+    setError('Failed to change model')
+    return false
+  }
+}, [moduleReady])
+\end{lstlisting}
+
+\subsubsection{Przekazywanie elementu canvas}
+
+Element HTML canvas jest przekazywany do modułu WebAssembly przez właściwość \texttt{Module.canvas}. Emscripten automatycznie używa tego elementu do utworzenia kontekstu WebGPU:
+
+\begin{lstlisting}[style=javascript, caption={Przypisanie canvas do modułu}, label={lst:canvas}]
+moduleConfig.canvas = canvasRef.current
+
+// Po inicjalizacji modul automatycznie uzywa przypisanego canvas
+// do renderowania przez WebGPU
+\end{lstlisting}
+
+\subsection{Komponent WebGPUCanvas}
+
+Komponent \texttt{WebGPUCanvas} stanowi publiczny interfejs do osadzania komponentu renderującego 3D w dowolnym miejscu aplikacji. Obsługuje responsywne wymiarowanie oraz automatyczną zmianę modelu.
+
+\begin{lstlisting}[style=javascript, caption={Użycie komponentu WebGPUCanvas}, label={lst:usage}]
+<WebGPUCanvas
+  width={800}
+  height={600}
+  model="fourareen"
+  showControls={true}
+  onModelChange={
+    (model) => console.log('Model changed:', model)
+  }
+/>
+\end{lstlisting}
+
+Komponent obsługuje trzy tryby wymiarowania:
+\begin{itemize}
+  \item określone wymiary (\texttt{width}/\texttt{height}) - stały rozmiar w pikselach,
+  \item proporcjonalne - podanie tylko wysokości automatycznie oblicza szerokość (proporcja 4:3),
+  \item responsywne - brak wymiarów powoduje dopasowanie do kontenera rodzica z użyciem \texttt{ResizeObserver}.
+\end{itemize}
