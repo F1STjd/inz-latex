@@ -257,6 +257,70 @@
              {\ }{{\copyablespace}}1,
 }
 
+% Konfiguracja syntax highlighting dla JavaScript/JSX
+\lstdefinestyle{javascript}{
+    language=Java, % Java jako baza (podobna składnia)
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{orange!80!black},
+    numberstyle=\tiny\color{gray},
+    % Słowa kluczowe JavaScript/ES6+
+    morekeywords={async, await, const, let, var, function, return, if, else,
+                  for, while, do, switch, case, break, continue, try, catch,
+                  finally, throw, class, extends, constructor, static, get, set,
+                  import, export, default, from, as, of, in, typeof, instanceof,
+                  new, this, super, null, undefined, true, false, yield},
+    % Słowa kluczowe React
+    emph={useState, useEffect, useCallback, useRef, useMemo, useContext,
+          createContext, createPortal, Provider, Consumer,
+          React, ReactDOM, Component, Fragment,
+          props, children, state, refs, current,
+          window, document, console, Module, FS, IDBFS,
+          Promise, Error, Array, Object, String, Number, Boolean,
+          setTimeout, setInterval, fetch, queueMicrotask,
+          ResizeObserver, createElement, appendChild},
+    emphstyle=\color{teal},
+    % Metody i funkcje
+    emph={[2]log, error, warn, info, push, pop, map, filter, reduce,
+          forEach, find, findIndex, includes, indexOf, slice, splice,
+          join, split, replace, match, test, exec, stringify, parse,
+          then, catch, finally, resolve, reject, all, race,
+          addEventListener, removeEventListener, querySelector,
+          getElementById, createElement, appendChild, removeChild,
+          setAttribute, getAttribute, preventDefault, stopPropagation,
+          syncfs, mkdir, mount, writeFile, readFile, analyzePath},
+    emphstyle={[2]\color{purple}},
+    % Formatowanie
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{gray!50},
+    backgroundcolor=\color{gray!5},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+    showstringspaces=false,
+    captionpos=b,
+    aboveskip=10pt,
+    belowskip=10pt,
+    xleftmargin=15pt,
+    framexleftmargin=15pt,
+    % Operatory i specjalne znaki
+    literate={=>}{{\textcolor{blue}{=>}}}2
+             {->}{{\textcolor{blue}{->}}}2
+             {===}{{\textcolor{blue}{===}}}3
+             {!==}{{\textcolor{blue}{!==}}}3
+             {==}{{\textcolor{blue}{==}}}2
+             {!=}{{\textcolor{blue}{!=}}}2
+             {<=}{{\textcolor{blue}{<=}}}2
+             {>=}{{\textcolor{blue}{>=}}}2
+             {&&}{{\textcolor{blue}{\&\&}}}2
+             {||}{{\textcolor{blue}{||}}}2
+             {\ }{{\copyablespace}}1,
+}
+
 \newcommand{\copyablespace}{\ }
 
 \newcommand{\newCharapter}[1]{\newpage \include{#1}}
@@ -330,6 +394,8 @@
 \newCharapter{chapters/7frontend}
 \setcounter{figure}{0}
 \newCharapter{chapters/8backend}
+\setcounter{figure}{0}
+\newCharapter{chapters/9integracja}
 %\setcounter{figure}{0}
 %\newCharapter{chapters/5projekt}
 % \setcounter{figure}{0}
