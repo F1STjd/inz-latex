@@ -5,7 +5,6 @@
 \begin{itemize}
     \item Rejestracja nowego użytkownika
     \item Logowanie do systemu
-    \item Edycja konta
     \item Tworzenie aukcji
     \item Przeglądanie aukcji
     \item Wizualizacja modelu 3D
@@ -15,6 +14,7 @@
 \end{itemize}
 
 \subsubsection{Diagramy bpmn:}
+Diagramy BPMN (Business Process Model and Notation) służa do modelowania procesów biznesowych. Opisują sekwencje działań i przepływów w procesach danej organizacji. 
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/tworzenie aukcji.png}
     \captionof{figure}{Tworzenie aukcji}
@@ -27,6 +27,7 @@
 \todo[inline]{Czy diagramy nie za małe? Można użyć \texttt{\textbackslash landscape}, ale czy w pracy można to zastosować?}
 
 \subsection{Wymagania funkcjonalne:}
+Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
 \begin{itemize}
     \item Obsługa aukcji
           \begin{itemize}
@@ -61,6 +62,7 @@
 \end{itemize}
 
 \subsection{Wymagania niefunkcjonalne:}
+Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i ograniczeń systemu. Nie opisują działania systemu, lecz jego właściwości. 
 \begin{itemize}
     \item Wydajność
           \begin{itemize}
@@ -86,6 +88,7 @@
 \end{itemize}
 
 \subsection{Diagram pakietów przypadków użycia}
+Diagramy pakietów przypakdów użycia to diagramy UML grupujące przypadki użycia w grupy nazywane pakietami. Diagram ten pomaga organizować przypadki użycia w grupy, poprzez powiązane funkcjonalności. W tym diagramie pakiety są reprezentowane przez foldery, które zawierają przypadki użycia.  
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/Diagram pakietow.png}
     \captionof{figure}{Diagram pakietów}
@@ -93,6 +96,7 @@
 \end{center}
 
 \subsection{Diagramy przypadków użycia}
+Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje pomiędzy aktorami, a funkcjonalnościami systemu. 
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/zarzadzanie-uzytkownikami.png}
     \captionof{figure}{Zarządzanie użytkownikami}
@@ -141,6 +145,7 @@
 \end{figure}
 
 \subsection{Historyjki użytkownika}
+Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytkownika końcowego. Dzięki historyjkom, wiemy jakich funkcjonalności wymagaj poszczególni użytkownicy systemu.  
 \subsubsection{Użytkownik}
 \begin{itemize}
     \item \textbf{Jako} użytkownik,\\
@@ -234,6 +239,7 @@
 \end{itemize}
 
 \subsection{Diagramy klas}
+Diagramem klas to typ diagramu strukturalnego UML, który przedstawia strukturę systemu. Pokazuje on klasy, właściwości klas i relacje między klasami. Diagram ten służy jako plan do zaimplementowania bazy danych w systemie. 
 \todo[inline]{bez landscape obrazki bardzo nieczytelne}
 \begin{landscape}
     \begin{figure}[p]
@@ -260,6 +266,8 @@
 \end{landscape}
 
 \subsection{Diagramy sekwencji}
+Diagramy sekwencji pokazują współprace obiektów w systemie podczas działania danego procesu. Obiekty lub aktorzy są przedstawieni na górze diagramu, pionowe linie, zwane liniami życia, odzwierciedlają ich istnienie. Strzałki pomiędzy obiektami, pokazują jak zachodzi komunikacja w systemie pomiędzy poszczególnymi obiektami. 
+
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/GenerowanieRaportow.png}
     \captionof{figure}{Generowanie raportów}
