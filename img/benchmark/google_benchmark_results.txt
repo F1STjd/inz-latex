@@ -1,0 +1,93 @@
+inz> .\build-dawn\bin\benchmark_load_obj.exe
+2026-01-03T18:17:15-00:00
+Running D:\code\WebGPU\inz\build-dawn\bin\benchmark_load_obj.exe
+Run on (4 X 2712 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 32 KiB (x4)
+  L2 Unified 256 KiB (x4)
+  L3 Unified 6144 KiB (x1)
+Loading geometry: D:/code/WebGPU/inz/benchmark\1k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\1k.obj
+---------------------------------------------------------------------------------------------------------------------
+Benchmark                                                           Time             CPU   Iterations UserCounters...
+---------------------------------------------------------------------------------------------------------------------
+BM_LoadGeometryObj/0/repeats:10/real_time_mean                   5.05 ms         4.80 ms           10 Vertices=5.994k VerticesPerSec=1.18897M/s bytes_per_second=77.1047Mi/s 1k.obj
+BM_LoadGeometryObj/0/repeats:10/real_time_median                 5.04 ms         4.93 ms           10 Vertices=5.994k VerticesPerSec=1.1896M/s bytes_per_second=77.1454Mi/s 1k.obj
+BM_LoadGeometryObj/0/repeats:10/real_time_stddev                0.178 ms        0.268 ms           10 Vertices=0 VerticesPerSec=40.8303k/s bytes_per_second=2.64784Mi/s 1k.obj
+BM_LoadGeometryObj/0/repeats:10/real_time_cv                     3.52 %          5.60 %            10 Vertices=0.00% VerticesPerSec=3.43% bytes_per_second=3.43% 1k.obj
+BM_LoadGeometryObj/0/repeats:10/real_time_min                    4.84 ms         4.33 ms           10 Vertices=5.994k VerticesPerSec=1.10481M/s bytes_per_second=71.6465Mi/s 1k.obj
+BM_LoadGeometryObj/0/repeats:10/real_time_max                    5.43 ms         5.05 ms           10 Vertices=5.994k VerticesPerSec=1.23843M/s bytes_per_second=80.312Mi/s 1k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\10k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_mean                   43.1 ms         42.6 ms           10 Vertices=59.994k VerticesPerSec=1.39186M/s bytes_per_second=90.262Mi/s 10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_median                 43.1 ms         43.0 ms           10 Vertices=59.994k VerticesPerSec=1.3935M/s bytes_per_second=90.3684Mi/s 10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_stddev                0.502 ms         1.15 ms           10 Vertices=0 VerticesPerSec=16.0046k/s bytes_per_second=1.0379Mi/s 10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_cv                     1.16 %          2.69 %            10 Vertices=0.00% VerticesPerSec=1.15% bytes_per_second=1.15% 10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_min                    42.5 ms         41.0 ms           10 Vertices=59.994k VerticesPerSec=1.3557M/s bytes_per_second=87.9169Mi/s 10k.obj
+BM_LoadGeometryObj/1/repeats:10/real_time_max                    44.3 ms         44.9 ms           10 Vertices=59.994k VerticesPerSec=1.41012M/s bytes_per_second=91.4462Mi/s 10k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\100k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_mean                    427 ms          429 ms           10 Vertices=599.964k VerticesPerSec=1.40402M/s bytes_per_second=91.0508Mi/s 100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_median                  427 ms          430 ms           10 Vertices=599.964k VerticesPerSec=1.40374M/s bytes_per_second=91.032Mi/s 100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_stddev                 2.34 ms         2.47 ms           10 Vertices=0 VerticesPerSec=7.66953k/s bytes_per_second=509.305Ki/s 100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_cv                     0.55 %          0.58 %            10 Vertices=0.00% VerticesPerSec=0.55% bytes_per_second=0.55% 100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_min                     424 ms          422 ms           10 Vertices=599.964k VerticesPerSec=1.38967M/s bytes_per_second=90.1201Mi/s 100k.obj
+BM_LoadGeometryObj/2/repeats:10/real_time_max                     432 ms          430 ms           10 Vertices=599.964k VerticesPerSec=1.41521M/s bytes_per_second=91.7765Mi/s 100k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\1M.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_mean                   4290 ms         4283 ms           10 Vertices=5.90088M VerticesPerSec=1.37555M/s bytes_per_second=89.2041Mi/s 1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_median                 4274 ms         4273 ms           10 Vertices=5.90088M VerticesPerSec=1.38054M/s bytes_per_second=89.5275Mi/s 1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_stddev                 32.8 ms         29.0 ms           10 Vertices=0 VerticesPerSec=10.4453k/s bytes_per_second=693.632Ki/s 1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_cv                     0.77 %          0.68 %            10 Vertices=0.00% VerticesPerSec=0.76% bytes_per_second=0.76% 1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_min                    4258 ms         4250 ms           10 Vertices=5.90088M VerticesPerSec=1.35291M/s bytes_per_second=87.7358Mi/s 1M.obj
+BM_LoadGeometryObj/3/repeats:10/real_time_max                    4362 ms         4328 ms           10 Vertices=5.90088M VerticesPerSec=1.38585M/s bytes_per_second=89.8724Mi/s 1M.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\1k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\1k.obj
+BM_LoadGeometryObj_CPUTime/0/repeats:10_mean                     4.87 ms         4.77 ms           10 Vertices=5.994k 1k.obj
+BM_LoadGeometryObj_CPUTime/0/repeats:10_median                   4.86 ms         4.74 ms           10 Vertices=5.994k 1k.obj
+BM_LoadGeometryObj_CPUTime/0/repeats:10_stddev                  0.079 ms        0.158 ms           10 Vertices=0 1k.obj
+BM_LoadGeometryObj_CPUTime/0/repeats:10_cv                       1.63 %          3.32 %            10 Vertices=0.00% 1k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\10k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\10k.obj
+BM_LoadGeometryObj_CPUTime/1/repeats:10_mean                     42.0 ms         41.2 ms           10 Vertices=59.994k 10k.obj
+BM_LoadGeometryObj_CPUTime/1/repeats:10_median                   42.0 ms         41.4 ms           10 Vertices=59.994k 10k.obj
+BM_LoadGeometryObj_CPUTime/1/repeats:10_stddev                  0.315 ms         1.49 ms           10 Vertices=0 10k.obj
+BM_LoadGeometryObj_CPUTime/1/repeats:10_cv                       0.75 %          3.61 %            10 Vertices=0.00% 10k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\100k.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\100k.obj
+BM_LoadGeometryObj_CPUTime/2/repeats:10_mean                      421 ms          420 ms           10 Vertices=599.964k 100k.obj
+BM_LoadGeometryObj_CPUTime/2/repeats:10_median                    420 ms          422 ms           10 Vertices=599.964k 100k.obj
+BM_LoadGeometryObj_CPUTime/2/repeats:10_stddev                   3.12 ms         6.16 ms           10 Vertices=0 100k.obj
+BM_LoadGeometryObj_CPUTime/2/repeats:10_cv                       0.74 %          1.47 %            10 Vertices=0.00% 100k.obj
+Loading geometry: D:/code/WebGPU/inz/benchmark\1M.obj
+...
+Loading geometry: D:/code/WebGPU/inz/benchmark\1M.obj
+BM_LoadGeometryObj_CPUTime/3/repeats:10_mean                     4282 ms         4275 ms           10 Vertices=5.90088M 1M.obj
+BM_LoadGeometryObj_CPUTime/3/repeats:10_median                   4282 ms         4281 ms           10 Vertices=5.90088M 1M.obj
+BM_LoadGeometryObj_CPUTime/3/repeats:10_stddev                   18.5 ms         19.8 ms           10 Vertices=0 1M.obj
+BM_LoadGeometryObj_CPUTime/3/repeats:10_cv                       0.43 %          0.46 %            10 Vertices=0.00% 1M.obj
+BM_LoadGeometryObj_ParseOnly/0/repeats:10/real_time_mean         4.16 ms         4.17 ms           10 Indices=5.994k 1k.obj
+BM_LoadGeometryObj_ParseOnly/0/repeats:10/real_time_median       4.16 ms         4.19 ms           10 Indices=5.994k 1k.obj
+BM_LoadGeometryObj_ParseOnly/0/repeats:10/real_time_stddev      0.012 ms        0.039 ms           10 Indices=0 1k.obj
+BM_LoadGeometryObj_ParseOnly/0/repeats:10/real_time_cv           0.29 %          0.94 %            10 Indices=0.00% 1k.obj
+BM_LoadGeometryObj_ParseOnly/1/repeats:10/real_time_mean         38.0 ms         38.0 ms           10 Indices=59.994k 10k.obj
+BM_LoadGeometryObj_ParseOnly/1/repeats:10/real_time_median       38.0 ms         38.2 ms           10 Indices=59.994k 10k.obj
+BM_LoadGeometryObj_ParseOnly/1/repeats:10/real_time_stddev      0.228 ms        0.549 ms           10 Indices=0 10k.obj
+BM_LoadGeometryObj_ParseOnly/1/repeats:10/real_time_cv           0.60 %          1.44 %            10 Indices=0.00% 10k.obj
+BM_LoadGeometryObj_ParseOnly/2/repeats:10/real_time_mean          392 ms          392 ms           10 Indices=599.964k 100k.obj
+BM_LoadGeometryObj_ParseOnly/2/repeats:10/real_time_median        390 ms          391 ms           10 Indices=599.964k 100k.obj
+BM_LoadGeometryObj_ParseOnly/2/repeats:10/real_time_stddev       2.76 ms         3.29 ms           10 Indices=0 100k.obj
+BM_LoadGeometryObj_ParseOnly/2/repeats:10/real_time_cv           0.70 %          0.84 %            10 Indices=0.00% 100k.obj
+BM_LoadGeometryObj_ParseOnly/3/repeats:10/real_time_mean         3927 ms         3925 ms           10 Indices=5.90088M 1M.obj
+BM_LoadGeometryObj_ParseOnly/3/repeats:10/real_time_median       3926 ms         3922 ms           10 Indices=5.90088M 1M.obj
+BM_LoadGeometryObj_ParseOnly/3/repeats:10/real_time_stddev       12.1 ms         9.88 ms           10 Indices=0 1M.obj
+BM_LoadGeometryObj_ParseOnly/3/repeats:10/real_time_cv           0.31 %          0.25 %            10 Indices=0.00% 1M.obj
+inz>
