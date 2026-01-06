@@ -1,221 +1,416 @@
 \section{Implementacja Bazy Danych oraz Logiki Biznesowej}
 
-\subsection{Model Aukcji (Auction)}
-
-Model Auction stanowi rdzeń systemu aukcyjnego i zawiera logikę biznesową związaną z zarządzaniem aukcjami.
-
-\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
-  \hline
-  \textbf{Pole} & \textbf{Typ}  & \textbf{Opis}                                                                                                                                                 \\ \hline
-  \endfirsthead
-  \hline
-  \textbf{Pole} & \textbf{Typ}  & \textbf{Opis}                                                                                                                                                 \\ \hline
-  \endhead
-
-  title         & String        & Tytuł aukcji (3-100 znaków, wymagane)                                                                                                                         \\ \hline
-  description   & String        & Opis aukcji (10-5000 znaków, wymagane)                                                                                                                        \\ \hline
-  category      & Enum          & 12 kategorii: Sztuka, Antyki, Biżuteria, Monety i Banknoty, Książki, Militaria, Meble, Porcelana i Ceramika, Zegarki, Instrumenty Muzyczne, Elektronika, Inne \\ \hline
-  images        & Array[String] & Tablica URLi obrazów                                                                                                                                          \\ \hline
-  model3D       & String        & Opcjonalny model 3D (formaty: .obj, .gltf, .glb, .fbx)                                                                                                        \\ \hline
-  startingPrice & Number        & Cena wywoławcza (wymagana, $\geq 0$)                                                                                                                          \\ \hline
-  currentPrice  & Number        & Aktualna cena aukcji                                                                                                                                          \\ \hline
-  bidIncrement  & Number        & Minimalne podwyższenie (domyślnie: 100)                                                                                                                       \\ \hline
-  buyNowPrice   & Number        & Opcjonalna cena \enquote{Kup Teraz}                                                                                                                           \\ \hline
-  seller        & ObjectId      & Referencja do modelu User (wymagane, indeksowane)                                                                                                             \\ \hline
-  startTime     & Date          & Data rozpoczęcia aukcji                                                                                                                                       \\ \hline
-  endTime       & Date          & Data zakończenia aukcji                                                                                                                                       \\ \hline
-  status        & Enum          & Status: draft, active, completed, cancelled                                                                                                                   \\ \hline
-  winnerId      & ObjectId      & Zwycięzca aukcji (referencja do User)                                                                                                                         \\ \hline
-  condition     & Enum          & Stan przedmiotu: Nowy, Bardzo dobry, Dobry, Zadowalający, Do renowacji                                                                                        \\ \hline
-  timestamps    & Date          & Automatyczne pola: createdAt, updatedAt                                                                                                                       \\ \hline
-\end{longtable}
-
-Model zawiera również pola pomocnicze: \texttt{totalBids}, \texttt{watchers}, \texttt{watchersCount}, \texttt{views}, \texttt{featured}, \texttt{isDeleted}.
-
-\paragraph{Indeksy Bazy Danych}
-
-System wykorzystuje \textbf{9 strategicznych indeksów} dla optymalizacji zapytań, w tym indeksy złożone (\texttt{seller + status}, \texttt{endTime + status}, \texttt{category + status}) oraz indeks tekstowy na polach \texttt{title + description} dla full-text search.
-
-\paragraph{Kluczowe metody}
-
+\subsection{Struktura części serwerowej}
+Na rysunku x przedstawiono strukturę części serwerowej systemu aukcyjnego:
 \begin{itemize}
-  \item \textbf{placeBid(bidderId, amount)} --- główna metoda biznesowa do składania licytacji. Waliduje status aukcji, czas, własność i minimalną kwotę. Aktualizuje \texttt{currentPrice}, \texttt{winnerId} oraz \texttt{totalBids}.
-  \item \textbf{complete()} --- zamyka aukcję, ustawia zwycięzcę i aktualizuje statystyki użytkowników.
-  \item \textbf{closeExpiredAuctions()} --- metoda statyczna batch processing do automatycznego zamykania wygasłych aukcji, kompatybilna z cron jobs.
+	\item tests - w tym folderze zawarte są testy: jednostkowe, implementacyjne i funkcjonalne, opisane w rozdziale x.
+	\item Controllers - w tym folderze znajduje się kod opisujący logikę biznesową.
+	\item Middleware - w tym folderze znajduje się kod opisujący autentykacje za pomocą JWT. 
+	\item Models - w tym folderze znajduje się kod opisującymodele: User, Bid i Auction dla bazy danych. 
+	\item	Routes - w tym folderze są opisane trasy URL.
+	\item Utils - w tym folderze są opisane funkcje pomocnicze. 
 \end{itemize}
 
-Pozostałe metody (\texttt{cancel}, \texttt{softDelete}, \texttt{addWatcher/removeWatcher}, \texttt{incrementViews}) działają analogicznie --- modyfikują odpowiednie pola modelu z walidacją.
+%tutaj zdjęcie backend.png
 
-\subsection{Model Licytacji (Bid)}
+\subsection{Połączenie z bazą danych.}
 
-Model Bid reprezentuje pojedynczą licytację w systemie.
+W celu uproszczenia pracy z projektem zostało użyte rozwiązanie Atlas, czyli rozwiązanie chmurowe bazy danych MongoDB. Dzięki takiemu działaniu udało się ułatwić 
+pracę z projektem. Serwer łączy się z bazą danych, za pomocą zmiennej środowiskowej. Jeżeli połączenie nie nastąpi, wyświetlany jest typ błędu.
 
-\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
-  \hline
-  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                 \\ \hline
-  \endfirsthead
-  \hline
-  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                 \\ \hline
-  \endhead
-
-  auction       & ObjectId     & Referencja do Auction (wymagane, indeksowane) \\ \hline
-  bidder        & ObjectId     & Referencja do User (wymagane, indeksowane)    \\ \hline
-  amount        & Number       & Kwota licytacji (wymagane, $\geq 0$)          \\ \hline
-  isWinning     & Boolean      & Czy to aktualnie wygrywająca licytacja        \\ \hline
-  status        & Enum         & Status: active, outbid, won, lost, cancelled  \\ \hline
-\end{longtable}
-
-\paragraph{Kluczowe metody}
-
-\begin{itemize}
-  \item \textbf{markLostBids(auctionId, winnerId)} --- batch update oznaczający wszystkie licytacje (oprócz zwycięskiej) jako przegrane po zakończeniu aukcji.
-  \item \textbf{getAuctionBids/getUserBids} --- metody pobierające historię licytacji z paginacją i filtrowaniem. Działają analogicznie dla aukcji i użytkownika.
-\end{itemize}
-
-\subsection{Model Użytkownika (User)}
-
-Model User zawiera dane użytkownika oraz system autentykacji.
-
-\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
-  \hline
-  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
-  \endfirsthead
-  \hline
-  \textbf{Pole} & \textbf{Typ} & \textbf{Opis}                                                                       \\ \hline
-  \endhead
-
-  username      & String       & Nazwa użytkownika (unikalne)                                                        \\ \hline
-  email         & String       & Adres email (unikalne)                                                              \\ \hline
-  password      & String       & Hasło (bcrypt hash)                                                                 \\ \hline
-  role          & Enum         & Rola: user, admin                                                                   \\ \hline
-  isActive      & Boolean      & Czy konto jest aktywne                                                              \\ \hline
-  stats         & Object       & Statystyki: totalAuctionsCreated, totalAuctionsWon, totalBidsPlaced, totalItemsSold \\ \hline
-\end{longtable}
-
-Model zawiera również pola profilu (\texttt{firstName}, \texttt{lastName}, \texttt{phone}, \texttt{avatar}, \texttt{address}) oraz tokeny autentykacji.
-
-\paragraph{Zabezpieczenia}
-
-\begin{itemize}
-  \item Hasło hashowane przez \textbf{bcrypt} (cost factor: 12)
-  \item Pole \texttt{password} wyłączone z domyślnych queries
-  \item JWT token z 7-dniowym czasem wygaśnięcia
-\end{itemize}
-
-\subsection{Strategia Walidacji}
-
-System implementuje \textbf{wielopoziomową walidację}:
-
-\begin{enumerate}
-  \item \textbf{Schema (Mongoose)} --- typy danych, wymagalność pól, ograniczenia długości, wartości enum
-  \item \textbf{Model (Business Logic)} --- metody instancji, middleware hooks, warunki złożone
-  \item \textbf{Kontroler (Authorization)} --- weryfikacja własności zasobów, sprawdzanie ról
-\end{enumerate}
-
-\subsection{Relacje między modelami}
-
-\begin{itemize}
-  \item \textbf{User $\rightarrow$ Auction} (1:N) --- pole \texttt{seller}
-  \item \textbf{User $\rightarrow$ Bid} (1:N) --- pole \texttt{bidder}
-  \item \textbf{Auction $\rightarrow$ Bid} (1:N) --- pole \texttt{auction}
-  \item \textbf{Auction $\leftrightarrow$ User} (N:M) --- tablica \texttt{watchers}
-\end{itemize}
-
-\newpage
-
-\subsection{Implementacja REST API}
-
-API implementuje standardy \textbf{RESTful}: GET (pobieranie), POST (tworzenie), PATCH (aktualizacja), DELETE (usuwanie).
-
-\subsubsection{Middleware Autentykacji}
-
-\begin{itemize}
-  \item \textbf{protect} --- ekstrakcja i weryfikacja JWT z nagłówka \texttt{Authorization: Bearer <token>}, pobranie użytkownika z bazy, sprawdzenie aktywności konta
-  \item \textbf{restrictTo(...roles)} --- kontrola dostępu RBAC, zwraca \texttt{403 Forbidden} dla nieuprawnionych ról
-\end{itemize}
-
-\subsubsection{Kluczowe endpointy API}
-
-\paragraph{Pobieranie aukcji (GET /api/auctions)}
-
-Endpoint publiczny z filtrowaniem (category, minPrice, maxPrice, status), sortowaniem i paginacją. Analogicznie działa \texttt{GET /api/auctions/search} z wyszukiwaniem full-text oraz \texttt{GET /api/auctions/:id} dla pojedynczej aukcji.
-
-\paragraph{Tworzenie aukcji (POST /api/auctions)}
-
-Endpoint chroniony (\texttt{protect}). Wymagane pola: title, description, category, startingPrice, bidIncrement, startTime, endTime, condition. Opcjonalne: images, model3D, reservePrice, buyNowPrice. Automatycznie przypisuje \texttt{seller} i aktualizuje statystyki.
-
-\paragraph{Składanie licytacji (POST /api/auctions/:id/bid)}
-
-Endpoint chroniony. Waliduje: aktywność aukcji, minimalną kwotę ($\geq$ currentPrice + bidIncrement), brak własności aukcji. Post-save hook automatycznie aktualizuje cenę aukcji, winnerId oraz oznacza poprzednie bidy jako \texttt{outbid}.
-
-\paragraph{Pozostałe endpointy}
-
-Endpointy \texttt{PATCH /api/auctions/:id} i \texttt{DELETE /api/auctions/:id} działają analogicznie z walidacją własności i ograniczeniami edycji w zależności od statusu aukcji. Endpointy watchlist (\texttt{POST/DELETE /api/auctions/:id/watch}) oraz historia licytacji (\texttt{GET /api/bids/me}, \texttt{GET /api/auctions/:id/bids}) działają w podobny sposób z odpowiednią autoryzacją.
-
-\subsubsection{Format odpowiedzi}
-
-\textbf{Sukces:}
-\begin{lstlisting}
-{
-  "success": true,
-  "data": { ... },
-  "results": 10,
-  "totalPages": 5,
-  "currentPage": 1
-}
-\end{lstlisting}
-
-\textbf{Błąd:}
-\begin{lstlisting}
-{
-  "success": false,
-  "error": {
-    "message": "Opis bledu",
-    "statusCode": 400
+\begin{lstlisting}[style=javascript]
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`Database: ${conn.connection.name}`);
+  } catch (error) {
+    console.error('MongoDB Connection Error:', error.message);
+    process.exit(1);
   }
-}
+};
 \end{lstlisting}
 
-Kody statusów: 200 (OK), 201 (Created), 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 500 (Internal Server Error).
 
-\subsubsection{Przepływ danych --- Złożenie licytacji}
+\subsection{Rejestracja użytkowników}
+Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik podaje nazwę użytkownika, email, hasło obowiązkowo, a opcjonalnie może podać imię, nazwisko orz numer telefonu. Jeżeli użytkownik podał istniejący email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzymy model User i token JWT oraz zapisujemy użytkownika w bazie danych. Hasła są hashowane przed zapisem do bazy danych, w celu zabepieczenia użytkownika. Jeżeli wystąpi jakiś błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu przedstawiono kod dotyczący rejestracji użytkowników. Na listingu x przedstawiono ochronę haseł poprzez hashowanie.
 
-\begin{enumerate}
-  \item Użytkownik: \texttt{POST /api/auctions/:id/bid \{ amount \}}
-  \item Kontroler waliduje żądanie HTTP
-  \item \texttt{Auction.placeBid()} --- walidacja biznesowa (aktywność, kwota, własność)
-  \item Utworzenie dokumentu Bid
-  \item Post-save hook aktualizuje: \texttt{Auction.currentPrice}, \texttt{winnerId}, poprzednie bidy na \texttt{outbid}
-  \item Zwrot zaaktualizowanej licytacji
-\end{enumerate}
+\begin{lstlisting}[style=javascript]
+export const register = async (req, res) => {
+  try {
+    const {	username, email, password, 
+    		firstName, lastName, phone } = req.body;
+    
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Podaj wymagane pola: username, email i password'
+      });
+    }
+   
+    const existingUser = await User.findOne({ 
+    $or: [{ email }, { username }] });
+    
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: existingUser.email === email
+          ? 'Uzytkownik z tym adresem email juz istnieje'
+          : 'Nazwa użytkownika jest juz zajeta'
+      });}
+    const newUser = await User.create({
+      username, email,
+      password, firstName,
+      lastName, phone
+    });
+    
+    const verificationToken = newUser.createVerificationToken();
+    await newUser.save({ validateBeforeSave: false });
+    console.log('Verification token:', verificationToken);
+    
+    createSendToken(newUser, 201, 
+    	res, 'Konto zostalo utworzone pomyslnie');
+    
+  } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        message: `${field === 'email' ? 'Email' : 
+        'Nazwa uzytkownika'} jest juz zajeta`
+      });
+    }    
+    return sendErrorResponse(res, 500, 
+    	'Blad podczas rejestracji', error);
+  }
+};
+\end{lstlisting}
 
-Pozostałe scenariusze (zakończenie aukcji, wyszukiwanie) działają analogicznie z wykorzystaniem odpowiednich metod modeli.
+\begin{lstlisting}[style=javascript]
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    this.password = await bcrypt.hash(this.password, 12);
+    
+    if (!this.isNew) {
+      this.passwordChangedAt = Date.now() - 1000; 
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+\end{lstlisting}
 
-\section{Wymagania sprzętowe}
+\subsection{Logowanie użytkownika}
+Po dokonaniu rejestracji, użytknownik może się zalgować do systemu aukcyjnego. Do logowania wprowadzamy email bądź nazwę użytkownika oraz podane hasło podczas rejestracji.
+Podczas procesu logowania porównujemy hashe hasła, które zostało wprowadzone przez użytkownika, z hashem zapisanym w bazie danych. Dzięki takiej praktyce podczas wycieku danych z bazy, użytkownicy nie tracą swojego loginu i hasła. Na listingu x przedstawiono kod, który obsługuję logowanie użytkowników. 
 
-Finalna aplikacja działa bez problemów na wszystkich przeglądarkach wspierających technologię WebGPU. Poniżej przedstawiono listę kompatybilnych przeglądarek wraz z minimalnymi wymaganiami:
+\begin{lstlisting}[style=javascript]
+export const login = async (req, res) => {
+  try {
+    const { credential, password } = req.body;
 
-\subsection{Przeglądarki desktopowe}
+    if (!credential || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Podaj email/username i hasło'
+      });
+    }
 
-\begin{itemize}
-  \item \textbf{Google Chrome} --- wersja 113 i kolejne
-  \item \textbf{Microsoft Edge} --- wersja 113 i kolejne
-  \item \textbf{Opera} --- wersja 99 i kolejne
-  \item \textbf{Safari} --- wersja 26.0 i kolejne, wyłącznie na systemie macOS 26 Tahoe lub późniejszych
-  \item \textbf{Mozilla Firefox} --- wersja 141 i kolejne z następującymi zastrzeżeniami:
-        \begin{itemize}
-          \item Windows: dostępne bez dodatkowej konfiguracji od wersji 141
-          \item macOS 26 Tahoe lub późniejsze: dostępne bez konfiguracji od wersji 145
-          \item Pozostałe systemy: wymagane włączenie flagi \texttt{dom.webgpu.enabled} w ustawieniach przeglądarki
-        \end{itemize}
-\end{itemize}
+    const user = await User.findByCredential(credential);
 
-\subsection{Przeglądarki mobilne}
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: 'Nieprawidłowe dane logowania'
+      });
+    }
 
-\begin{itemize}
-  \item \textbf{Chrome dla Androida} --- wersja 142 i kolejne
-  \item \textbf{Safari oraz inne przeglądarki na iOS} --- wersja 26.0 i kolejne
-  \item \textbf{Samsung Internet} --- wersja 29 i kolejne
-  \item \textbf{Opera dla Androida} --- wersja 80 i kolejne
-\end{itemize}
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'To konto zostało dezaktywowane'
+      });
+    }
+
+    createSendToken(user, 200, res, 'Zalogowano pomyślnie');
+  } catch (error) {
+    return sendErrorResponse(res, 500, 'Błąd podczas logowania', error);
+  }
+};
+\end{lstlisting}
+
+\subsection{Autentykacja użytkownika}
+Użytkownicy są autetykowani poprzez Json Web Token. Ten standard pozwala nam na bezpieczną wymianę danych pomiędzy kilentem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówek zawiera typ tokenu i algorytm podpisu, ładunek zawiera dane użytkownika, podpis zawiera kryptograficzyny podpis, dzięki któremu potwierdzamy poprawność JWT. Na listingu przedstawiono implementacje tokenów JWT. 
+
+\begin{lstlisting}[style=javascript]
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+  });
+};
+
+const createSendToken = 
+	(user, statusCode, res, message = 'Sukces') => {
+  
+  const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + (process.env.JWT_COOKIE_EXPIRES_IN || 7) 
+      				* 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    success: true,
+    message,
+    token,
+    data: { user }
+  });
+};
+\end{lstlisting}
+
+\subsection{Zarządzanie aukcjami}
+
+\subsubsection{Stworzenie aukcji}
+
+Zalogowany użytkownik może stworzyć wiele aukcji. Swojej aukcji nie może licytować, aby nie zawyżać sztucznie ceny. Przy utworzeniu każdej aukcji przez danego użytkownika, inkrementujemy liczbę wszystkich utworzonych aukcji. Na listingu przedstawiono funkcje tworzącą aukcję. 
+
+\begin{lstlisting}[style=javascript]
+export const createAuction = async (req, res) => {
+  try {
+    const auctionData = {
+      ...req.body,
+      seller: req.user._id
+    };
+    const startTime = new Date(auctionData.startTime || Date.now());
+    const endTime = new Date(auctionData.endTime);
+
+    if (endTime <= startTime) {
+      return res.status(400).json({
+        success: false,
+        message: 'Data zakonczenia musi byc 
+        pozniejsza niz data rozpoczecia'
+      });
+    }
+
+    const auction = await Auction.create(auctionData);
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'stats.totalAuctionsCreated': 1 }
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Aukcja zostala utworzona pomyslnie',
+      data: auction
+    });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors)
+      	.map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: messages[0]
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: 'Błąd podczas tworzenia aukcji',
+      error: error.message
+    });
+  }
+};
+\end{lstlisting}
+
+\subsubsection{Kategorie Aukcji}
+Każda aukcja ma przypisaną jedną z dwunastu kategorii. Dzięki temu podczas wyświetlania wszystkich aukcji możemy filtrować dane w taki sposób, aby użytkownik miał łatwość w szukaniu potrzebnego dla siebie przedmiotu. Listing przedstawia kod odpowidający za opisanie kategorii aukcji. 
+\begin{lstlisting}[style = javascript]
+export const getCategories = async (req, res) => {
+  try {
+    const categories = [
+      'Sztuka', 'Antyki', 'Bizuteria',
+      'Monety i Banknoty', 'Ksiazki', 'Militaria',
+      'Meble', 'Porcelana i Ceramika', 'Zegarki',
+      'Instrumenty Muzyczne', 'Elektronika', 'Inne',
+    ];
+    
+     const categoriesWithCount = await Promise.all(
+      categories.map(async (category) => {
+        const count = await Auction.countDocuments({
+          category,
+          status: 'active',
+          isDeleted: false,
+          endTime: { $gt: Date.now() }
+        });
+        return { name: category, count };
+      })
+    );
+    res.status(200).json({
+      success: true,
+      data: categoriesWithCount
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Blad podczas pobierania kategorii',
+      error: error.message
+    });
+  }
+};
+\end{lstlisting}
+
+\subsubsection{Licytowanie aukcji}
+Użytkownik może licytować wiele aukcji na raz. Każda aukcja ma cene wywoławczą i najmniejszą cenę o jaką można podbić aukcje. Po utworzeniu zgodnego podbicia, aktualizujemy cene aukcji, poprzednie podbicia ustawiamy jako przebite i zatwierdzamy transakcję. Na listingu został przedstawiony proces licytowania aukcji przez jednego użytkownika. 
+\begin{lstlisting}[style=javascript]
+export const placeBid = async (req, res) => {
+  const mongoose = (await import('mongoose')).default;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { amount } = req.body;
+    const auctionId = req.params.id;
+    const bidderId = req.user._id;
+
+    const auction = await Auction.findById(auctionId)
+    .session(session);
+
+    const bidArray = await Bid.create([{
+      auction: auctionId,
+      bidder: bidderId,
+      amount,
+      previousBid: auction.currentPrice,
+      isWinning: true,
+      status: 'active'
+    }], { session });
+    
+    const minimumBid = auction.currentPrice + auction.bidIncrement;
+        if (amount < minimumBid) {
+          throw new Error(`Minimalna oferta to ${minimumBid} zł`);
+        }
+        
+    const bid = bidArray[0];
+    await Auction.findOneAndUpdate(
+      { _id: auctionId, __v: auction.__v },
+      {
+        $set: {
+          currentPrice: amount,
+          winnerId: bidderId
+        },
+        $inc: {
+          totalBids: 1,
+          __v: 1
+        }
+      },
+      { new: true, session, runValidators: true }
+    );
+
+    await Bid.updateMany(
+      {
+        auction: auctionId,
+        _id: { $ne: bid._id },
+        isWinning: true
+      },
+      {
+        $set: {
+          isWinning: false,
+          status: 'outbid'
+        }
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    const populatedBid = await Bid.findById(bid._id)
+      .populate('bidder', 'username rating')
+      .populate('auction', 'title currentPrice endTime');
+
+    res.status(201).json({
+      success: true,
+      message: 'Oferta została zlozona pomyslnie',
+      data: populatedBid
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Blad podczas skladania oferty'
+    });
+  } finally {
+    session.endSession();
+  }
+};
+\end{lstlisting}
+
+
+\subsubsection{Wyświetlanie wszystkich aukcji}
+
+Niezalogowani użytkownicy mogą wyświetlać wszystkie aukcje. Aukcje mogą być sortowane po kategorii, cenie albo po czasie aukcji. Na listingu przedstawiono funkcje, która pozwala na pobranie wszystkich aukcji. 
+
+\begin{lstlisting}[style=javascript]
+export const getAllAuctions = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      category,
+      minPrice,
+      maxPrice,
+      sortBy = 'endTime',
+      sortOrder = 'asc',
+      status = 'active'
+    } = req.query;
+
+    const query = {
+      isDeleted: false
+    };
+    if (category) query.category = category;
+
+    if (minPrice || maxPrice) {
+      query.currentPrice = {};
+      if (minPrice) query.currentPrice.$gte = parseFloat(minPrice);
+      if (maxPrice) query.currentPrice.$lte = parseFloat(maxPrice);
+    }
+
+    if (status === 'active') {
+      query.endTime = { $gt: Date.now() };
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const auctions = await Auction.find(query)
+      .populate('seller', 'username rating')
+      .populate('winnerId', 'username')
+      .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+
+    const total = await Auction.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      results: auctions.length,
+      totalPages: Math.ceil(total / parseInt(limit)),
+      currentPage: parseInt(page),
+      total,
+      data: auctions
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Blad podczas pobierania aukcji',
+      error: error.message
+    });}};
+\end{lstlisting} 
 
