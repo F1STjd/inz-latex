@@ -20,7 +20,10 @@
 \babelprovide[transforms = oneletter.nobreak]{polish} 
 \usepackage{array}
 \usepackage{enumitem}
-\usepackage[backend=biber, defernumbers=true]{biblatex}
+\usepackage[backend=biber,
+            style=numeric-comp,
+            sorting=nyt,
+            defernumbers=true]{biblatex}
 \usepackage{tabularx}
 \usepackage{xltabular}
 \usepackage{multirow}
@@ -37,6 +40,8 @@
 \usepackage{listings}
 \usepackage{csquotes}
 \usepackage{pdflscape}
+\usepackage{url}
+\urlstyle{same}
 
 
 % komentarze
@@ -79,6 +84,20 @@
 \DeclareFloatingEnvironment{graph}
 
 \addbibresource{bib/thesis.bib}
+
+% Usunięcie prefiksu "URL:" przed linkami
+\DeclareFieldFormat{url}{\url{#1}}
+
+% Niestandardowe formatowanie dla źródeł internetowych (wymagania uczelni)
+% Format: Tytuł. URL. [data dostępu]
+\DeclareBibliographyDriver{online}{%
+  \printfield{title}.%
+  \addspace%
+  \printfield{url}.%
+  \addspace%
+  \printfield{note}%
+  \finentry%
+}
 
 \newcolumntype{C}[1]{>{\centering\arraybackslash} m{#1} }
 \newcolumntype{?}{!{\vrule width 1.5pt}}
@@ -411,9 +430,6 @@
 % \setcounter{figure}{0}
 % \newCharapter{chapters/chapter8}
 
-\nocite{*}
-%\printbibliography[type=article,title={Źródła naukowe}]
-%\printbibliography[type=online,title={Źródła internetowe}]
-%\printbibliography[sorting=nyt, title={Bibliografia}]
+\printbibliography[title={Bibliografia}]
 
 \end{document}
