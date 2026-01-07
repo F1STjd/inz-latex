@@ -6,8 +6,8 @@ W 2016 roku firma Google zaproponowała stworzenie nowego standardu pozwalające
 
 Istnieją dwie możliwości korzystania z WebGPU w aplikacjach webowych. Pierwsza z nich to użycie języka programowania JavaScript, które są natywnie obsługiwane przez przeglądarki internetowe. Druga możliwość to skorzystanie z interfejsu programistycznego w języku C udostępnianego przez dwie istniejące implementacje:
 \begin{itemize}
-  \item \textbf{Dawn} – implementacja stworzona przez firmę Google, przy pomocy języka C++ - używana w przeglądarkach opartych na silniku Chromium.
-  \item \textbf{wgpu} – implementacja stworzona przez firmę Mozilla, przy pomocy języka Rust - używana w przeglądarce Mozilla Firefox.
+  \item \textbf{Dawn} – implementacja stworzona przez firmę Google, przy pomocy języka C++ - używana w przeglądarkach opartych na silniku Chromium.~\cite{Dawn}
+  \item \textbf{wgpu} – otwarta implementacja, stworzona przy pomocy języka Rust - używana w przeglądarce Mozilla Firefox.~\cite{wgpu}
 \end{itemize}
 Następnie napisany kod należy skompilować do formatu WebAssembly. Zaletą tego podejścia jest niemalże porównywalna wydajność aplikacji z wersją natywną, gdyż kod WebAssembly jest uruchamiany bezpośrednio przez silnik przeglądarki, a nie interpretowany jak w przypadku języka JavaScript. Ponadto istniejący już kod można skompilować także do typowego dla systemu operacyjnego formatu wykonywalnego, co pozwala na uruchomienie aplikacji zarówno w przeglądarce internetowej, jak i natywnie na komputerze.
 
