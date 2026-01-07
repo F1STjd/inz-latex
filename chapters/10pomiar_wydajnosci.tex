@@ -4,7 +4,7 @@ Istotnym elementem oceny jakości oprogramowania jest analiza wydajności kluczo
 
 \subsection{Metodyka pomiaru}
 
-Do przeprowadzenia pomiarów wykorzystano bibliotekę Google Benchmark, który umożliwia precyzyjne i powtarzalne mierzenie czasu wykonania funkcji w języku C++. Wyniki zostały zwizualizowane przy pomocy biblioteki Matplot++. Każdy test został wykonany dziesięciokrotnie, co pozwoliło na obliczenie miar statystycznych: średniej arytmetycznej, mediany oraz odchylenia standardowego.
+Do przeprowadzenia pomiarów wykorzystano bibliotekę Google Benchmark, która umożliwia precyzyjne i powtarzalne mierzenie czasu wykonania funkcji w języku C++. Wyniki zostały zwizualizowane przy pomocy biblioteki Matplot++. Każdy test został wykonany dziesięciokrotnie, co pozwoliło na obliczenie miar statystycznych: średniej arytmetycznej, mediany oraz odchylenia standardowego.
 
 Badaną funkcją była \texttt{load::geometry\_obj()}, której zadaniem jest wczytanie pliku OBJ zawierającego trójwymiarowy model i przekształcenie go do formatu atrybutów wierzchołków. Funkcja ta wykonuje dwie główne operacje:
 \begin{enumerate}
