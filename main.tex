@@ -17,7 +17,8 @@
 \usepackage{adjustbox}
 \usepackage[utf8]{inputenc}
 \usepackage[english, polish]{babel}
-\babelprovide[transforms = oneletter.nobreak]{polish} 
+\babelprovide[transforms = oneletter.nobreak]{polish}
+
 \usepackage{array}
 \usepackage{enumitem}
 \usepackage[backend=biber,
@@ -88,15 +89,18 @@
 % Usunięcie prefiksu "URL:" przed linkami
 \DeclareFieldFormat{url}{\url{#1}}
 
+% Formatowanie tytułu dla źródeł online (kursywa)
+\DeclareFieldFormat[online]{title}{\mkbibemph{#1}}
+
 % Formatowanie dla standardów/manuali w stylu APA 7
 % Format: Autor. (Rok). Tytuł (Numer).
 \DeclareBibliographyDriver{manual}{%
-  \printnames{author}.%
+  \usebibmacro{author}.%
   \addspace%
   (\printfield{year}).%
   \addspace%
-  \printfield{title}%
-  \iffieldundef{number}{}{
+  \mkbibemph{\printfield[title]{title}}%
+  \iffieldundef{number}{}{%
     \addspace%
     (\printfield{number})%
   }.%
