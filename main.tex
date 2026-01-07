@@ -88,6 +88,21 @@
 % Usunięcie prefiksu "URL:" przed linkami
 \DeclareFieldFormat{url}{\url{#1}}
 
+% Formatowanie dla standardów/manuali w stylu APA 7
+% Format: Autor. (Rok). Tytuł (Numer).
+\DeclareBibliographyDriver{manual}{%
+  \printnames{author}.%
+  \addspace%
+  (\printfield{year}).%
+  \addspace%
+  \printfield{title}%
+  \iffieldundef{number}{}{
+    \addspace%
+    (\printfield{number})%
+  }.%
+  \finentry%
+}
+
 % Niestandardowe formatowanie dla źródeł internetowych (wymagania uczelni)
 % Format: Tytuł. URL. [data dostępu]
 \DeclareBibliographyDriver{online}{%
