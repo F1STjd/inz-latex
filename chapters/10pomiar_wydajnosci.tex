@@ -13,7 +13,7 @@ Badaną funkcją była \texttt{load::geometry\_obj()}, której zadaniem jest wcz
 \end{enumerate}
 
 \subsubsection{Macierz TBN}
-Macierz TBN (Tangent-Bitangent-Normal) jest macierzą transformacji $3 \times 3$, która przekształca wektory z przestrzeni stycznej tekstury do przestrzeni świata. Jest ona niezbędna do prawidłowego stosowania map normalnych (ang. \textit{normal mapping}) w procesie renderowania. Dla trójkąta o wierzchołkach $\mathbf{P}_0$, $\mathbf{P}_1$, $\mathbf{P}_2$ z odpowiadającymi współrzędnymi tekstury $(u_0, v_0)$, $(u_1, v_1)$, $(u_2, v_2)$, wektory krawędzi definiuje się jako:
+Macierz TBN (Tangent-Bitangent-Normal) jest macierzą transformacji $3 \times 3$, która przekształca wektory z przestrzeni stycznej tekstury do przestrzeni świata~\cite{Halladay2019}. Jest ona niezbędna do prawidłowego stosowania map normalnych (ang. \textit{normal mapping}) w procesie renderowania. Dla trójkąta o wierzchołkach $\mathbf{P}_0$, $\mathbf{P}_1$, $\mathbf{P}_2$ z odpowiadającymi współrzędnymi tekstury $(u_0, v_0)$, $(u_1, v_1)$, $(u_2, v_2)$, wektory krawędzi definiuje się jako:
 \begin{equation}
   \mathbf{E}_1 = \mathbf{P}_1 - \mathbf{P}_0, \quad \mathbf{E}_2 = \mathbf{P}_2 - \mathbf{P}_0
 \end{equation}
@@ -41,7 +41,7 @@ Następnie wykonywana jest ortogonalizacja Grama-Schmidta, aby zapewnić ortogon
 \end{equation}
 
 \subsubsection{Dane testowe}
-W badaniu wykorzystano model \textit{Stanford Dragon} -- klasyczny model testowy powszechnie stosowany w badaniach grafiki komputerowej. Model ten został przygotowany w czterech wariantach o różnej złożoności geometrycznej:
+W badaniu wykorzystano model \textit{Stanford Dragon} -- klasyczny model testowy powszechnie stosowany w badaniach grafiki komputerowej~\cite{stanford-dragon}. Model ten został przygotowany w czterech wariantach o różnej złożoności geometrycznej:
 \begin{itemize}
   \item 1 tysiąc wierzchołków
   \item 10 tysięcy wierzchołków
@@ -135,7 +135,7 @@ W celu oceny wiarygodności wyników obliczono współczynnik zmienności (CV, a
 \begin{equation}
   CV = \frac{\sigma}{\mu} \cdot 100\%
 \end{equation}
-gdzie $\sigma$ oznacza odchylenie standardowe, a $\mu$ średnią arytmetyczną. Niższa wartość współczynnika zmienności świadczy o większej stabilności i powtarzalności pomiarów.
+gdzie $\sigma$ oznacza odchylenie standardowe, a $\mu$ średnią arytmetyczną. Niższa wartość współczynnika zmienności świadczy o większej stabilności i powtarzalności pomiarów~\cite{Brown1998}.
 
 \begin{figure}[h!]
   \centering
