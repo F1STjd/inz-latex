@@ -1,7 +1,8 @@
 \section{Implementacja Bazy Danych oraz Logiki Biznesowej}
 
 \subsection{Struktura części serwerowej}
-Na rysunku x przedstawiono strukturę części serwerowej systemu aukcyjnego:
+
+Na rysunku 9.1 przedstawiono strukturę części serwerowej systemu aukcyjnego:
 \begin{itemize}
 	\item tests - w tym folderze zawarte są testy: jednostkowe, implementacyjne i funkcjonalne, opisane w rozdziale x.
 	\item Controllers - w tym folderze znajduje się kod opisujący logikę biznesową.
@@ -11,14 +12,21 @@ Na rysunku x przedstawiono strukturę części serwerowej systemu aukcyjnego:
 	\item Utils - w tym folderze są opisane funkcje pomocnicze. 
 \end{itemize}
 
-%tutaj zdjęcie backend.png
+\begin{figure}[H]
+  \centering
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{0.5pt}%
+  \fbox{\includegraphics[width=0.3\linewidth]{img/backend/backend.png}}
+  \caption{Struktura części serwerowej systemu aukcyjnego}
+  \label{fig:backend_serwer}
+\end{figure}
 
 \subsection{Połączenie z bazą danych.}
 
 W celu uproszczenia pracy z projektem zostało użyte rozwiązanie Atlas, czyli rozwiązanie chmurowe bazy danych MongoDB. Dzięki takiemu działaniu udało się ułatwić 
 pracę z projektem. Serwer łączy się z bazą danych, za pomocą zmiennej środowiskowej. Jeżeli połączenie nie nastąpi, wyświetlany jest typ błędu.
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Konfiguracja połączenia z bazą danych}, label = {lst:provider}]
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
@@ -37,7 +45,7 @@ const connectDB = async () => {
 \subsection{Rejestracja użytkowników}
 Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik podaje nazwę użytkownika, email, hasło obowiązkowo, a opcjonalnie może podać imię, nazwisko orz numer telefonu. Jeżeli użytkownik podał istniejący email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzymy model User i token JWT oraz zapisujemy użytkownika w bazie danych. Hasła są hashowane przed zapisem do bazy danych, w celu zabepieczenia użytkownika. Jeżeli wystąpi jakiś błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu przedstawiono kod dotyczący rejestracji użytkowników. Na listingu x przedstawiono ochronę haseł poprzez hashowanie.
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Implementacja procesu rejestracji użytkownika}, label = {lst:provider}]
 export const register = async (req, res) => {
   try {
     const {	username, email, password, 
@@ -88,7 +96,7 @@ export const register = async (req, res) => {
 };
 \end{lstlisting}
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {test}, label = {lst:provider}]
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -109,7 +117,7 @@ userSchema.pre('save', async function(next) {
 Po dokonaniu rejestracji, użytknownik może się zalgować do systemu aukcyjnego. Do logowania wprowadzamy email bądź nazwę użytkownika oraz podane hasło podczas rejestracji.
 Podczas procesu logowania porównujemy hashe hasła, które zostało wprowadzone przez użytkownika, z hashem zapisanym w bazie danych. Dzięki takiej praktyce podczas wycieku danych z bazy, użytkownicy nie tracą swojego loginu i hasła. Na listingu x przedstawiono kod, który obsługuję logowanie użytkowników. 
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Implementacja procesu logowania użytkownika}, label = {lst:provider}]
 export const login = async (req, res) => {
   try {
     const { credential, password } = req.body;
@@ -147,7 +155,7 @@ export const login = async (req, res) => {
 \subsection{Autentykacja użytkownika}
 Użytkownicy są autetykowani poprzez Json Web Token. Ten standard pozwala nam na bezpieczną wymianę danych pomiędzy kilentem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówek zawiera typ tokenu i algorytm podpisu, ładunek zawiera dane użytkownika, podpis zawiera kryptograficzyny podpis, dzięki któremu potwierdzamy poprawność JWT. Na listingu przedstawiono implementacje tokenów JWT. 
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Implementcja autentykacji użytkownika}, label = {lst:provider}]
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
@@ -185,7 +193,7 @@ const createSendToken =
 
 Zalogowany użytkownik może stworzyć wiele aukcji. Swojej aukcji nie może licytować, aby nie zawyżać sztucznie ceny. Przy utworzeniu każdej aukcji przez danego użytkownika, inkrementujemy liczbę wszystkich utworzonych aukcji. Na listingu przedstawiono funkcje tworzącą aukcję. 
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Obsługa utworzenia aukcji}, label = {lst:provider}]
 export const createAuction = async (req, res) => {
   try {
     const auctionData = {
@@ -233,7 +241,7 @@ export const createAuction = async (req, res) => {
 
 \subsubsection{Kategorie Aukcji}
 Każda aukcja ma przypisaną jedną z dwunastu kategorii. Dzięki temu podczas wyświetlania wszystkich aukcji możemy filtrować dane w taki sposób, aby użytkownik miał łatwość w szukaniu potrzebnego dla siebie przedmiotu. Listing przedstawia kod odpowidający za opisanie kategorii aukcji. 
-\begin{lstlisting}[style = javascript]
+\begin{lstlisting}[style=javascript, caption = {Obsługa wyświetlania aukcji}, label = {lst:provider}]
 export const getCategories = async (req, res) => {
   try {
     const categories = [
@@ -270,7 +278,7 @@ export const getCategories = async (req, res) => {
 
 \subsubsection{Licytowanie aukcji}
 Użytkownik może licytować wiele aukcji na raz. Każda aukcja ma cene wywoławczą i najmniejszą cenę o jaką można podbić aukcje. Po utworzeniu zgodnego podbicia, aktualizujemy cene aukcji, poprzednie podbicia ustawiamy jako przebite i zatwierdzamy transakcję. Na listingu został przedstawiony proces licytowania aukcji przez jednego użytkownika. 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Proces licytowania aukcji}, label = {lst:provider}]
 export const placeBid = async (req, res) => {
   const mongoose = (await import('mongoose')).default;
   const session = await mongoose.startSession();
@@ -358,7 +366,7 @@ export const placeBid = async (req, res) => {
 
 Niezalogowani użytkownicy mogą wyświetlać wszystkie aukcje. Aukcje mogą być sortowane po kategorii, cenie albo po czasie aukcji. Na listingu przedstawiono funkcje, która pozwala na pobranie wszystkich aukcji. 
 
-\begin{lstlisting}[style=javascript]
+\begin{lstlisting}[style=javascript, caption = {Obsługa mechanizmu wyświetlania wszystkich aukcji}, label = {lst:provider}]
 export const getAllAuctions = async (req, res) => {
   try {
     const {
