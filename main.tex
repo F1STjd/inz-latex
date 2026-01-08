@@ -99,6 +99,13 @@
 \DeclareDelimFormat{finalnamedelim}{\addspace\&\space}
 \DeclareDelimFormat{multinamedelim}{\addcomma\space}
 
+% Rok w nawiasach po autorach dla wszystkich typów
+\renewbibmacro*{date+extradate}{%
+  \iffieldundef{year}
+    {}
+    {\printtext[parens]{\printdateextra}}%
+}
+
 % Format imion: tylko inicjały z kropką
 \DeclareNameFormat{family-given}{%
   \namepartfamily%
@@ -129,15 +136,123 @@
 % Formatowanie dla standardów/manuali w stylu APA 7
 % Format: Autor. (Rok). Tytuł (Numer).
 \DeclareBibliographyDriver{manual}{%
-  \usebibmacro{author}.%
-  \addspace%
-  (\printfield{year}).%
-  \addspace%
+  \usebibmacro{author}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
   \mkbibemph{\printfield[title]{title}}%
   \iffieldundef{number}{}{%
     \addspace%
     (\printfield{number})%
   }.%
+  \finentry%
+}
+
+% Formatowanie dla niepublikowanych prac
+\DeclareBibliographyDriver{unpublished}{%
+  \usebibmacro{author}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
+  \mkbibemph{\printfield[title]{title}}%
+  \setunit{\addperiod\addspace}%
+  \printfield{note}%
+  \finentry%
+}
+
+% Formatowanie dla książek - Autor. (Rok). Tytuł. Wydawca.
+\DeclareBibliographyDriver{book}{%
+  \usebibmacro{author/editor}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
+  \mkbibemph{\printfield{title}}%
+  \setunit{\addperiod\addspace}%
+  \printlist{publisher}%
+  \setunit{\addperiod}%
+  \finentry%
+}
+
+% Formatowanie dla artykułów konferencyjnych
+\DeclareBibliographyDriver{inproceedings}{%
+  \usebibmacro{author}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
+  \printfield{title}%
+  \setunit{\addperiod\addspace}%
+  \mkbibemph{\printfield{booktitle}}%
+  \iffieldundef{series}{}{%
+    \setunit{\addperiod\addspace}%
+    \printfield{series}%
+  }%
+  \setunit{\addperiod\addspace}%
+  \printlist{publisher}%
+  \iffieldundef{pages}{}{%
+    \setunit{\addcomma\addspace}%
+    s.~\printfield{pages}%
+  }%
+  \iffieldundef{isbn}{}{%
+    \setunit{\addperiod\addspace}%
+    isbn: \printfield{isbn}%
+  }%
+  \iffieldundef{doi}{}{%
+    \setunit{\addperiod\addspace}%
+    \printfield{doi}%
+  }%
+  \setunit{\addperiod}%
+  \finentry%
+}
+
+% Formatowanie dla rozdziałów książek (inbook)
+\DeclareBibliographyDriver{inbook}{%
+  \usebibmacro{author}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
+  \printfield{title}%
+  \setunit{\addperiod\addspace}%
+  \mkbibemph{\printfield{booktitle}}%
+  \setunit{\addperiod\addspace}%
+  \printlist{publisher}%
+  \iffieldundef{pages}{}{%
+    \setunit{\addcomma\addspace}%
+    s.~\printfield{pages}%
+  }%
+  \iffieldundef{isbn}{}{%
+    \setunit{\addperiod\addspace}%
+    isbn: \printfield{isbn}%
+  }%
+  \iffieldundef{doi}{}{%
+    \setunit{\addperiod\addspace}%
+    \printfield{doi}%
+  }%
+  \setunit{\addperiod}%
+  \finentry%
+}
+
+% Formatowanie dla artykułów w czasopismach
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{author}%
+  \setunit{\addspace}%
+  \usebibmacro{date+extradate}%
+  \setunit{\addperiod\addspace}%
+  \printfield{title}%
+  \setunit{\addperiod\addspace}%
+  \mkbibemph{\printfield{journaltitle}}%
+  \iffieldundef{volume}{}{%
+    \setunit{\addcomma\addspace}%
+    \printfield{volume}%
+  }%
+  \iffieldundef{pages}{}{%
+    \setunit{\addcomma\addspace}%
+    s.~\printfield{pages}%
+  }%
+  \iffieldundef{doi}{}{%
+    \setunit{\addperiod\addspace}%
+    \printfield{doi}%
+  }%
+  \setunit{\addperiod}%
   \finentry%
 }
 
