@@ -21,10 +21,6 @@
 
 \usepackage{array}
 \usepackage{enumitem}
-\usepackage[backend=biber,
-            style=numeric-comp,
-            sorting=nyt,
-            defernumbers=true]{biblatex}
 \usepackage{tabularx}
 \usepackage{xltabular}
 \usepackage{multirow}
@@ -80,192 +76,128 @@
   breakable % Allow breaking across pages
 }
 
-
-
 \DeclareFloatingEnvironment{graph}
 
-\addbibresource{bib/thesis.bib}
+\usepackage[
+  backend=biber,            % polecany backend dla biblatex
+  bibstyle=apa,             % formatowanie wpisów wg APA 7
+  citestyle=numeric-comp,   % numeryczne cytowania [1], [2-5]
+  sorting=nyt,              % sortowanie: name, year, title
+  defernumbers=true,        % numery wg kolejności w bibliografii
+  giveninits=true           % inicjały imion
+]{biblatex}
 
-% ============== KONFIGURACJA APA ==============
+% Lepsze łamanie URL w bibliografii
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+\setcounter{biburlnumpenalty}{8000}
 
-% Format autorów: Nazwisko, I. I., & Nazwisko2, I.
-\DeclareNameAlias{sortname}{family-given}
-\DeclareNameAlias{default}{family-given}
+% ===== MSYS2 / TeX Live 2023 — APA compatibility patch =====
+\makeatletter
+\providecommand*{\mkbibdateapalong}[4]{#2} % Drukuj tylko rok
+\providecommand*{\mkbibdateapalongextra}[4]{}
+\providecommand*{\mkbibdateapalongshort}[4]{}
+\providecommand*{\dateeraprint}[1]{}
+\providecommand*{\dateunce}{}
+\providecommand*{\datecircaprint}{}
+\makeatother
+% === Naprawienie wyświetlania roku w APA - wyświetl rok w nawiasach okrągłych ===
+% Nadpisanie makra APA dla daty - format: (rok).
+\renewbibmacro*{apaauthor}{%
+  \ifboolexpr{
+    test \ifuseauthor
+    and
+    not test {\ifnameundef{author}}
+  }
+    {\usebibmacro{bbx:dashcheck}
+       {\bibnamedash}
+       {\printnames{author}%
+        \setunit{\addspace}%
+        \iffieldundef{year}
+          {}
+          {\mkbibparens{\usebibmacro{date}}\adddot\addspace}%
+        \usebibmacro{bbx:savehash}}}
+    {\global\undef\bbx@lasthash}}
+\renewbibmacro*{apaeditor}{%
+  \ifboolexpr{
+    test \ifuseeditor
+    and
+    not test {\ifnameundef{editor}}
+  }
+    {\usebibmacro{bbx:dashcheck}
+       {\bibnamedash}
+       {\printnames{editor}%
+        \setunit{\addcomma\space}%
+        \usebibmacro{editorstrg}%
+        \setunit{\addspace}%
+        \iffieldundef{year}
+          {}
+          {\mkbibparens{\usebibmacro{date}}\adddot\addspace}%
+        \usebibmacro{bbx:savehash}}}
+    {\global\undef\bbx@lasthash}}
 
-% Wypisuj WSZYSTKICH autorów (bez skracania)
-\ExecuteBibliographyOptions{maxbibnames=99, minbibnames=99}
+% === Naprawienie pola note dla @unpublished - tylko nawiasy okrągłe ===
+\DeclareFieldFormat[unpublished]{note}{#1}  % Usuń dodatkowe formatowanie
 
-% Separator między autorami: przecinek, przed ostatnim "&"
-\DeclareDelimFormat{finalnamedelim}{\addspace\&\space}
-\DeclareDelimFormat{multinamedelim}{\addcomma\space}
-
-% Rok w nawiasach po autorach dla wszystkich typów
-\renewbibmacro*{date+extradate}{%
-  \iffieldundef{year}
-    {}
-    {\printtext[parens]{\printdateextra}}%
-}
-
-% Format imion: tylko inicjały z kropką
-\DeclareNameFormat{family-given}{%
-  \namepartfamily%
-  \ifdefvoid{\namepartgiveni}{}{\addcomma\space\namepartgiveni}%
-  \ifthenelse{\value{listcount}<\value{liststop}}
-    {\multinamedelim}
-    {}%
-}
-
-% Usunięcie "W:" (In:) przed nazwami konferencji/książek
-\renewbibmacro{in:}{}
-
-% Usunięcie prefiksu "doi:" - tylko numer DOI
-\DeclareFieldFormat{doi}{%
-  \ifhyperref
-    {\href{https://doi.org/#1}{\nolinkurl{https://doi.org/#1}}}
-    {\nolinkurl{https://doi.org/#1}}%
-}
-
-% ============== KONIEC KONFIGURACJI APA ==============
-
-% Usunięcie prefiksu "URL:" przed linkami
-\DeclareFieldFormat{url}{\url{#1}}
-
-% Formatowanie tytułu dla źródeł online (kursywa)
-\DeclareFieldFormat[online]{title}{\mkbibemph{#1}}
-
-% Formatowanie dla standardów/manuali w stylu APA 7
-% Format: Autor. (Rok). Tytuł (Numer).
-\DeclareBibliographyDriver{manual}{%
-  \usebibmacro{author}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield[title]{title}}%
-  \iffieldundef{number}{}{%
-    \addspace%
-    (\printfield{number})%
-  }.%
-  \finentry%
-}
-
-% Formatowanie dla niepublikowanych prac
+% Nadpisanie całego drivera unpublished żeby kontrolować format
 \DeclareBibliographyDriver{unpublished}{%
-  \usebibmacro{author}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield[title]{title}}%
-  \setunit{\addperiod\addspace}%
-  \printfield{note}%
-  \finentry%
-}
-
-% Formatowanie dla książek - Autor. (Rok). Tytuł. Wydawca.
-\DeclareBibliographyDriver{book}{%
-  \usebibmacro{author/editor}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield{title}}%
-  \setunit{\addperiod\addspace}%
-  \printlist{publisher}%
-  \setunit{\addperiod}%
-  \finentry%
-}
-
-% Formatowanie dla artykułów konferencyjnych
-\DeclareBibliographyDriver{inproceedings}{%
-  \usebibmacro{author}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \printnames{author}%
+  %\setunit{\addspace}%
+  \addspace
+  \iffieldundef{year}{}{\mkbibparens{\printfield{year}}\adddot\addspace}%
   \printfield{title}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield{booktitle}}%
-  \iffieldundef{series}{}{%
-    \setunit{\addperiod\addspace}%
-    \printfield{series}%
-  }%
-  \setunit{\addperiod\addspace}%
-  \printlist{publisher}%
-  \iffieldundef{pages}{}{%
-    \setunit{\addcomma\addspace}%
-    s.~\printfield{pages}%
-  }%
-  \iffieldundef{isbn}{}{%
-    \setunit{\addperiod\addspace}%
-    isbn: \printfield{isbn}%
-  }%
-  \iffieldundef{doi}{}{%
-    \setunit{\addperiod\addspace}%
-    \printfield{doi}%
-  }%
-  \setunit{\addperiod}%
-  \finentry%
-}
+  \iffieldundef{note}{}{\addspace\mkbibparens{\printfield{note}}}%  % Tylko jedno \mkbibparens
+  \usebibmacro{finentry}}
 
-% Formatowanie dla rozdziałów książek (inbook)
-\DeclareBibliographyDriver{inbook}{%
-  \usebibmacro{author}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
-  \printfield{title}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield{booktitle}}%
-  \setunit{\addperiod\addspace}%
-  \printlist{publisher}%
-  \iffieldundef{pages}{}{%
-    \setunit{\addcomma\addspace}%
-    s.~\printfield{pages}%
-  }%
-  \iffieldundef{isbn}{}{%
-    \setunit{\addperiod\addspace}%
-    isbn: \printfield{isbn}%
-  }%
-  \iffieldundef{doi}{}{%
-    \setunit{\addperiod\addspace}%
-    \printfield{doi}%
-  }%
-  \setunit{\addperiod}%
-  \finentry%
-}
+% Cytaty w nawiasach kwadratowych [1] - nadpisanie formatu APA
+\DeclareFieldFormat{labelnumber}{#1}
+\DeclareCiteCommand{\cite}[\mkbibbrackets]
+  {\usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+   \printfield{labelnumber}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
 
-% Formatowanie dla artykułów w czasopismach
-\DeclareBibliographyDriver{article}{%
-  \usebibmacro{author}%
-  \setunit{\addspace}%
-  \usebibmacro{date+extradate}%
-  \setunit{\addperiod\addspace}%
-  \printfield{title}%
-  \setunit{\addperiod\addspace}%
-  \mkbibemph{\printfield{journaltitle}}%
-  \iffieldundef{volume}{}{%
-    \setunit{\addcomma\addspace}%
-    \printfield{volume}%
-  }%
-  \iffieldundef{pages}{}{%
-    \setunit{\addcomma\addspace}%
-    s.~\printfield{pages}%
-  }%
-  \iffieldundef{doi}{}{%
-    \setunit{\addperiod\addspace}%
-    \printfield{doi}%
-  }%
-  \setunit{\addperiod}%
-  \finentry%
-}
+% === Dodanie numerów [N] do bibliografii w stylu APA ===
+% Dodanie sloppy dla lepszego łamania linii
+\defbibenvironment{bibliography}
+  {\list
+     {\mkbibbrackets{\printfield{labelnumber}}}
+     {\setlength{\labelwidth}{2em}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\labelsep}{\biblabelsep}%
+      \addtolength{\leftmargin}{\labelsep}%
+      \setlength{\itemsep}{\bibitemsep}%
+      \setlength{\parsep}{\bibparsep}}%
+      \renewcommand*{\makelabel}[1]{\hss##1}%
+      \sloppy}
+  {\endlist}
+  {\item}
 
-% Niestandardowe formatowanie dla źródeł internetowych (wymagania uczelni)
-% Format: Tytuł. URL. [data dostępu]
+% ========== CUSTOM DRIVER FOR @online ==========
+% Format: [N] <title (italic)>. <url>. [<urldate>]
+\DeclareFieldFormat[online]{title}{\emph{#1}}
 \DeclareBibliographyDriver{online}{%
-  \printfield{title}.%
-  \addspace%
-  \printfield{url}.%
-  \addspace%
-  \printfield{note}%
-  \finentry%
-}
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  % Tytuł (pochylony)
+  \iffieldundef{title}
+    {}
+    {\printfield{title}\adddot\addspace}%
+  % URL z możliwością łamania
+  \iffieldundef{url}
+    {}
+    {\url{\thefield{url}}\adddot\addspace}%
+  % Data dostępu w nawiasach kwadratowych (format DD.MM.YYYY)
+  \iffieldundef{urlyear}
+    {}
+    {\mkbibbrackets{\iffieldundef{urlday}{}{\thefield{urlday}.}\iffieldundef{urlmonth}{}{\thefield{urlmonth}.}\thefield{urlyear}}}%
+  \usebibmacro{finentry}}
+
+% Dodaj plik z bibliografią
+\addbibresource{bib/thesis.bib}
 
 \newcolumntype{C}[1]{>{\centering\arraybackslash} m{#1} }
 \newcolumntype{?}{!{\vrule width 1.5pt}}
