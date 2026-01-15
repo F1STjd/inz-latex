@@ -93,49 +93,11 @@
 \setcounter{biburlucpenalty}{8000}
 \setcounter{biburlnumpenalty}{8000}
 
-% ===== MSYS2 / TeX Live 2023 — APA compatibility patch =====
-\makeatletter
-\providecommand*{\mkbibdateapalong}[4]{#2} % Drukuj tylko rok
-\providecommand*{\mkbibdateapalongextra}[4]{}
-\providecommand*{\mkbibdateapalongshort}[4]{}
-\providecommand*{\dateeraprint}[1]{}
-\providecommand*{\dateunce}{}
-\providecommand*{\datecircaprint}{}
-\makeatother
-% === Naprawienie wyświetlania roku w APA - wyświetl rok w nawiasach okrągłych ===
-% Nadpisanie makra APA dla daty - format: (rok).
-\renewbibmacro*{apaauthor}{%
-  \ifboolexpr{
-    test \ifuseauthor
-    and
-    not test {\ifnameundef{author}}
-  }
-    {\usebibmacro{bbx:dashcheck}
-       {\bibnamedash}
-       {\printnames{author}%
-        \setunit{\addspace}%
-        \iffieldundef{year}
-          {}
-          {\mkbibparens{\usebibmacro{date}}\adddot\addspace}%
-        \usebibmacro{bbx:savehash}}}
-    {\global\undef\bbx@lasthash}}
-\renewbibmacro*{apaeditor}{%
-  \ifboolexpr{
-    test \ifuseeditor
-    and
-    not test {\ifnameundef{editor}}
-  }
-    {\usebibmacro{bbx:dashcheck}
-       {\bibnamedash}
-       {\printnames{editor}%
-        \setunit{\addcomma\space}%
-        \usebibmacro{editorstrg}%
-        \setunit{\addspace}%
-        \iffieldundef{year}
-          {}
-          {\mkbibparens{\usebibmacro{date}}\adddot\addspace}%
-        \usebibmacro{bbx:savehash}}}
-    {\global\undef\bbx@lasthash}}
+% ===== Mapowanie języka polskiego na APA =====
+% biblatex-apa nie ma pliku polish-apa.lbx, więc używamy american-apa
+% To definiuje wszystkie potrzebne makra (mkbibdateapalong, datecircaprint, itp.)
+\DeclareLanguageMapping{polish}{american-apa}
+\DeclareLanguageMapping{english}{american-apa}
 
 % === Naprawienie pola note dla @unpublished - tylko nawiasy okrągłe ===
 \DeclareFieldFormat[unpublished]{note}{#1}  % Usuń dodatkowe formatowanie
