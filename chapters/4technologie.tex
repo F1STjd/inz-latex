@@ -4,7 +4,7 @@
 \subsection{Komponent renderujący}
 
 \subsubsection{Język C++}
-Wysokopoziomowy język programowania stworzony przez Bjarne Stroustrupa, jako dodatek do języka C. C++ jest szeroko używany w aplikacjach wymagających wysokiej wydajności, takich jak gry komputerowe, silniki gier komputerowych, aplikacje graficzne, aplikacje uczenia maszynowego i wiele innych, gdzie wydajność jest kluczowa. Perfekcyjnie wpasowuję się on w potrzebę stworzenia graficznego komponentu renderującego obiekty 3D.
+Wysokopoziomowy język programowania stworzony przez Bjarne Stroustrupa, jako dodatek do języka C. C++ jest szeroko używany w aplikacjach wymagających wysokiej wydajności, takich jak gry komputerowe, silniki gier komputerowych, aplikacje graficzne, aplikacje uczenia maszynowego i wiele innych, gdzie wydajność jest kluczowa. Perfekcyjnie wpasowuję się w potrzebę stworzenia graficznego komponentu renderującego obiekty 3D.
 
 W przedstawionym projekcie wykorzystywany jest C++23 (ISO/IEC 14882:2024), czyli aktualny otwarty standard języka~\cite{ISO-IEC-14882-2024}. Zawiera ona w sobie wiele nowych funkcji, oraz całą zawartość wcześniejszych standardów.
 
@@ -17,7 +17,7 @@ WebGPU jest wspierane zarówno w Google Chrome, jak i Firefox. Mozilla używa im
 Wrapper dla WebGPU napisany w C++, ponieważ obie implementacje udostępniają plik nagłówkowy w języku C z definicjami funkcji i struktur. Stworzony został przez użytkownika eliemichel i udostępniany jest na platformie Github~\cite{WebGPU-Cpp}.
 
 \subsubsection{WebAssembly}
-Otwarty standard, który definiuje przenośny format binarny i odpowiadający mu format tekstowy dla programów komputerowych. Głównym celem jest umożliwienie łatwiejszego tworzenia wielce wydajnych apliakcji w przeglądarkach na stronach internetowych. Jest niezależny od platformy oraz wspiera każdy język programowania. Kod wykonywany jest w wirtualnej maszynie stosowej~\cite{WebAssembly}.
+Otwarty standard, który definiuje przenośny format binarny i odpowiadający mu format tekstowy dla programów komputerowych. Głównym celem jest umożliwienie łatwiejszego tworzenia wydajnych apliakcji w przeglądarkach na stronach internetowych. Jest niezależny od platformy oraz wspiera każdy język programowania. Kod wykonywany jest w wirtualnej maszynie stosowej~\cite{WebAssembly}.
 
 \subsubsection{Emscripten}
 Całkowicie otwarty kompilator, który umożliwia kompilację kodu C i C++, lub innego języka używającego LLVM, do formatu WebAssembly. Emcc, czyli frontend kompilatora używa Clang, oraz LLVM. Pozwala on na bezproblemową konwersję praktycznie każdego projektu C i C++ do WebAssembly~\cite{Emscripten}. Emscripten ma na koncie kilka udanych konwersji takich jak: Unreal Engine 4, Quake 3, czy Doom 3, wszystkie działające w przeglądarce~\cite{emscripten-examples}.
@@ -44,50 +44,50 @@ Lekki system budowania, skupiający się na szybkości. Jest zaprojektowany, aby
 \subsection{System aukcyjny - Frontend}
 
 \subsubsection{React}
-Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony. ~\cite{react}
+Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony ~\cite{react}.
 
-\subsection{Vite}
-Nardzędzie do budowania aplikacji webowych. Główną zaletą jest szybkie odpalenie serwera deweloperskiego oraz natychmiastowe odświeżanie zmian kodu w przeglądarce.~\cite{vite}
+\subsubsection{Vite}
+Nardzędzie do budowania aplikacji webowych. Główną zaletą jest szybkie uruchomienie serwera deweloperskiego oraz natychmiastowe odświeżanie zmian kodu w przeglądarce~\cite{vite}.
 
 \subsubsection{React Router DOM}
-Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. Pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki.~\cite{react-router}
+Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. W realizowanym projekcie pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki~\cite{react-router}.
 
 \subsubsection{Tailwind CSS}
-Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism.~\cite{tailwindcss}
+Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism~\cite{tailwindcss}.
 
 \subsubsection{TW Elements}
-Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia).~\cite{tw-elements}
+Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia)~\cite{tw-elements}.
 
 \subsection{System aukcyjny - Backend}
 
-\subsection{npm}
-Node Package Managet to menadżer pakietów dla JavaScript. Jest to narzędzie do zarządzania bibliotekami i zależnościami oraz ich wersjami w projektach pisanych w JavaScript. Dzięki niemu możemy instalować i odinstalowywać pakiety w projekcie.~\cite{npm}
+\subsubsection{npm}
+Node Package Managet to menadżer pakietów dla JavaScript. Jest to narzędzie do zarządzania bibliotekami i zależnościami oraz ich wersjami w projektach pisanych w JavaScript. Dzięki niemu możn instalować i odinstalowywać pakiety w projekcie~\cite{npm}.
 
 \subsubsection{Node.js}
-Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników.~\cite{nodejs}
+Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników~\cite{nodejs}.
 
 \subsubsection{Express.js}
-Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja).~\cite{expressjs}
+Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja)~\cite{expressjs}.
 
 \subsubsection{MongoDB}
-Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze.~\cite{mongodb}
+Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze~\cite{mongodb}.
 
 \subsubsection{Mongoose}
-Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych.~\cite{mongoose}
+Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych~\cite{mongoose}.
 
 \subsubsection{JWT (jsonwebtoken)}
-Standard tworzenia tokenów uwierzytelniających. Odpowiada za bezpieczne logowanie użytkowników i utrzymywanie sesji bez przechowywania stanu na serwerze.~\cite{jwt}
+Standard tworzenia tokenów uwierzytelniających. Odpowiada za bezpieczne logowanie użytkowników i utrzymywanie sesji bez przechowywania stanu na serwerze~\cite{jwt}.
 
 \subsubsection{bcryptjs}
-Biblioteka do hashowania haseł. Zapewnia bezpieczne przechowywanie haseł użytkowników poprzez jednokierunkowe szyfrowanie z solą.~\cite{}
+Biblioteka do hashowania haseł. Zapewnia bezpieczne przechowywanie haseł użytkowników poprzez jednokierunkowe szyfrowanie z solą.
 
 \subsubsection{CORS}
-Middleware umożliwiający komunikację między domenami. Pozwala frontendowi (\texttt{localhost:5173}) komunikować się z backendem (inny port/domena) zgodnie z polityką bezpieczeństwa przeglądarek.~\cite{}
+Middleware umożliwiający komunikację między domenami. Pozwala frontendowi komunikować się z backendem (inny port/domena) zgodnie z polityką bezpieczeństwa przeglądarek.
 
 \subsubsection{dotenv}
-Narzędzie do zarządzania zmiennymi środowiskowymi. Przechowuje wrażliwe dane (klucze API, połączenie z bazą) poza kodem źródłowym w pliku .env.~\cite{}
+Narzędzie do zarządzania zmiennymi środowiskowymi. Przechowuje wrażliwe dane (klucze API, połączenie z bazą) poza kodem źródłowym w pliku .env.
 
 \subsubsection{validator}
-Biblioteka do walidacji danych wejściowych. Sprawdza poprawność formatów (email, URL, numery telefonu) i zabezpiecza przed nieprawidłowymi danymi.~\cite{}
+Biblioteka do walidacji danych wejściowych. Sprawdza poprawność formatów (email, URL, numery telefonu) i zabezpiecza przed nieprawidłowymi danymi.
 
 

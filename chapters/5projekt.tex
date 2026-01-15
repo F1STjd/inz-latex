@@ -26,7 +26,7 @@ Diagramy BPMN (Business Process Model and Notation) służa do modelowania proce
 
 \todo[inline]{Czy diagramy nie za małe? Można użyć \texttt{\textbackslash landscape}, ale czy w pracy można to zastosować?}
 
-\subsection{Wymagania funkcjonalne:}
+\subsection{Wymagania funkcjonalne}
 Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
 \begin{itemize}
     \item Obsługa aukcji
@@ -41,7 +41,7 @@ Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
               \item Mechanizm obsługi przebijania ofert: każde nowe przebicie powinno być natychmiast komunikowane pozostałym uczestnikom.
               \item Logika rozstrzygania zwycięzcy oraz rezerwacja przedmiotu po zakończeniu aukcji.
           \end{itemize}
-    \item Wizualizacja 3D
+    \item System wizualizacji modeli 3D
           \begin{itemize}
               \item Dla każdej pozycji aukcyjnej system zapewnia podgląd modelu 3D przedmiotu, osadzony w interaktywnym viewerze.
               \item Viewer 3D powinien obsługiwać podstawowe operacje (obrót, przybliżenie/oddalenie), by użytkownik mógł dokładnie obejrzeć szczegóły oferty.
@@ -50,7 +50,7 @@ Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
     \item Zarządzanie użytkownikami
           \begin{itemize}
               \item Rejestracja i uwierzytelnianie: tworzenie kont z walidacją danych, logowanie, wylogowanie, procedura resetu hasła.
-              \item Konta użytkowników z podziałem na role: licytujący, dom aukcyjny, administrator. Każda rola ma inne uprawnienia (np. tylko dom aukcyjny może tworzyć aukcje).
+              \item Konta użytkowników z podziałem na role: licytujący, dom aukcyjny, administrator. Każda rola ma inne uprawnienia.
               \item Profil użytkownika: edycja danych osobowych, podgląd historii aktywności (aukcje wygrane/przegrane, złożone oferty).
           \end{itemize}
     \item Interaktywna wyszukiwarka i filtry
@@ -61,8 +61,8 @@ Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
           \end{itemize}
 \end{itemize}
 
-\subsection{Wymagania niefunkcjonalne:}
-Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i ograniczeń systemu. Nie opisują działania systemu, lecz jego właściwości. 
+\subsection{Wymagania niefunkcjonalne}
+Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i jego ograniczeń. Nie opisują działania systemu, lecz jego właściwości. 
 \begin{itemize}
     \item Wydajność
           \begin{itemize}
@@ -87,8 +87,8 @@ Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i og
           \end{itemize}
 \end{itemize}
 
-\subsection{Diagram pakietów przypadków użycia}
-Diagramy pakietów przypakdów użycia to diagramy UML grupujące przypadki użycia w grupy nazywane pakietami. Diagram ten pomaga organizować przypadki użycia w grupy, poprzez powiązane funkcjonalności. W tym diagramie pakiety są reprezentowane przez foldery, które zawierają przypadki użycia.  
+\subsection{Diagram pakietów}
+Diagramy pakietów to diagramy UML grupujące przypadki użycia w grupy nazywane pakietami. Diagram ten pomaga organizować przypadki użycia w grupy, poprzez powiązane funkcjonalności. W tym diagramie pakiety są reprezentowane przez foldery, które zawierają przypadki użycia.  
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/Diagram pakietow.png}
     \captionof{figure}{Diagram pakietów}
@@ -99,7 +99,7 @@ Diagramy pakietów przypakdów użycia to diagramy UML grupujące przypadki uży
 Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje pomiędzy aktorami, a funkcjonalnościami systemu. 
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/zarzadzanie-uzytkownikami.png}
-    \captionof{figure}{Zarządzanie użytkownikami}
+    \captionof{figure}{Diagram przypadków użycia zarządzania użytkownikami}
     \label{fig:diagram_przypadkow_uzycia}
 \end{center}
 %\image{img/schematy/zarzadzanie-uzytkownikami.png}{Zarządzanie użytkownikami}
@@ -110,7 +110,7 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/zarzadzanie-aukcjami.png}
-    \caption{Zarządzanie aukcjami}
+    \caption{Diagram przypadków użycia zarządzania aukcjami}
     \label{fig:zdj6}
 \end{figure}
 
@@ -120,7 +120,7 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/administracja-i-raporty.png}
-    \caption{administracja i raporty}
+    \caption{Diagram przypadków użycia administracji i raportów}
     \label{fig:zdj7}
 \end{figure}
 
@@ -130,7 +130,7 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/przegladanie-aukcji.png}
-    \caption{Przeglądanie aukcji}
+    \caption{Diagram przypadków użycia przeglądania aukcji}
     \label{fig:zdj8}
 \end{figure}
 
@@ -140,12 +140,12 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/wizualizacja-3d.png}
-    \caption{Wizualizacja modelu 3D}
+    \caption{Diagram przypadków użycia wizualizacji modelu 3D}
     \label{fig:zdj9}
 \end{figure}
 
 \subsection{Historyjki użytkownika}
-Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytkownika końcowego. Dzięki historyjkom, wiemy jakich funkcjonalności wymagaj poszczególni użytkownicy systemu.  
+Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytkownika końcowego. Dzięki historyjkom, wiemy jakich funkcjonalności wymagają poszczególni użytkownicy systemu.  
 \subsubsection{Użytkownik}
 \begin{itemize}
     \item \textbf{Jako} użytkownik,\\
@@ -178,7 +178,7 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
           \textbf{To wtedy} system wyświetli pierwsze 10 najbardziej dopasowanych aukcji do zapytania.\\
     \item \textbf{Jako} użytkownik,\\
           \textbf{Chciałbym} móc zawęzić ilość wyszukanych przedmiotów przez zastosowanie filtrów ceny (filtrowanie według ceny malejąco i rosnąco),\\
-          \textbf{Aby} wyrzucić przedmioty, które nie będą w moim budżecie \\
+          \textbf{Aby} wyrzucić przedmioty, które nie będą w moim budżecie. \\
           \textbf{Zakładając}, że użytkownik określi przedział cenowy lub wybierze sortowanie po cenie,\\
           \textbf{Jeśli} kliknie „Zastosuj filtr”,\\
           \textbf{To wtedy} system pokaże tylko aukcje mieszczące się w wybranym przedziale lub odpowiednio posortowane.\\
@@ -195,9 +195,9 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
           \textbf{Jeśli} kliknie ikonę „Dodaj do obserwowanych”,\\
           \textbf{To wtedy} przedmiot zostanie zapisany w sekcji „Obserwowane” na jego profilu.\\
 
-    \item \textbf{Jako} użytkownik\\
+    \item \textbf{Jako} użytkownik,\\
           \textbf{Chciałbym} zobaczyć swoją historię zakupów, których dokonałem,\\
-          \textbf{Aby} móc szybko wyszukać zakupiony przedmiot \\
+          \textbf{Aby} móc szybko wyszukać zakupiony przedmiot. \\
           \textbf{Zakładając}, że użytkownik jest zalogowany,\\
           \textbf{Jeśli} przejdzie do swojego profilu i kliknie „Historia zakupów”,\\
           \textbf{To wtedy} system wyświetli listę wygranych przez niego aukcji.\\
@@ -211,7 +211,7 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
           \textbf{Jeśli} administrator wybierze opcję usunięcia tej aukcji, \\
           \textbf{To wtedy} aukcja zostanie trwale usunięta z systemu.\\
     \item \textbf{Jako} administrator, \\
-          \textbf{Chciałbym} generować raporty i statystyki platformy \\
+          \textbf{Chciałbym} generować raporty i statystyki platformy, \\
           \textbf{Aby} analizować aktywność użytkowników i wyniki aukcji. \\
           \textbf{Zakładając}, że system posiada dane o aukcjach i użytkownikach,\\
           \textbf{Jeśli} administrator wybierze zakres dat i kliknie „Generuj raport”,\\
@@ -222,8 +222,8 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
 \subsubsection{Dom aukcyjny}
 \begin{itemize}
     \item \textbf{Jako} dom aukcyjny,\\
-          \textbf{Chciałbym} zarejestrować konto w serwisie \\
-          \textbf{Aby} móc tworzyć i wystawiać własne aukcje:\\
+          \textbf{Chciałbym} zarejestrować konto w serwisie, \\
+          \textbf{Aby} móc tworzyć i wystawiać własne aukcje.\\
           \textbf{Zakładając}, że podano prawidłowe dane rejestracyjne (w tym informacje o domu aukcyjnym),\\
           \textbf{Jeśli} formularz rejestracji zostanie poprawnie wypełniony i zatwierdzony,\\
           \textbf{To wtedy} konto domu aukcyjnego zostanie utworzone, a użytkownik uzyska dostęp do panelu aukcyjnego.\\
@@ -249,7 +249,7 @@ Diagramem klas to typ diagramu strukturalnego UML, który przedstawia strukturę
             height=\dimexpr\textwidth\relax,
             keepaspectratio
         ]{img/schematy/proces-licytacji-CD.png}
-        \caption{Proces licytacji}
+        \caption{Diagram klas procesu licytacji}
         \label{fig:zdj10}
     \end{figure}
 
@@ -260,7 +260,7 @@ Diagramem klas to typ diagramu strukturalnego UML, który przedstawia strukturę
             height=\dimexpr\textwidth\relax-67pt,
             keepaspectratio
         ]{img/schematy/wizualizacja-obiektu-CD.png}
-        \caption{Wizualizacja obiektu 3D}
+        \caption{Diagram klas wizualizacji obiektu 3D}
         \label{fig:zdj11}
     \end{figure}
 \end{landscape}
@@ -270,7 +270,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
 
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/GenerowanieRaportow.png}
-    \captionof{figure}{Generowanie raportów}
+    \captionof{figure}{Diagram sekwencji generowania raportów}
     \label{fig:generowanie_raportow}
 \end{center}
 
@@ -280,7 +280,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/Logowanie.png}
-    \caption{Logowanie}
+    \caption{Diagram sekwencji logowania}
     \label{fig:zdj13}
 \end{figure}
 
@@ -290,7 +290,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/ModeracjaAukcji.png}
-    \caption{Moderacja aukcji}
+    \caption{Diagram sekwencji moderacji aukcji}
     \label{fig:zdj14}
 \end{figure}
 
@@ -300,7 +300,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/PodgladModelu3D.png}
-    \caption{Wizualizacja modelu 3D}
+    \caption{Diagram sekwencji wizualizacji modelu 3D}
     \label{fig:zdj15}
 \end{figure}
 
@@ -310,7 +310,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/Rejestracja.png}
-    \caption{Rejestracja}
+    \caption{Diagram sekwencji rejestracji}
     \label{fig:zdj16}
 \end{figure}
 
@@ -320,7 +320,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/SystemLicytowania.png}
-    \caption{System licytowania}
+    \caption{Diagram sekwencji systemu licytowania}
     \label{fig:zdj17}
 \end{figure}
 
@@ -330,7 +330,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
         width=\dimexpr\textwidth\relax,
         keepaspectratio
     ]{img/schematy/TworzenieAukcji.png}
-    \caption{Tworzenie aukcji}
+    \caption{Diagram sekwencji tworzenia aukcji}
     \label{fig:zdj18}
 \end{figure}
 

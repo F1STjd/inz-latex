@@ -12,6 +12,7 @@
 \newfontfamily\titlepagefont{Arial} % Ustalenie czcionki dla strony tytułowej
 %\setstretch{1.5} 
 
+\usepackage{titlesec} % Dodanie kropki do podrozdziałów
 \usepackage{newtxtext} % Czcionka New Times Roman
 \usepackage{graphicx}
 \usepackage{adjustbox}
@@ -441,6 +442,10 @@
 }
 
 \newcommand{\copyablespace}{\ }
+
+
+% Dodaje kropkę po numerze rozdziału
+\titlelabel{\thetitle.\quad}
 
 \newcommand{\newCharapter}[1]{\newpage \include{#1}}
 
