@@ -1,6 +1,6 @@
 \section{Implementacja komponentu renderującego}
 % https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/n4950.pdf s. 745
-Implementację można podzielić w logiczny sposób na trzy główne etapy: inicjalizacja okna, inicjalizajcja WebGPU, oraz pętla główna aplikacji. Etapy inicjalizacji muszą być wykonywane w określonej kolejności, dlatego naturalnie układają się w potok. Jednak inaczej niż w typowym potoku zamiast przekazywać między etapami dane, zostanie przekazyawana informacja o sukcesie lub błędzie inicjalizacji poszczególnego elementu. W razie wystąpienia błędu, potok zostanie przerwany, a informacja o błędzie wyświetlona. Jest to system podobny w swoim działaniu to wyjątków, jednak dużo bardziej wydajny. Standard C++23 dostarcza do biblioteki standardowej obiekt \texttt{std::expected<T1, T2>}, który spełnia wyżej wymienioną funkcjonalność~\cite{ISO-IEC-14882-2024}. Użyta zostanie specjalizacja \texttt{std::expected<void, std::string>}, gdzie pierwszy parametr szablonu \texttt{void} symbolizuje brak danych zwracanych w przypadku sukcesu, a drugi parametr \texttt{std::string}, przechowuje komunikat o błędzie. Jak można zauważyć na poniższym listingu, głowna funkcja inicializująca składa się z dwóch z trzech wcześniej wymienionych etapów, ponieważ pętla głowna wykonywana jest po zakończeniu poprawnej inicjalizacji. %monadic operations
+Implementację podzielono w logiczny sposób na trzy główne etapy: inicjalizacja okna, inicjalizajcja WebGPU, oraz pętla główna aplikacji. Etapy inicjalizacji wykonywano w określonej kolejności, dlatego naturalnie układały się w potok. Jednak inaczej niż w typowym potoku zamiast przekazywać między etapami dane, przekazywano informację o sukcesie lub błędzie inicjalizacji poszczególnego elementu. W razie wystąpienia błędu, potok zostanie przerwany, a informacja o błędzie wyświetlona. Jest to system podobny w swoim działaniu to wyjątków, jednak dużo bardziej wydajny. Standard C++23 dostarcza do biblioteki standardowej obiekt \texttt{std::expected<T1, T2>}, który spełnia wyżej wymienioną funkcjonalność~\cite{ISO-IEC-14882-2024}. Użyto specjalizacji \texttt{std::expected<void, std::string>}, gdzie pierwszy parametr szablonu \texttt{void} symbolizuje brak danych zwracanych w przypadku sukcesu, a drugi parametr \texttt{std::string}, przechowuje komunikat o błędzie. Jak można zauważyć na listingu 7.1, główna funkcja inicjalizująca składa się z dwóch wcześniej wymienionych etapów, ponieważ pętla głowna wykonywana jest po zakończeniu poprawnej inicjalizacji. %monadic operations
 \begin{lstlisting}[caption={Funkcja inicjalizująca komponent renderujący}, label={lst:initialize}]
 void
 initialize()
@@ -18,7 +18,7 @@ initialize()
 \end{lstlisting}
 
 \subsection{Okno aplikcji}
-Pierwszym etapem jest utworzenie okna aplikacji, w którym będzie wyświetlany renderowany obraz. W tym celu wykorzystano bibliotekę GLFW, która umożliwia tworzenie okien oraz obsługę zdarzeń wejściowych w sposób niezależny od platformy. Proces inicjalizacji okna obejmuje inicjalizację biblioteki, oraz stworzenie okna. Wskaźnik na utworzone okno jest zapisywany w klasie głównej aplikacji. Opcjonalnie można też narzucić minimalny rozmiar okna lub wymusić stałą proporcję, co ułatwia utrzymanie spójnej perspektywy w czasie demonstracji.
+W pierwszym etapie utworzono okno aplikacji, w którym będzie wyświetlany renderowany obraz. W tym celu wykorzystano bibliotekę GLFW, która umożliwia tworzenie okien oraz obsługę zdarzeń wejściowych w sposób niezależny od platformy. Proces inicjalizacji okna obejmuje inicjalizację biblioteki, oraz stworzenie okna. Wskaźnik na utworzone okno jest zapisywany w klasie głównej aplikacji. Opcjonalnie można też narzucić minimalny rozmiar okna lub wymusić stałą proporcję, co ułatwia utrzymanie spójnej perspektywy w czasie demonstracji.
 \begin{lstlisting}[caption={Część kodu odpowiedzialna za inicjalizację okna}, label={lst:init_window}]
 auto
 init_window() -> std::expected<void, std::string>
@@ -41,7 +41,7 @@ init_window() -> std::expected<void, std::string>
   // ...
 }
 \end{lstlisting}
-Reszta kodu w tej funkcji odpowiada za ustawienie asynchronicznych funkcji obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
+Dalsza część kodu w tej funkcji, przedstawiona na listingu 7.3, odpowiada za ustawienie asynchronicznych funkcji obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
 \begin{lstlisting}[caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
 auto
 init_window() -> std::expected<void, std::string>
@@ -61,7 +61,7 @@ init_window() -> std::expected<void, std::string>
 \end{lstlisting}
 
 \subsection{WebGPU}
-Inicjalizacja WebGPU składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. Poniżej przedstawiono poszczególne kroki wraz z opisem ich funkcji. W praktyce są one łączone w potok oparty na \texttt{std::expected} i operacjach \texttt{and\_then}, co umożliwia natychmiastowe przerwanie przy pierwszym błędzie oraz czytelne przesłanie komunikatu o niepowodzeniu.
+Inicjalizacje WebGPU przedstawiono na listingu 7.4. Składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. W dalszej części rozdziału przedstawiono poszczególne kroki wraz z opisem ich funkcji. W praktyce są one łączone w potok oparty na \texttt{std::expected} i operacjach \texttt{and\_then}, co umożliwia natychmiastowe przerwanie przy pierwszym błędzie oraz czytelne przesłanie komunikatu o niepowodzeniu.
 %cos dodac
 %init_renderer()
 \begin{lstlisting}[caption={Funkcja inicializująca WebGPU, stworzona jako potok}, label={lst:init_renderer}]
@@ -86,7 +86,7 @@ init_renderer() -> std::expected<void, std::string>
 
 \subsubsection{Adapter}
 %https://www.w3.org/TR/webgpu/#adapters
-Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje~\cite{WebGPU-draft}. Aby móc uzyskać adapter, należy najpierw utworzyć instancję WebGPU (\texttt{WGPUInstance}), która stanowi globalny punkt wejścia do interfejsu WebGPU i reprezentuje implementację tego API w systemie. Następnie tworzona jest powierzchnia renderująca (\texttt{WGPUSurface}), która stanowi abstrakcję powiązaną z wcześniej zainicjalizowanym oknem GLFW i umożliwia prezentację wyrenderowanych obrazów użytkownikowi. Powierzchnia ta jest przekazywana jako parametr opcji adaptera (\texttt{compatibleSurface}), dzięki czemu wybierany adapter będzie kompatybilny z docelową powierzchnią renderowania. Dopiero po utworzeniu instancji i powierzchni możliwe jest wysłanie zapytania o adapter spełniający określone kryteria kompatybilności.
+Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. Implementację tej części przedstawiono na listingu 7.5. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje~\cite{WebGPU-draft}. Aby móc uzyskać adapter, należy najpierw utworzyć instancję WebGPU (\texttt{WGPUInstance}), która stanowi globalny punkt wejścia do interfejsu WebGPU i reprezentuje implementację tego API w systemie. Następnie tworzona jest powierzchnia renderującą (\texttt{WGPUSurface}), która stanowi abstrakcję powiązaną z wcześniej zainicjalizowanym oknem GLFW i umożliwia prezentację wyrenderowanych obrazów użytkownikowi. Powierzchnia ta jest przekazywana jako parametr opcji adaptera (\texttt{compatibleSurface}), dzięki czemu wybierany adapter będzie kompatybilny z docelową powierzchnią renderowania. Dopiero po utworzeniu instancji i powierzchni możliwe jest wysłanie zapytania o adapter spełniający określone kryteria kompatybilności.
 %kod init_adapter()
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt adapter}, label={lst:init_adapter}]
 auto
@@ -115,7 +115,7 @@ init_adapter() -> std::expected<void, std::string>
 
 \subsubsection{Urządzenie}
 %https://www.w3.org/TR/webgpu/#devices
-Urządzenie to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących~\cite{WebGPU-draft}. W tym kroku aplikacja tworzy obiekt \texttt{WGPUDevice}, który będzie używany do komunikacji z procesorem graficznym. Przed jego utworzeniem z adaptera odczytywane są wspierane limity (\texttt{WGPULimits}), a następnie definiowany jest zestaw wymaganych limitów przekazywany w deskryptorze urządzenia. Limity te określają oczekiwania aplikacji względem: organizacji geometrii (np. liczby i struktury atrybutów oraz buforów wierzchołków), poprawnych przesunięć dla operacji na pamięci, przepływu danych między etapami shadera (uniformy), a także modelu powiązań zasobów. Obejmują również ograniczenia dotyczące tekstur i samplerów (wymiary oraz liczebność na etap), tak aby odpowiadały realnym wymaganiom potoku i używanych materiałów. Dzięki zastosowaniu limitów urządzenie jest tworzone tylko wtedy, gdy implementacja WebGPU gwarantuje parametry wystarczające do bezpiecznego i wydajnego działania. W \texttt{WGPUDeviceDescriptor} ustawiane są ponadto etykiety, wskaźnik do wymaganych limitów, opis domyślnej kolejki oraz funkcje zwrotne dla utraty urządzenia i błędów nieprzechwyconych, które służą diagnostyce. Po utworzeniu urządzenia dobierany jest format powierzchni (\texttt{BGRA8Unorm}) i wykonywana jest konfiguracja (\texttt{configure\_surface()}), aby zapewnić poprawne wyświetlanie na utworzonej wcześniej powierzchni.
+Urządzenie to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących~\cite{WebGPU-draft}. W tym kroku aplikacja tworzy obiekt \texttt{WGPUDevice}, który będzie używany do komunikacji z procesorem graficznym. Przed jego utworzeniem z adaptera odczytywane są wspierane limity (\texttt{WGPULimits}), a następnie definiowany jest zestaw wymaganych limitów przekazywany w deskryptorze urządzenia. Limity te określają oczekiwania aplikacji względem: organizacji geometrii (np. liczby i struktury atrybutów oraz buforów wierzchołków), poprawnych przesunięć dla operacji na pamięci, przepływu danych między etapami shadera (uniformy), a także modelu powiązań zasobów. Obejmują również ograniczenia dotyczące tekstur i samplerów (wymiary oraz liczebność na etap), tak aby odpowiadały realnym wymaganiom potoku i używanych materiałów. Dzięki zastosowaniu limitów urządzenie jest tworzone tylko wtedy, gdy implementacja WebGPU gwarantuje parametry wystarczające do bezpiecznego i wydajnego działania. W \texttt{WGPUDeviceDescriptor} ustawiane są ponadto etykiety, wskaźnik do wymaganych limitów, opis domyślnej kolejki oraz funkcje zwrotne dla utraty urządzenia i błędów nieprzechwyconych, które służą diagnostyce. Po utworzeniu urządzenia dobierany jest format powierzchni (\texttt{BGRA8Unorm}) i wykonywana jest konfiguracja (\texttt{configure\_surface()}), aby zapewnić poprawne wyświetlanie na utworzonej wcześniej powierzchni. Implementacje kodu przestawiono na listingu 7.6.
 %kod init_device()
 \begin{lstlisting}[caption={Funkcja inicializująca obiekt device}, label={lst:init_device}]
 auto
@@ -232,7 +232,7 @@ W pętli głównej wykonywane są ciągłe aktualizacje sceny oraz renderowanie 
   \item Utworzenie enkodera poleceń używanego do nagrywania poleceń procesora graficznego.
   \item Stworzenie obiektu render pass.
         Każda instancja tego obiektu definiuje zestaw zasobów obrazów, zwanych załącznikami, wykorzystywanych podczas renderowania.
-  \item Ustawienie wcześniej zainicializowanych elementów: potoku renderowania, bufora wierzchołków oraz powiązań uniformów.
+  \item Ustawienie wcześniej zainicjalizowanych elementów: potoku renderowania, bufora wierzchołków oraz powiązań uniformów.
   \item Wykonanie polecenia rysowania.
   \item Zakończenie działania obiektu render pass.
   \item Sfinalizowanie nagranych poleceń: przesłanie poleceń do kolejki procesora graficznego.
