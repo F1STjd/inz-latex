@@ -1,8 +1,8 @@
-\section{Integracja}
+\section{Integracja komponentu renderującego z systemem aukcyjnym.}
 
 Proces integracji obejmuje kilka warstw technicznych: kompilację kodu natywnego do formatu WebAssembly przy użyciu kompilatora Emscripten, zaprojektowanie architektury komponentów React umożliwiającej efektywne zarządzanie pojedynczą instancją komponentu renderującego oraz implementację mechanizmów komunikacji między kodem JavaScript a skompilowanym kodem C++.
 
-\subsection{Kompilacja do WebAssembly}
+\subsection{Kompilacja kodu komponentu renderującego do WebAssembly}
 
 Kompilacja komponentu renderującego do formatu WebAssembly wymaga odpowiedniej konfiguracji systemu budowania CMake oraz użycia kompilatora emscripten. Proces ten przekształca kod źródłowy C++ w pliki wykonywalne w środowisku przeglądarki internetowej.
 
@@ -28,7 +28,7 @@ Proces kompilacji generuje dwa główne pliki:
   \item \texttt{main.js} - kod JavaScript pozwalający na wywoływanie formatu WebAssembly. Odpowiedzialny za inicjalizację modułu, zarządzanie pamięcią oraz mostkowanie wywołań między JavaScript a WebAssembly.
 \end{itemize}
 
-Plik \texttt{main.js} definiuje globalny obiekt \texttt{Module}, który stanowi interfejs komunikacji z kodem WebAssembly. Obiekt ten zawiera atrybutamy, które kod wygenerowany przez Emscripten wywołuje w różnych momentach swojego działania.
+Plik \texttt{main.js} definiuje globalny obiekt \texttt{Module}, który stanowi interfejs komunikacji z kodem WebAssembly. Obiekt ten zawiera atrybuty, które kod wygenerowany przez Emscripten wywołuje w różnych momentach swojego działania.
 
 \subsection{Architektura integracji w React}
 
@@ -79,7 +79,7 @@ const publicApi = {
 
 Kluczowym elementem architektury jest wykorzystanie mechanizmu React Portals do dynamicznego przenoszenia elementu canvas między różnymi miejscami w strukturze DOM. Pozwala to na wyświetlanie tego samego komponentu renderującego 3D w różnych sekcjach aplikacji bez konieczności reinicjalizacji kontekstu WebGPU.
 
-\subsubsection{Zasada działania}
+\subsubsection{Zasada działania React Portals}
 
 React Portal umożliwia renderowanie komponentu potomnego do węzła DOM znajdującego się poza hierarchią rodzica. W przypadku integracji WebGPU, współdzielony canvas jest renderowany przez Portal do aktualnie aktywnego \enquote{slotu} - kontenera DOM wskazanego przez komponent \texttt{WebGPUCanvas}.
 
