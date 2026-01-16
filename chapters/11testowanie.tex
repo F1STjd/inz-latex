@@ -1,7 +1,7 @@
 \section{Testowanie systemu aukcyjnego}
 W celu zapewnienia poprawnego działania serwisu auckyjnego wykorzystano szkielet testowy oraz utworzono pakiet testów. Zawiera on testy integracyjne, jednostkowe oraz funkcjonalne.
 Testy integracyjne sprawdzają jak poszczególne części systemu współpracują ze sobą, takie jak rejestracja czy logowanie. Testy jednostkowe sprawdzają pojedyncze metody oraz funkcje, izolując je od reszty kodu. Testy funkcjonalne sprawdzają, czy napisany kod spełnia swoje działanie.  \\
-W celu sprawdzenia poprawności testów wykorzystano nardzędzie do uruchamiania testów o nazwie Jest~\cite{Jest} z menadżera pakietów npm. Szkielet ten pozwala na łatwe skonfigurowanie testów oraz na ich bezproblemowe uruchomienie. 
+W celu sprawdzenia poprawności testów wykorzystano nardzędzie do uruchamiania testów o nazwie Jest~\cite{Jest} z menadżera pakietów npm. Szkielet ten pozwala na łatwe skonfigurowanie testów oraz na ich bezproblemowe uruchomienie.
 
 Na listingu 12.1 przedstawiono konfiguracje środowiska testowego przed uruchomieniem testów. Przed uruchomieniem testów, inicjalizujemy instancje MongoDB w pamięci ram podczas testowania. Dzięki temu możemy przetestować działania na bazie. Po każdym teście wszystkie dokumenty z bazy danych są usuwane, a po uruchomieniu wszystkich testów, połączenie z bazą danych jest zrywane i serwer jest wyłączany. Dzięki takiej praktyce mamy pewność, że testy są od siebie niezależne.
 
@@ -26,7 +26,7 @@ beforeAll(async () => {
 \subsection{Testy jednostkowe}
 
 Na listingu 12.2 przedstawiono test jednostkowy który sprawdza poprawność działania dodania użytkownika z wymaganymi przez bazę danych polami. Jeżeli któreś z tych pól jest puste, w takim przypadku test zakończył się niepowodzeniem.
- 
+
 \begin{lstlisting}[style=javascript, caption = {Test jednostkowy utworzenia instancji modelu User}, label = {lst:provider}]
  test('should create user with required fields', async () => {
       const userData = {
@@ -45,7 +45,7 @@ Na listingu 12.2 przedstawiono test jednostkowy który sprawdza poprawność dzi
 \end{lstlisting}
 
 \subsection{Testy integracyjne}
-Na listingu 12.3 przedstawiono test integracjny, który sprawdza proces rejestracji, kiedy użytkownik poda adres email w złym formacie. W tym przypadku podczas rejestracji serwer  wysła żądanie o kodzie 400, które oznacza, że żądanie jest źle sformułowane. 
+Na listingu 12.3 przedstawiono test integracjny, który sprawdza proces rejestracji, kiedy użytkownik poda adres email w złym formacie. W tym przypadku podczas rejestracji serwer  wysła żądanie o kodzie 400, które oznacza, że żądanie jest źle sformułowane.
 
 \begin{lstlisting}[style=javascript, caption = {Test integracyjny rejestracji ze złym adresem email}, label = {lst:provider}]
  test('should fail with invalid email format', async () => {
@@ -58,11 +58,10 @@ Na listingu 12.3 przedstawiono test integracjny, który sprawdza proces rejestra
         })
         .expect(400);
       expect(response.body.success).toBe(false);
-    });
   });
 \end{lstlisting}
 \subsection{Testy funkcjonalne}
-Na listingu 12.4 przedstawiono test funkcjonalny, który sprawdza filtrowanie aukcji po kategoriach. Utworzono obiekt użytkownika oraz aukcji z kategorią Zegarki. Potem sprawdzono, czy możliwe jest wyszukanie aktywnej aukcji poprzez kategorię i sprawdzono czy to jest jedyny utworzony obiekt z tej kategorii. 
+Na listingu 12.4 przedstawiono test funkcjonalny, który sprawdza filtrowanie aukcji po kategoriach. Utworzono obiekt użytkownika oraz aukcji z kategorią Zegarki. Potem sprawdzono, czy możliwe jest wyszukanie aktywnej aukcji poprzez kategorię i sprawdzono czy to jest jedyny utworzony obiekt z tej kategorii.
 
 \begin{lstlisting}[style=javascript, caption = {Test funkcjonalny filtrowania przez kategorie}, label = {lst:provider}]
  test('should filter auctions by category', async () => {
