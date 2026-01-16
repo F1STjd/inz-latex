@@ -41,7 +41,7 @@ Następnie wykonywana jest ortogonalizacja Grama-Schmidta, aby zapewnić ortogon
 \end{equation}
 
 \subsubsection{Dane testowe}
-W badaniu wykorzystano model \textit{Stanford Dragon} -- klasyczny model testowy powszechnie stosowany w badaniach grafiki komputerowej~\cite{stanford-dragon}. Model ten został przygotowany w czterech wariantach o różnej złożoności geometrycznej:
+W badaniu wykorzystano model 3D \textit{Stanford Dragon} -- klasyczny model testowy powszechnie stosowany w badaniach grafiki komputerowej~\cite{stanford-dragon}. Model ten został przygotowany w czterech wariantach o różnej złożoności geometrycznej:
 \begin{itemize}
   \item 1 tysiąc wierzchołków
   \item 10 tysięcy wierzchołków
@@ -54,7 +54,7 @@ W badaniu wykorzystano model \textit{Stanford Dragon} -- klasyczny model testowy
   \setlength{\fboxsep}{0pt}%
   \setlength{\fboxrule}{0.5pt}%
   \fbox{\includegraphics[width=\linewidth-130pt]{img/benchmark/smoki.png}}
-  \caption{Model Stanford Dragon w czterech wariantach złożoności geometrycznej: lewa góra -- 1k, prawa góra -- 10k, lewy dół -- 100k, prawy dół -- 1M wierzchołków}
+  \caption{Model 3D Stanford Dragon w czterech wariantach złożoności geometrycznej: lewa góra -- 1k, prawa góra -- 10k, lewy dół -- 100k, prawy dół -- 1M wierzchołków}
   \label{fig:stanford_dragon}
 \end{figure}
 
@@ -94,7 +94,7 @@ W tabeli \ref{tab:benchmark_results} przedstawiono zestawienie wyników pomiaró
 
 \subsubsection{Analiza skalowania czasowego}
 
-Na rysunku \ref{fig:time_scaling} przedstawiono zależność czasu wykonania od rozmiaru modelu w skali podwójnie logarytmicznej. Liniowy charakter wykresu w tej skali potwierdza, że złożoność czasowa algorytmu jest proporcjonalna do liczby wierzchołków, tj. wynosi $O(n)$, gdzie $n$ oznacza liczbę wierzchołków.
+Na rysunku \ref{fig:time_scaling} przedstawiono zależność czasu wykonania od rozmiaru modelu 3D w skali podwójnie logarytmicznej. Liniowy charakter wykresu w tej skali potwierdza, że złożoność czasowa algorytmu jest proporcjonalna do liczby wierzchołków, tj. wynosi $O(n)$, gdzie $n$ oznacza liczbę wierzchołków.
 
 \begin{figure}[h!]
   \centering
@@ -118,9 +118,9 @@ Szczególnie istotna jest analiza podziału czasu między dwie główne fazy ope
 
 Obliczenia macierzy TBN stanowią stały procent całkowitego czasu ładowania -- około 8-9\% dla wszystkich rozmiarów modeli. Oznacza to, że dominującym czynnikiem wpływającym na wydajność jest operacja parsowania pliku OBJ, która obejmuje odczyt z dysku oraz interpretację formatu tekstowego.
 
-\subsubsection{Przepustowość}
+\subsubsection{Przepustowość operacji ładowania}
 
-Przepustowość operacji ładowania, wyrażona jako liczba przetworzonych wierzchołków na sekundę, utrzymuje się na stabilnym poziomie około 1,4 miliona wierzchołków na sekundę dla modeli powyżej 10 tysięcy wierzchołków (rysunek \ref{fig:throughput}). Niższa przepustowość dla najmniejszego modelu (1,19 mln wierzch./s) wynika z narzutu związanego z inicjalizacją operacji wejścia/wyjścia.
+Przepustowość operacji ładowania, wyrażona jako liczba przetworzonych wierzchołków na sekundę, utrzymuje się na stabilnym poziomie około 1,4 miliona wierzchołków na sekundę dla modeli powyżej 10 tysięcy wierzchołków (rysunek \ref{fig:throughput}). Niższa przepustowość dla najmniejszego modelu 3D s(1,19 mln wierzch./s) wynika z narzutu związanego z inicjalizacją operacji wejścia/wyjścia.
 
 \begin{figure}[h!]
   \centering
@@ -140,7 +140,7 @@ gdzie $\sigma$ oznacza odchylenie standardowe, a $\mu$ średnią arytmetyczną. 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth]{img/benchmark/benchmark_cv.png}
-  \caption{Współczynnik zmienności pomiarów -- niższa wartość oznacza większą stabilność}
+  \caption{Współczynnik zmienności pomiarów }
   \label{fig:cv}
 \end{figure}
 
