@@ -1,37 +1,175 @@
-\section{Implementacja wyglądu serwisu aukcyjnego}
+\section{Implementacja warstwy frontendowej serwisu auckyjnego}
 
-\subsection{Koncepcja interfejsu użytkownika}
+\subsection{Rola warstwy frontendowej w systemie aukcyjnym}
 
-Frontend aplikacji został zaprojektowany z myślą o nowoczesnym, minimalistycznym designie, który kładzie nacisk na prezentację wizualizacji 3D oferowanych obiektów. Interfejs wykorzystuje technologie React oraz Tailwind CSS, co pozwoliło na stworzenie responsywnego i intuicyjnego środowiska aukcyjnego z płynną nawigacją oraz estetycznym układem elementów.
+Struktura części frontendowej odpowiedzialna jest za interakcję użytkownika z systemem aukcyjnym. Jej głównym zadaniem jest przedstawienie danych dostarczanych przez strukturę części serwerowej. Istotnym aspektem jest, aby interfejs użytkownika zapewniał odpowiednią użyteczność oraz spójny interfejs, poprzez przejrzyste układy stron.
 
-\subsection{Prezentacja poszczególnych widoków}
+\subsection{Struktura części interfejsu użytkownika}
 
-\subsubsection{Strona główna}
+Na rysunku~\ref{fig:frontend} przedstawiono strukturę części odpowiedzialnej za interfejs użytkownika:
 
-Strona główna została zaprojektowana jako wizytówka całej platformy, z charakterystycznym hero section prezentującym główną wartość aplikacji - możliwość przeglądania aukcji z wizualizacją 3D. W centralnej części ekranu znajduje się transparentny panel z nagłówkiem \enquote{Przyszłość aukcji z wizualizacją 3D} oraz krótkim opisem: \enquote{Odkryj unikalne przedmioty artystyczne w innowacyjny sposób. Zobacz aukcje z wizualizacją 3D zamiast zwykłych zdjęć.}
+\begin{itemize}
+	\item public - w tym folderze zawarte są pliki statyczne oraz zasoby 3D, wykorzystywane w aplikacji do renderowania obiektów.
+	\item src/components - w tym folderze zadeklarowane są komponenty wielokrotnego użytku takie jak: Navbar, Footer, AuctionCard.
+	\item src/contexts - w tym folderze znajdują się konteksty React, które są odpowiedzialne za zarządzanie stanem autoryzacji użytkownika.
+	\item src/pages - w tym folderze zawarte są wszystkie widoki w aplikacji widoczne dla użytkownika.
+	\item	src/services - w tym folderze opisana jest komunikacja części interfejsu użytkownika z częścią serwerową.
+	\item src/styles - w tym folderze znajdują się pliki stylów CSS aplikacji. 
+	\item src/utils - w tym folderze opisane są funkcje pomocnicze. 
+\end{itemize}
 
-\image{img/front/main-page.png}{Widok strony głównej aplikacji AuctionHub}
+\begin{figure}[H]
+  \centering
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{0.5pt}%
+  \fbox{\includegraphics[width=0.3\linewidth]{img/front/frontend.png}}
+  \caption{Struktura części serwerowej systemu aukcyjnego}
+  \label{fig:frontend}
+\end{figure}
 
-Kluczowym elementem designu jest umieszczenie interaktywnego modelu 3D bezpośrednio na stronie głównej, co natychmiast komunikuje użytkownikowi unikalną funkcjonalność platformy. Panel zawiera dwa przyciski: \enquote{Przeglądaj aukcje} oraz \enquote{Zobacz demo 3D}, co pozwala użytkownikom od razu zaangażować się w eksplorację platformy.
+\subsection{Routing i nawigacja w aplikacji}
 
-Poniżej hero section znajduje się sekcja \enquote{Aukcje na żywo} z aktualnie trwającymi licytacjami. Wykorzystano tutaj system kart z wizualizacjami 3D aukcji. Każda karta zawiera miniaturę wizualizacji, tytuł aukcji oraz krótki opis. Sekcja posiada również czerwony badge \enquote{Na żywo} z licznikiem aktywnych aukcji oraz link \enquote{Zobacz wszystkie} dla pełnego dostępu do ofert.
+W aplikacji zastosowano mechanizm routingu React Router DOM~\cite{react-router}, który jest przedstawiony na listingu~\ref{lst:routing}. Umożliwia on korzystanie z aplikacji internetowej bez konieczności ciągłego przeładowywania całej strony przy odświeżeniu. Dzięki temu rozwiązaniu usprawniono działanie aplikacji, poprawiając komfort użytkowania.
 
-Tło strony wykorzystuje delikatną teksturę marmuru w odcieniach szarości, co nadaje platformie elegancki, luksusowy charakter odpowiedni dla aukcji przedmiotów artystycznych.
+\begin{lstlisting}[style=javascript, caption = {Mechanizm routingu React Router DOM}, label = {lst:routing}]
+createRoot(document.getElementById('root')).render(
+ <StrictMode>
+  <ErrorBoundary FallbackComponent={ErrorFallback} 
+  			   onError={handleError}>
+   <BrowserRouter>
+    <AuthProvider>
+     <WebGPUCanvasProvider>
+      <Routes>
+       <Route path="/" element={<MainPage />}/>
+       <Route path="/main" element={<MainPage />} />
+       <Route path="/test" element={<TestPage />} />
+       <Route path="/auctions" element={<Auctions />} />
+       <Route path="/auctionview" element={<AuctionView />} />
+       <Route path="/auction/:id" element={<AuctionDetail />} />
+       <Route path="/create-auction" element={<CreateAuction />} />
+       <Route path="/viewer3d" element={<Viewer3D />} />
+       <Route path="/3d" element={<Viewer3D />} />
+       <Route path="/userpanel" element={<UserPanel />} />
+       <Route path="/register" element={<RegisterPage />} />
+       <Route path="/login" element={<LoginPage />} />
+       <Route path="*" element={<MainPage />} />
+      </Routes>
+     </WebGPUCanvasProvider>
+    </AuthProvider>
+   </BrowserRouter>
+  </ErrorBoundary>
+ </StrictMode>
+);
+\end{lstlisting}
 
-\subsubsection{Strona szczegółów aukcji}
 
-Widok szczegółowy aukcji dzieli ekran na dwie główne sekcje. Po lewej stronie znajduje się duży panel z wizualizacją 3D obiektu. Prawa kolumna zawiera pełne informacje o aukcji. Pod panelem wizualizacji znajdują się dwie sekcje informacyjne.
+\subsection{Komunikacja części klienckiej z częścią serwerową}
+Warstwa interfejsu użytkownika serwisu aukcyjnego komunikuje się z częścią serwerową za pomocą interfejsu API opartego na protokole HTTP~\cite{http}. Wymiana danych realizowana jest asynchroniczne przy wykorzystaniu metody fetch. W celu uporządkowania komunikacji z częścią serwerową zastosowano wydzieloną warstwę serwisów, odpowiedzialną za realizację zapytań sieciowych. Przykładem tego zastosowania jest ukazany na listingu~\ref{lst:apijs}
 
-\image{img/front/licytacja.png}{Widok szczegółów aukcji z wizualizacją 3D}
+\begin{lstlisting}[style=javascript, caption = {Zawartośc pliku api.js}, label = {lst:apijs}]
+import { handleResponse, getAuthHeaders } 
+from '../utils/apiHelpers';
 
-\subsubsection{System nawigacji}
+const API_URL = import.meta.env.VITE_API_URL 
+|| 'http://localhost:8080/api';
 
-Oba widoki zawierają identyczny, minimalistyczny pasek nawigacji z logo \enquote{AuctionHub} po lewej stronie oraz menu zawierające linki: \enquote{Strona Główna}, \enquote{Aukcje na żywo}, \enquote{Przeglądanie 3D}, \enquote{Kategorie}, \enquote{Domy Aukcyjne}. Po prawej stronie paska znajdują się przyciski \enquote{Zaloguj się} oraz wyróżniony przycisk \enquote{Zarejestruj się}.
+// Auth API calls
 
-\subsubsection{Strony logowania i rejestracji}
+export const authAPI = {
+  register: async (userData) => {
+    const response = await fetch(`${API_URL}/users/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+   
+    return handleResponse(response);
+  },
 
-Aplikacja zawiera również dedykowane widoki do autoryzacji użytkowników. Strony logowania i rejestracji utrzymane są w spójnej stylistyce z resztą aplikacji, wykorzystując to samo tło marmurowe oraz transparentne panele formularzy. Formularze zawierają standardowe pola (email, hasło) oraz przyciski akcji w charakterystycznym niebieskim kolorze. Design tych stron jest minimalistyczny i skupiony na funkcjonalności, zapewniając użytkownikom szybki i bezproblemowy proces uwierzytelnienia.
+  login: async (credential, password) => {
+    const response = await fetch(`${API_URL}/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credential, password }),
+    });
+    
+    return handleResponse(response);
+  }
+};
 
-\image{img/front/login.png}{Widok strony logowania}
+//...
+\end{lstlisting}
 
-\image{img/front/register.png}{Widok strony rejestracji}
+\subsection{Walidacja danych}
+
+Walidacja danych została wprowadzona wprowadzona w części interfejsu użytkownika i w części serwerowej w celu sprawdzania wartości wprowadzanych przez użytkowników. Dzięki takiej praktyce jesteśmy w stanie ochronić użytkownika przed wprowadzeniem kurwa nie wiem co tu napisać ktoś z was to musi przepisać.~\ref{lst:validation}
+
+\begin{lstlisting}[style=javascript, caption = {Walidacja danych po stronie interfejsu użytkownika}, label = {lst:validation}]
+  const validateForm = () => {
+    if (!formData.username) {
+      setError('Nazwa uzytkownika jest wymagana');
+      return false;
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
+      setError('Nazwa moze zawierac tylko litery, cyfry.');
+      return false;
+    }
+    if (!formData.email) {
+      setError('Email jest wymagany');
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Podaj prawidlowy adres email');
+      return false;
+    }
+
+    if (!formData.password) {
+      setError('Haslo jest wymagane');
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setError('Haslo musi mieć co najmniej 8 znakow');
+      return false;
+    }
+    // Password confirmation
+    if (formData.password !== formData.passwordConfirm) {
+      setError('Hasla nie sa identyczne');
+      return false;
+    }
+\end{lstlisting}
+
+\subsection{Obsługa błędów}
+
+W części interfejsu użytkownika zaimplementowano mechanizmy obsługi błędów, które zapewniają stabilność działania systemu oraz przekazywanie czytelnych informacji podczas wyświetlania błędów aplikacji.
+
+W przypadku formularza rejestracyjnego zastosowano asynchroniczną funkcję, która obsługuje zdarzenie wysyłane do formularza. Funkcja kontroluje poprawność danych wejściowych, po czym zarządza stanem ładowania i reaguje na błędy, jeżeli takowe powstaną. Implementacja tej części jest przedstawiona na listingu~\ref{lst:error_handle}.
+
+\begin{lstlisting}[style=javascript, caption = {Obsługiwanie błędów po stronie interfejsu użytkownika}, label = {lst:error_handle}]
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const { passwordConfirm, ...userData } = formData;
+      const result = await register(userData);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.message || 'Blad rejestracji');
+      }
+    } catch (err) {
+      setError('Wystapil blad podczas rejestracji. ');
+    } finally {
+      setLoading(false);
+    }
+  };
+\end{lstlisting}
