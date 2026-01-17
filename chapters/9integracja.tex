@@ -163,11 +163,9 @@ moduleConfig.preRun.push(() => {
   const FS = window.FS
   const IDBFS = window.IDBFS
   
-  // Katalog na baze danych modeli
   FS.mkdir('/database')
   FS.mount(IDBFS, {}, '/database')
   
-  // Katalog na cache zasobow
   FS.mkdir('/resources_cache')
   FS.mount(IDBFS, {}, '/resources_cache')
 })

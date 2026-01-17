@@ -47,7 +47,7 @@ const connectDB = async () => {
 
 
 \subsection{Rejestracja użytkowników}
-Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik obowiązkowo podaje nazwę użytkownika, adres email, hasło, a opcjonalnie może podać imię, nazwisko oraz numer telefonu. Jeżeli użytkownik podał istniejący adres email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzony jest model User i token JWT oraz zapisywany jest użytkownik w bazie danych. Hasła są szyfrowane funkcją skrótu przed zapisem do bazy danych w celu zabezpieczenia użytkownika. Jeżeli wystąpi błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu~\ref{lst:user_register} przedstawiono kod dotyczący rejestracji użytkowników.
+Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik obowiązkowo podaje nazwę użytkownika, adres email, hasło, a opcjonalnie może podać imię, nazwisko oraz numer telefonu. Jeżeli użytkownik podał istniejący adres email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzony jest model User i token JWT oraz zapisywany jest użytkownik w bazie danych. Hasła są szyfrowane przed zapisem do bazy danych w celu zabezpieczenia użytkownika. Jeżeli wystąpi błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu~\ref{lst:user_register} przedstawiono kod dotyczący rejestracji użytkowników.
 
 \begin{lstlisting}[style=javascript, caption = {Implementacja procesu rejestracji użytkownika}, label = {lst:user_register}]
 export const register = async (req, res) => {
