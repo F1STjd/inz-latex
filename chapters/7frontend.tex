@@ -9,13 +9,13 @@ Struktura części frontendowej odpowiedzialna jest za interakcję użytkownika 
 Na rysunku~\ref{fig:frontend} przedstawiono strukturę części odpowiedzialnej za interfejs użytkownika:
 
 \begin{itemize}
-	\item public - w tym folderze zawarte są pliki statyczne oraz zasoby 3D, wykorzystywane w aplikacji do renderowania obiektów.
-	\item src/components - w tym folderze zadeklarowane są komponenty wielokrotnego użytku takie jak: Navbar, Footer, AuctionCard.
-	\item src/contexts - w tym folderze znajdują się konteksty React, które są odpowiedzialne za zarządzanie stanem autoryzacji użytkownika.
-	\item src/pages - w tym folderze zawarte są wszystkie widoki w aplikacji widoczne dla użytkownika.
-	\item	src/services - w tym folderze opisana jest komunikacja części interfejsu użytkownika z częścią serwerową.
-	\item src/styles - w tym folderze znajdują się pliki stylów CSS aplikacji. 
-	\item src/utils - w tym folderze opisane są funkcje pomocnicze. 
+  \item public - w tym folderze zawarte są pliki statyczne oraz zasoby 3D, wykorzystywane w aplikacji do renderowania obiektów.
+  \item src/components - w tym folderze zadeklarowane są komponenty wielokrotnego użytku takie jak: Navbar, Footer, AuctionCard.
+  \item src/contexts - w tym folderze znajdują się konteksty React, które są odpowiedzialne za zarządzanie stanem autoryzacji użytkownika.
+  \item src/pages - w tym folderze zawarte są wszystkie widoki w aplikacji widoczne dla użytkownika.
+  \item	src/services - w tym folderze opisana jest komunikacja części interfejsu użytkownika z częścią serwerową.
+  \item src/styles - w tym folderze znajdują się pliki stylów CSS aplikacji.
+  \item src/utils - w tym folderze opisane są funkcje pomocnicze.
 \end{itemize}
 
 \begin{figure}[H]
@@ -106,7 +106,7 @@ export const authAPI = {
 
 \subsection{Walidacja danych}
 
-Walidacja danych została wprowadzona wprowadzona w części interfejsu użytkownika i w części serwerowej w celu sprawdzania wartości wprowadzanych przez użytkowników. Dzięki takiej praktyce jesteśmy w stanie ochronić użytkownika przed wprowadzeniem kurwa nie wiem co tu napisać ktoś z was to musi przepisać.~\ref{lst:validation}
+Walidacja danych została zaimplementowana zarówno w części interfejsu użytkownika, jak i w części serwerowej, w celu weryfikacji wartości wprowadzanych przez użytkowników. Dzięki tej praktyce możliwe jest zapobieganie przesyłaniu niepoprawnych danych do serwera oraz informowanie użytkownika o błędach w czasie rzeczywistym. Na listingu~\ref{lst:validation} przedstawiono przykład walidacji formularza rejestracyjnego, obejmującej sprawdzenie nazwy użytkownika, poprawności adresu email oraz wymagań dotyczących hasła.
 
 \begin{lstlisting}[style=javascript, caption = {Walidacja danych po stronie interfejsu użytkownika}, label = {lst:validation}]
   const validateForm = () => {
@@ -114,11 +114,11 @@ Walidacja danych została wprowadzona wprowadzona w części interfejsu użytkow
       setError('Nazwa uzytkownika jest wymagana');
       return false;
     }
-
     if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
       setError('Nazwa moze zawierac tylko litery, cyfry.');
       return false;
     }
+
     if (!formData.email) {
       setError('Email jest wymagany');
       return false;
@@ -136,11 +136,11 @@ Walidacja danych została wprowadzona wprowadzona w części interfejsu użytkow
       setError('Haslo musi mieć co najmniej 8 znakow');
       return false;
     }
-    // Password confirmation
     if (formData.password !== formData.passwordConfirm) {
       setError('Hasla nie sa identyczne');
       return false;
     }
+  };
 \end{lstlisting}
 
 \subsection{Obsługa błędów}
