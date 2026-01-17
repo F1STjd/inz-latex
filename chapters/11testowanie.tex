@@ -1,7 +1,7 @@
 \section{Testowanie systemu aukcyjnego}
-W celu zapewnienia poprawnego działania serwisu auckyjnego wykorzystano szkielet testowy oraz utworzono pakiet testów. Zawiera on testy integracyjne, jednostkowe oraz funkcjonalne.
+W celu zapewnienia poprawnego działania serwisu aukcyjnego wykorzystano szkielet testowy oraz utworzono pakiet testów. Zawiera on testy integracyjne, jednostkowe oraz funkcjonalne.
 Testy integracyjne sprawdzają jak poszczególne części systemu współpracują ze sobą, takie jak rejestracja czy logowanie. Testy jednostkowe sprawdzają pojedyncze metody oraz funkcje, izolując je od reszty kodu. Testy funkcjonalne sprawdzają, czy napisany kod spełnia swoje działanie.  \\
-W celu sprawdzenia poprawności testów wykorzystano nardzędzie do uruchamiania testów o nazwie Jest~\cite{Jest} z menadżera pakietów npm. Szkielet ten pozwala na łatwe skonfigurowanie testów oraz na ich bezproblemowe uruchomienie.
+W celu sprawdzenia poprawności testów wykorzystano narzędzie do uruchamiania testów o nazwie Jest~\cite{Jest} z menedżera pakietów npm. Szkielet ten pozwala na łatwe skonfigurowanie testów oraz na ich bezproblemowe uruchomienie.
 
 Na listingu~\ref{lst:test_config} przedstawiono konfiguracje środowiska testowego przed uruchomieniem testów. Przed uruchomieniem testów, inicjalizujemy instancje MongoDB w pamięci ram podczas testowania. Dzięki temu możemy przetestować działania na bazie. Po każdym teście wszystkie dokumenty z bazy danych są usuwane, a po uruchomieniu wszystkich testów, połączenie z bazą danych jest zrywane i serwer jest wyłączany. Dzięki takiej praktyce mamy pewność, że testy są od siebie niezależne.
 
@@ -91,7 +91,7 @@ Na listingu~\ref{lst:test_functional} przedstawiono test funkcjonalny, który sp
   });
 \end{lstlisting}
 \vspace{5cm}
-Na rysunku~\ref{fig:tests} przedstawiono sktueczność wszystkich testów zawartych w projekcie. Wszystkie napisane testy są kompilowane bezbłędnie, co oznacza, że najważniejsze części systemu aukcyjnego działają poprawnie.
+Na rysunku~\ref{fig:tests} przedstawiono skuteczność wszystkich testów zawartych w projekcie. Wszystkie napisane testy są kompilowane bezbłędnie, co oznacza, że najważniejsze części systemu aukcyjnego działają poprawnie.
 
 \begin{figure}[h!]
   \centering

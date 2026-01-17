@@ -7,7 +7,7 @@
   \item \textbf{Język C++} -- Wysokopoziomowy język programowania stworzony przez Bjarne Stroustrupa, jako dodatek do języka C. C++ jest szeroko używany w aplikacjach wymagających wysokiej wydajności, takich jak gry komputerowe, silniki gier komputerowych, aplikacje graficzne, aplikacje uczenia maszynowego i wiele innych, gdzie wydajność jest kluczowa. Doskonale nadaje się do stworzenia graficznego komponentu renderującego obiekty 3D. W przedstawionym projekcie wykorzystywany jest C++23 (ISO/IEC 14882:2024), czyli aktualny otwarty standard języka~\cite{ISO-IEC-14882-2024}. Zawiera ona w sobie wiele nowych funkcji, oraz całą zawartość wcześniejszych standardów.
   \item \textbf{WebGPU} -- Nowoczesny interfejs programowania aplikacji (API), który umożliwia wydajny dostęp do procesora graficznego (GPU) na różnych platformach~\cite{WebGPU-draft}. U podstawy działania wykorzystuje systemowe interfejsy: Vulkan, Metal, lub Direct3D 12. Zastępuje starszą technologię WebGL, jako nowy główny standard graficzny dla sieci. WebGPU jest wspierane zarówno w Google Chrome, jak i Firefox. Mozilla używa implementacji w języku Rust o nazwie wgpu~\cite{wgpu}. Google natomiast stworzyło Dawn, czyli implementację standardu WebGPU w Chromium za pomocą C++~\cite{Dawn}.
   \item \textbf{WebGPU‑Cpp} -- Wrapper dla WebGPU napisany w C++, ponieważ obie implementacje udostępniają plik nagłówkowy w języku C z definicjami funkcji i struktur. Stworzony został przez użytkownika eliemichel i udostępniany jest na platformie Github~\cite{WebGPU-Cpp}.
-  \item \textbf{WebAssembly} -- Otwarty standard, który definiuje przenośny format binarny i odpowiadający mu format tekstowy dla programów komputerowych. Głównym celem jest umożliwienie łatwiejszego tworzenia wydajnych apliakcji w przeglądarkach na stronach internetowych. Jest niezależny od platformy oraz wspiera każdy język programowania. Kod wykonywany jest w wirtualnej maszynie stosowej~\cite{WebAssembly}.
+  \item \textbf{WebAssembly} -- Otwarty standard, który definiuje przenośny format binarny i odpowiadający mu format tekstowy dla programów komputerowych. Głównym celem jest umożliwienie łatwiejszego tworzenia wydajnych aplikacji w przeglądarkach na stronach internetowych. Jest niezależny od platformy oraz wspiera każdy język programowania. Kod wykonywany jest w wirtualnej maszynie stosowej~\cite{WebAssembly}.
   \item \textbf{Emscripten} -- Całkowicie otwarty kompilator, który umożliwia kompilację kodu C i C++, lub innego języka używającego LLVM, do formatu WebAssembly. Emcc, czyli frontend kompilatora używa Clang, oraz LLVM. Pozwala on na bezproblemową konwersję praktycznie każdego projektu C i C++ do WebAssembly~\cite{Emscripten}. Emscripten ma na koncie kilka udanych konwersji takich jak: Unreal Engine 4, Quake 3, czy Doom 3, wszystkie działające w przeglądarce~\cite{emscripten-examples}.
   \item \textbf{WGSL (WebGPU Shading Language)} -- Wysokopoziomowy język shaderów dla WebGPU. Umożliwia on tworzenie shaderów, czyli programów wykonywanych na procesorze graficznym. Został stworzony przez W3C GPU for the Web Community Group, aby zapewnić nowoczesny, bezpieczny i przenośny sposób pisania shaderów dla WebGPU~\cite{WGSL-draft}.
   \item \textbf{CMake} -- Narzędzie do zarządzania budowaniem kodu źródłowego. Zdejmuje z użytkownika konieczność pisania skomplikowanych plików potrzebnych systemom budowania. Jest szeroko używany w projektach C i C++~\cite{CMake}.
@@ -20,21 +20,21 @@
 \end{itemize}
 
 %–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-\subsection{System aukcyjny - Frontend}
+\subsection{System aukcyjny -- część kliencka}
 
 \begin{itemize}
   \item \textbf{React} -- Biblioteka JavaScript do budowy interfejsu użytkownika, odpowiedzialna za interaktywne komponenty strony (nawigacja, karty aukcji, formularze). Umożliwia dynamiczne renderowanie widoków bez przeładowywania całej strony~\cite{react}.
-  \item \textbf{Vite} -- Narzędzie do budowania aplikacji webowych. Główną zaletą jest szybkie uruchomienie serwera deweloperskiego oraz natychmiastowe odświeżanie zmian kodu w przeglądarce~\cite{vite}.
-  \item \textbf{React Router DOM} -- Biblioteka zarządzająca nawigacją i routingiem w aplikacji React. W realizowanym projekcie pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki~\cite{react-router}.
-  \item \textbf{Tailwind CSS} -- Framework CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, layout, animacje, efekty glassmorphism~\cite{tailwindcss}.
+  \item \textbf{Vite} -- Narzędzie do budowania aplikacji internetowych. Główną zaletą jest szybkie uruchomienie serwera programistycznego oraz natychmiastowe odświeżanie zmian kodu w przeglądarce~\cite{vite}.
+  \item \textbf{React Router DOM} -- Biblioteka zarządzająca nawigacją i trasowaniem w aplikacji React. W realizowanym projekcie pozwala na płynne przechodzenie między stronami (główna, aukcje, logowanie) bez odświeżania przeglądarki~\cite{react-router}.
+  \item \textbf{Tailwind CSS} -- Szkielet CSS wykorzystujący klasy użytkowe do szybkiego stylowania komponentów. Odpowiada za cały wygląd wizualny aplikacji -- kolory, układ strony, animacje, efekty glassmorphism~\cite{tailwindcss}.
   \item \textbf{TW Elements} -- Komponenty UI oparte na Tailwind CSS. Dostarcza gotowe, interaktywne elementy interfejsu (karty, modale, powiadomienia)~\cite{tw-elements}.
 \end{itemize}
 
-\subsection{System aukcyjny - Backend}
+\subsection{System aukcyjny -- część serwerowa}
 
 \begin{itemize}
   \item \textbf{npm} -- Node Package Manager to menadżer pakietów dla JavaScript. Jest to narzędzie do zarządzania bibliotekami i zależnościami oraz ich wersjami w projektach pisanych w JavaScript. Dzięki niemu można instalować i odinstalowywać pakiety w projekcie~\cite{npm}.
-  \item \textbf{Node.js} -- Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje requesty HTTP i zarządza danymi użytkowników~\cite{nodejs}.
+  \item \textbf{Node.js} -- Środowisko uruchomieniowe JavaScript po stronie serwera. Wykonuje logikę biznesową aplikacji, obsługuje żądania HTTP i zarządza danymi użytkowników~\cite{nodejs}.
   \item \textbf{Express.js} -- Minimalny framework webowy dla Node.js. Odpowiada za routing API, obsługę żądań HTTP (GET, POST, PUT, DELETE) i middleware (CORS, autentykacja)~\cite{expressjs}.
   \item \textbf{MongoDB} -- Nierelacyjna baza danych NoSQL przechowująca dokumenty w formacie JSON. Zarządza danymi użytkowników, aukcji i sesji w elastycznej, skalowalnej strukturze~\cite{mongodb}.
   \item \textbf{Mongoose} -- Biblioteka ODM (Object Data Modeling) dla MongoDB. Definiuje schematy danych, walidację i zapewnia wygodny interfejs do operacji bazodanowych~\cite{mongoose}.

@@ -36,7 +36,7 @@ Integracja komponentu WebGPU z aplikacją React opiera się na wzorcu Provider, 
 
 \subsubsection{Wzorzec Provider}
 
-Komponent \texttt{WebGPUCanvasProvider} (listing \ref{lst:provider}) implementuje wzorzec Provider z React Context API. Działa jako singleton zarządzający cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
+Komponent \texttt{WebGPUCanvasProvider} (listing \ref{lst:provider}) implementuje wzorzec Provider z React Context API. Działa jako pojedyncza instancja zarządzająca cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
 
 \begin{lstlisting}[style=javascript, caption={Struktura komponentu Provider}, label={lst:provider}]
 export function WebGPUCanvasProvider({ children }) {
@@ -55,9 +55,9 @@ export function WebGPUCanvasProvider({ children }) {
 }
 \end{lstlisting}
 
-\subsubsection{Hooki dostępu do API}
+\subsubsection{Funkcje pomocnicze dostępu do API}
 
-Dostęp do funkcjonalności komponentu renderującego z poziomu komponentów potomnych realizowany jest za pomocą dedykowanych hooków React. Hook \texttt{useWebGPUCanvas()} stanowi publiczny interfejs zwracający API do kontroli komponentu renderującego, którego strukturę przedstawia listing \ref{lst:api}. Dodatkowo dostępny jest wewnętrzny hook \texttt{useWebGPUCanvasInternal()}, wykorzystywany przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
+Dostęp do funkcjonalności komponentu renderującego z poziomu komponentów potomnych realizowany jest za pomocą dedykowanych funkcji pomocniczych React (ang. \textit{hooks}). Funkcja \texttt{useWebGPUCanvas()} stanowi publiczny interfejs zwracający API do kontroli komponentu renderującego, którego strukturę przedstawia listing \ref{lst:api}. Dodatkowo dostępna jest wewnętrzna funkcja \texttt{useWebGPUCanvasInternal()}, wykorzystywana przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
 
 \begin{lstlisting}[style=javascript, caption={Publiczne API komponentu renderującego}, label={lst:api}]
 const publicApi = {
@@ -108,7 +108,7 @@ Inicjalizacja modułu WebAssembly odbywa się asynchronicznie podczas pierwszego
 
 \subsubsection{Konfiguracja obiektu Module}
 
-Przed załadowaniem skryptu Emscripten, konfigurowany jest globalny obiekt \texttt{window.Module} z callbackami obsługującymi zdarzenia cyklu życia, jak przedstawiono na listingu \ref{lst:module}:
+Przed załadowaniem skryptu Emscripten konfigurowany jest globalny obiekt \texttt{window.Module} z funkcjami zwrotnymi obsługującymi zdarzenia cyklu życia, jak przedstawiono na listingu \ref{lst:module}:
 
 \begin{lstlisting}[style=javascript, caption={Konfiguracja obiektu Module}, label={lst:module}]
 const moduleConfig = {

@@ -2,14 +2,27 @@
 
 Celem pracy było zaprojektowanie i implementacja systemu informatycznego, składającego się z dwóch części: komponentu renderującego obiektów 3D oraz internetowego systemu aukcyjnego.
 
-Pierwszym etapem prac nad systemem, było przygotowanie projektu. Projekt zawierał wymagania funkcjonalne, niefunkcjonalne oraz diagramy  BPMN. Zdefiniowanie wymagań funkcjonalnych i niefunkcjonalnych pozwoliło jednoznacznie określić zakres działania systemu. Diagramy BPMN pozwoliły na szybkie zrozumienie i wdrożenie procesów biznesowych w systemie aukcyjnym.
+Pierwszym etapem prac nad systemem było przygotowanie projektu. Projekt zawierał wymagania funkcjonalne, niefunkcjonalne oraz diagramy BPMN. Zdefiniowanie wymagań funkcjonalnych i niefunkcjonalnych pozwoliło jednoznacznie określić zakres działania systemu. Diagramy BPMN pozwoliły na szybkie zrozumienie i wdrożenie procesów biznesowych w systemie aukcyjnym.
 
-Kolejnym etapem pracy była implementacja komponentu renderującego. Proces ten wymagał dogłębnego zrozumienia niskopoziomowej komunikacji z procesorem graficznym poprzez API WebGPU. Zastosowanie wzorca potoku opartego na \texttt{std::expected} ze standardu C++23 pozwoliło na przyzwoitą i spójną obsługę błędów podczas inicjalizacji trzynastu wymaganych zasobów GPU. Implementacja shaderów w języku WGSL umożliwiła realizację zaawansowanego modelu oświetlenia z mapami normalnych oraz wieloma źródłami światła. Szczególnym wyzwaniem okazała się kompilacja kodu do formatu WebAssembly przy użyciu narzędzia Emscripten, co wymagało odpowiedniej konfiguracji flag kompilacji oraz zrozumienia ograniczeń wirtualnego systemu plików przeglądarki. Dzięki temu osiągnięto wydajność renderowania porównywalną z aplikacjami natywnymi, zachowując jednocześnie pełną kompatybilność z ekosystemem internetowym.
+Kolejnym etapem pracy była implementacja komponentu renderującego. Proces ten wymagał dogłębnego zrozumienia niskopoziomowej komunikacji z procesorem graficznym poprzez API WebGPU. Zastosowanie wzorca potoku opartego na \texttt{std::expected} ze standardu C++23 pozwoliło na przejrzystą i spójną obsługę błędów podczas inicjalizacji trzynastu wymaganych zasobów GPU. Implementacja shaderów w języku WGSL umożliwiła realizację zaawansowanego modelu oświetlenia z mapami normalnych oraz wieloma źródłami światła. Szczególnym wyzwaniem okazała się kompilacja kodu do formatu WebAssembly przy użyciu narzędzia Emscripten, co wymagało odpowiedniej konfiguracji flag kompilacji oraz zrozumienia ograniczeń wirtualnego systemu plików przeglądarki.
 
-Następnym etapem była implementacja systemu aukcyjnego. System ten został podzielony na część internetową oraz serwerową. Część internetowa została stworzona zgodnie z początkowym projektem wizualnym. Podczas tworzenia części serwerowej instotnym wsparciem były diagramy BPMN, dzięki którym możliwe było wdrożenie zaprojektowane rozwiązania.
+Przeprowadzone testy wydajności wykazały, że narzut związany z uruchomieniem aplikacji w środowisku przeglądarki jest minimalny. Osiągnięto wydajność renderowania porównywalną z aplikacjami natywnymi, co potwierdza dojrzałość technologii WebGPU jako platformy do zaawansowanej grafiki 3D w środowisku internetowym.
+
+Następnym etapem była implementacja systemu aukcyjnego. System ten został podzielony na część internetową oraz serwerową. Część internetowa została stworzona zgodnie z początkowym projektem wizualnym. Podczas tworzenia części serwerowej istotnym wsparciem były diagramy BPMN, dzięki którym możliwe było wdrożenie zaprojektowanego rozwiązania. W ramach systemu zaimplementowano obsługę powrzechnie stosowanego formatu OBJ.
 
 Końcowym etapem było sprawdzenie działania aplikacji. Do każdej funkcjonalności systemu aukcyjnego opisano pakiet testów. Wykryte w ten sposób niepoprawne działania zostały naprawiane na bieżąco.
 
-Cel pracy został w pełni zrealizowany. Opracowano w pełni działający kod umożliwiający renderowanie obiektów 3D oraz zintegrowano go z systemem aukcyjnym. Dzięki temu możliwe było wskazanie nowego zastosowaniaf renderingu w WebGPU.
+Cel pracy został w pełni zrealizowany. Opracowano w pełni działający kod umożliwiający renderowanie obiektów 3D oraz zintegrowano go z systemem aukcyjnym. Dzięki temu możliwe było wskazanie nowego zastosowania renderingu w WebGPU. Obecnie technologia WebGPU jest wspierana przez 80,71\% przeglądarek~\cite{caniuse-webgpu}. Warto jednak zaznaczyć, że finalna wersja standardu nie została jeszcze opublikowana, w związku z czym wsparcie przeglądarek będzie systematycznie rosło.
+
+\subsection{Możliwe kierunki dalszych prac}
+
+W ramach dalszego rozwoju systemu można rozważyć następujące kierunki:
+\begin{itemize}
+  \item Rozszerzenie obsługi formatów 3D o dodatkowe standardy, takie jak glTF czy FBX, co zwiększyłoby elastyczność systemu.
+  \item Implementacja zaawansowanych technik renderowania, takich jak ray tracing w czasie rzeczywistym, wykorzystując przyszłe rozszerzenia WebGPU.
+  \item Optymalizacja ładowania modeli 3D poprzez zastosowanie technik strumieniowania i progresywnego wczytywania geometrii.
+  \item Dodanie funkcjonalności generowania podglądu modelu 3D w formie obrazu lub animacji dla urządzeń nieobsługujących WebGPU.
+  \item Rozbudowa systemu aukcyjnego o dodatkowe funkcjonalności, takie jak powiadomienia push czy integracja z systemami płatności.
+\end{itemize}
 
 Projektowanie tego systemu umożliwiło członkom grupy zdobycie praktycznego doświadczenia w pracy nad zaawansowaną aplikacją. Proces ten ukazał, jak istotna jest współpraca z wykorzystaniem zdalnego repozytorium oraz jak ważne są praktyki pisania czystego, czytelnego kodu.

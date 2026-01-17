@@ -1,30 +1,5 @@
 \section{Projekt aplikacji}
-
-\subsection{Udokumentowanie analizy i udokumentowanie rozpoznanych procesów biznesowych}
-\subsubsection{Przypadki użycia:}
-\begin{itemize}
-    \item Rejestracja nowego użytkownika
-    \item Logowanie do systemu
-    \item Tworzenie aukcji
-    \item Przeglądanie aukcji
-    \item Wizualizacja modelu 3D
-    \item Licytacja
-    \item Moderacja aukcji
-    \item Generowanie raportów i statystyk
-\end{itemize}
-
-\subsubsection{Diagramy bpmn:}
-Diagramy BPMN (Business Process Model and Notation) służa do modelowania procesów biznesowych. Opisują sekwencje działań i przepływów w procesach danej organizacji. 
-\begin{center}
-    \includegraphics[width=\linewidth]{img/schematy/tworzenie aukcji.png}
-    \captionof{figure}{Tworzenie aukcji}
-    \label{fig:tworzenie_aukcji}
-\end{center}
-%\image{img/schematy/tworzenie aukcji.png}{Tworzenie aukcji}
-\image{img/schematy/proces licytacji.png}{Proces licytacji}
-\image{img/schematy/konczenie aukcji.png}{Kończenie aukcji}
-
-\todo[inline]{Czy diagramy nie za małe? Można użyć \texttt{\textbackslash landscape}, ale czy w pracy można to zastosować?}
+\label{sec:projekt}
 
 \subsection{Wymagania funkcjonalne}
 Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
@@ -43,15 +18,14 @@ Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
           \end{itemize}
     \item System wizualizacji modeli 3D
           \begin{itemize}
-              \item Dla każdej pozycji aukcyjnej system zapewnia podgląd modelu 3D przedmiotu, osadzony w interaktywnym viewerze.
-              \item Viewer 3D powinien obsługiwać podstawowe operacje (obrót, przybliżenie/oddalenie), by użytkownik mógł dokładnie obejrzeć szczegóły oferty.
-              \item Integracja procesu uploadu i weryfikacji pliku 3D w formatach ustalonych w specyfikacji technicznej.
+              \item Dla każdej pozycji aukcyjnej system zapewnia podgląd modelu 3D przedmiotu, osadzony w interaktywnej przeglądarce.
+              \item Przeglądarka 3D powinna obsługiwać podstawowe operacje (obrót, przybliżenie/oddalenie), aby użytkownik mógł dokładnie obejrzeć szczegóły oferty.
+              \item Integracja procesu przesyłania i weryfikacji pliku 3D w formatach ustalonych w specyfikacji technicznej.
           \end{itemize}
     \item Zarządzanie użytkownikami
           \begin{itemize}
               \item Rejestracja i uwierzytelnianie: tworzenie kont z walidacją danych, logowanie, wylogowanie, procedura resetu hasła.
               \item Konta użytkowników z podziałem na role: licytujący, dom aukcyjny, administrator. Każda rola ma inne uprawnienia.
-              \item Profil użytkownika: edycja danych osobowych, podgląd historii aktywności (aukcje wygrane/przegrane, złożone oferty).
           \end{itemize}
     \item Interaktywna wyszukiwarka i filtry
           \begin{itemize}
@@ -62,7 +36,7 @@ Wymagania funkcjonalne opisują zakres działania i możliwości systemu.
 \end{itemize}
 
 \subsection{Wymagania niefunkcjonalne}
-Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i jego ograniczeń. Nie opisują działania systemu, lecz jego właściwości. 
+Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i jego ograniczeń. Nie opisują działania systemu, lecz jego właściwości.
 \begin{itemize}
     \item Wydajność
           \begin{itemize}
@@ -87,8 +61,29 @@ Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i je
           \end{itemize}
 \end{itemize}
 
+\subsection{Diagramy bpmn:}
+Diagramy BPMN (Business Process Model and Notation) służą do modelowania procesów biznesowych. Opisują sekwencje działań i przepływów w procesach danej organizacji. Na rysunku \ref{fig:tworzenie_aukcji} przedstawiono proces tworzenia aukcji, rysunek \ref{fig:proces_licytacji} ilustruje proces licytacji, natomiast rysunek \ref{fig:konczenie_aukcji} pokazuje proces kończenia aukcji.
+\begin{center}
+    \includegraphics[width=\linewidth]{img/schematy/tworzenie aukcji.png}
+    \captionof{figure}{Diagram BPMN - tworzenie aukcji}
+    \label{fig:tworzenie_aukcji}
+\end{center}
+\begin{center}
+    \includegraphics[width=\linewidth]{img/schematy/proces licytacji.png}
+    \captionof{figure}{Diagram BPMN - proces licytacji}
+    \label{fig:proces_licytacji}
+\end{center}
+\begin{center}
+    \includegraphics[width=\linewidth]{img/schematy/konczenie aukcji.png}
+    \captionof{figure}{Diagram BPMN - kończenie aukcji}
+    \label{fig:konczenie_aukcji}
+\end{center}
+%\image{img/schematy/tworzenie aukcji.png}{Tworzenie aukcji}
+%\image{img/schematy/proces licytacji.png}{Proces licytacji}
+%\image{img/schematy/konczenie aukcji.png}{Kończenie aukcji}
+
 \subsection{Diagram pakietów}
-Diagramy pakietów to diagramy UML grupujące przypadki użycia w grupy nazywane pakietami. Diagram ten pomaga organizować przypadki użycia w grupy, poprzez powiązane funkcjonalności. W tym diagramie pakiety są reprezentowane przez foldery, które zawierają przypadki użycia.  
+Diagramy pakietów to diagramy UML grupujące przypadki użycia w grupy nazywane pakietami. Diagram ten pomaga organizować przypadki użycia w grupy, poprzez powiązane funkcjonalności. W tym diagramie pakiety są reprezentowane przez foldery, które zawierają przypadki użycia. Diagram pakietów przedstawiono na rysunku \ref{fig:diagram_pakietow}.
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/Diagram pakietow.png}
     \captionof{figure}{Diagram pakietów}
@@ -96,7 +91,7 @@ Diagramy pakietów to diagramy UML grupujące przypadki użycia w grupy nazywane
 \end{center}
 
 \subsection{Diagramy przypadków użycia}
-Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje pomiędzy aktorami, a funkcjonalnościami systemu. 
+Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje pomiędzy aktorami, a funkcjonalnościami systemu. Na rysunku \ref{fig:diagram_przypadkow_uzycia} przedstawiono diagram przypadków użycia zarządzania użytkownikami, rysunek \ref{fig:zdj6} ilustruje zarządzanie aukcjami, rysunek \ref{fig:zdj8} pokazuje przeglądanie aukcji, natomiast rysunek \ref{fig:zdj9} prezentuje wizualizację modelu 3D.
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/zarzadzanie-uzytkownikami.png}
     \captionof{figure}{Diagram przypadków użycia zarządzania użytkownikami}
@@ -119,16 +114,6 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
     \includegraphics[
         width=\dimexpr\textwidth\relax,
         keepaspectratio
-    ]{img/schematy/administracja-i-raporty.png}
-    \caption{Diagram przypadków użycia administracji i raportów}
-    \label{fig:zdj7}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[
-        width=\dimexpr\textwidth\relax,
-        keepaspectratio
     ]{img/schematy/przegladanie-aukcji.png}
     \caption{Diagram przypadków użycia przeglądania aukcji}
     \label{fig:zdj8}
@@ -144,8 +129,9 @@ Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu
     \label{fig:zdj9}
 \end{figure}
 
+\clearpage
 \subsection{Historyjki użytkownika}
-Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytkownika końcowego. Dzięki historyjkom, wiemy jakich funkcjonalności wymagają poszczególni użytkownicy systemu.  
+Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytkownika końcowego. Dzięki historyjkom, wiemy jakich funkcjonalności wymagają poszczególni użytkownicy systemu.
 \subsubsection{Użytkownik}
 \begin{itemize}
     \item \textbf{Jako} użytkownik,\\
@@ -158,7 +144,7 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
     \item \textbf{Jako} użytkownik,\\
           \textbf{Chciałbym} móc obracać, przybliżać i oddalać przedmiot w podglądzie 3D,\\
           \textbf{Aby} móc dokładniej ocenić stan przedmiotu.\\
-          \textbf{Zakładając}, że widoczny jest model 3D w viewerze,\\
+          \textbf{Zakładając}, że widoczny jest model 3D w przeglądarce,\\
           \textbf{Jeśli} użytkownik użyje myszy lub gestów dotykowych,\\
           \textbf{To wtedy} model zareaguje odpowiednio na obrót, przybliżenie i oddalenie.\\
 
@@ -238,41 +224,8 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
           \textbf{To wtedy} nowa aukcja pojawi się na liście dostępnych aukcji na platformie.
 \end{itemize}
 
-\subsection{Diagramy klas}
-Diagramem klas to typ diagramu strukturalnego UML, który przedstawia strukturę systemu. Pokazuje on klasy, właściwości klas i relacje między klasami. Diagram ten służy jako plan do zaimplementowania bazy danych w systemie. 
-\todo[inline]{bez landscape obrazki bardzo nieczytelne}
-\begin{landscape}
-    \begin{figure}[p]
-        \centering
-        \includegraphics[
-            width=\dimexpr\paperheight\relax,
-            height=\dimexpr\textwidth\relax,
-            keepaspectratio
-        ]{img/schematy/proces-licytacji-CD.png}
-        \caption{Diagram klas procesu licytacji}
-        \label{fig:zdj10}
-    \end{figure}
-
-    \begin{figure}[p]
-        \centering
-        \includegraphics[
-            width=\dimexpr\paperheight\relax,
-            height=\dimexpr\textwidth\relax-67pt,
-            keepaspectratio
-        ]{img/schematy/wizualizacja-obiektu-CD.png}
-        \caption{Diagram klas wizualizacji obiektu 3D}
-        \label{fig:zdj11}
-    \end{figure}
-\end{landscape}
-
 \subsection{Diagramy sekwencji}
-Diagramy sekwencji pokazują współprace obiektów w systemie podczas działania danego procesu. Obiekty lub aktorzy są przedstawieni na górze diagramu, pionowe linie, zwane liniami życia, odzwierciedlają ich istnienie. Strzałki pomiędzy obiektami, pokazują jak zachodzi komunikacja w systemie pomiędzy poszczególnymi obiektami. 
-
-\begin{center}
-    \includegraphics[width=\linewidth]{img/schematy/GenerowanieRaportow.png}
-    \captionof{figure}{Diagram sekwencji generowania raportów}
-    \label{fig:generowanie_raportow}
-\end{center}
+Diagramy sekwencji pokazują współprace obiektów w systemie podczas działania danego procesu. Obiekty lub aktorzy są przedstawieni na górze diagramu, pionowe linie, zwane liniami życia, odzwierciedlają ich istnienie. Strzałki pomiędzy obiektami, pokazują jak zachodzi komunikacja w systemie pomiędzy poszczególnymi obiektami. Na rysunku \ref{fig:zdj13} przedstawiono diagram sekwencji logowania, rysunek \ref{fig:zdj15} ilustruje wizualizację modelu 3D, rysunek \ref{fig:zdj16} pokazuje proces rejestracji, natomiast rysunek \ref{fig:zdj17} prezentuje system licytowania.
 
 \begin{figure}[htbp]
     \centering
@@ -282,16 +235,6 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
     ]{img/schematy/Logowanie.png}
     \caption{Diagram sekwencji logowania}
     \label{fig:zdj13}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[
-        width=\dimexpr\textwidth\relax,
-        keepaspectratio
-    ]{img/schematy/ModeracjaAukcji.png}
-    \caption{Diagram sekwencji moderacji aukcji}
-    \label{fig:zdj14}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -324,18 +267,9 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
     \label{fig:zdj17}
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[
-        width=\dimexpr\textwidth\relax,
-        keepaspectratio
-    ]{img/schematy/TworzenieAukcji.png}
-    \caption{Diagram sekwencji tworzenia aukcji}
-    \label{fig:zdj18}
-\end{figure}
-
+\clearpage
 \subsection{Projekt interfejsu użytkownika}
-W celu łatwiejszej pracy nad implementacją części klienckej serwisu aukcyjnego, utworzono widoki, które pokazują ogólny zamysł wyglądu aplikacji. Podczas implementacji interfejsów graficznych, była potrzebna na zmianę niektórych widoków, tak aby interfejs był bardziej przejrzysty i ujednolicony.
+W celu łatwiejszej pracy nad implementacją części klienckiej serwisu aukcyjnego, utworzono widoki, które pokazują ogólny zamysł wyglądu aplikacji. Poniższe zdjęcia przedstawiają widoki strony głównej (rysunki \ref{fig:mockup1}, \ref{fig:mockup2}, \ref{fig:mockup3}, \ref{fig:mockup4}), widoku aukcji (rysunki \ref{fig:mockup5}, \ref{fig:mockup6}), panelu użytkownika (rysunek \ref{fig:mockup7}).
 
 \begin{landscape}
     \begin{figure}[p]
@@ -414,21 +348,10 @@ W celu łatwiejszej pracy nad implementacją części klienckej serwisu aukcyjne
         \caption{Mockup widoku panelu urzytkownika}
         \label{fig:mockup7}
     \end{figure}
-
-    \begin{figure}[p]
-        \centering
-        \includegraphics[
-            width=\dimexpr\paperheight\relax,
-            height=\dimexpr\textwidth-2cm\relax,
-            keepaspectratio
-        ]{img/schematy/mockup-panel-admin.png}
-        \caption{Mockup widoku panelu administratora}
-        \label{fig:mockup8}
-    \end{figure}
 \end{landscape}
 
 \subsection{Model danych}
-Poniższe diagramy klas prezentują model danych systemu aukcyjnego z kluczowymi encjami (Użytkownik, Aukcja, Przedmiot, PozycjaAukcji, Oferta) oraz ich relacjami; uproszczony diagram pokazuje jedynie nazwy klas i powiązania, a rozszerzony zawiera szczegółowe atrybuty i typy.
+Poniższe diagramy klas prezentują model danych systemu aukcyjnego z kluczowymi encjami (Użytkownik, Aukcja, Przedmiot, PozycjaAukcji, Oferta) oraz ich relacjami. Na rysunku \ref{fig:zdj19} przedstawiono uproszczony diagram pokazujący jedynie nazwy klas i powiązania, natomiast rysunek \ref{fig:zdj20} zawiera rozszerzony diagram ze szczegółowymi atrybutami i typami.
 \begin{figure}[htbp]
     \centering
     \includegraphics[

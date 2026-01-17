@@ -1,8 +1,8 @@
-\section{Implementacja warstwy frontendowej serwisu auckyjnego}
+\section{Implementacja warstwy interfejsu użytkownika serwisu aukcyjnego}
 
-\subsection{Rola warstwy frontendowej w systemie aukcyjnym}
+\subsection{Rola warstwy interfejsu użytkownika w systemie aukcyjnym}
 
-Struktura części frontendowej odpowiedzialna jest za interakcję użytkownika z systemem aukcyjnym. Jej głównym zadaniem jest przedstawienie danych dostarczanych przez strukturę części serwerowej. Istotnym aspektem jest, aby interfejs użytkownika zapewniał odpowiednią użyteczność oraz spójny interfejs, poprzez przejrzyste układy stron.
+Struktura części klienckiej odpowiedzialna jest za interakcję użytkownika z systemem aukcyjnym. Jej głównym zadaniem jest przedstawienie danych dostarczanych przez strukturę części serwerowej. Istotnym aspektem jest, aby interfejs użytkownika zapewniał odpowiednią użyteczność oraz spójny interfejs, poprzez przejrzyste układy stron. Ze względu na dążenie do większej przejrzystości interfejsu oraz ujednolicenia wyglądu aplikacji, w trakcie implementacji zmieniono wygląd niektórych widoków w stosunku do projektu przedstawionego w rozdziale~\ref{sec:projekt}.
 
 \subsection{Struktura części interfejsu użytkownika}
 
@@ -27,9 +27,9 @@ Na rysunku~\ref{fig:frontend} przedstawiono strukturę części odpowiedzialnej 
   \label{fig:frontend}
 \end{figure}
 
-\subsection{Routing i nawigacja w aplikacji}
+\subsection{Trasowanie i nawigacja w aplikacji}
 
-W aplikacji zastosowano mechanizm routingu React Router DOM~\cite{react-router}, który jest przedstawiony na listingu~\ref{lst:routing}. Umożliwia on korzystanie z aplikacji internetowej bez konieczności ciągłego przeładowywania całej strony przy odświeżeniu. Dzięki temu rozwiązaniu usprawniono działanie aplikacji, poprawiając komfort użytkowania.
+W aplikacji zastosowano mechanizm trasowania React Router DOM~\cite{react-router}, który jest przedstawiony na listingu~\ref{lst:routing}. Umożliwia on korzystanie z aplikacji internetowej bez konieczności ciągłego przeładowywania całej strony przy odświeżeniu. Dzięki temu rozwiązaniu usprawniono działanie aplikacji, poprawiając komfort użytkowania.
 
 \begin{lstlisting}[style=javascript, caption = {Mechanizm routingu React Router DOM}, label = {lst:routing}]
 createRoot(document.getElementById('root')).render(
@@ -64,7 +64,7 @@ createRoot(document.getElementById('root')).render(
 
 
 \subsection{Komunikacja części klienckiej z częścią serwerową}
-Warstwa interfejsu użytkownika serwisu aukcyjnego komunikuje się z częścią serwerową za pomocą interfejsu API opartego na protokole HTTP~\cite{http}. Wymiana danych realizowana jest asynchroniczne przy wykorzystaniu metody fetch. W celu uporządkowania komunikacji z częścią serwerową zastosowano wydzieloną warstwę serwisów, odpowiedzialną za realizację zapytań sieciowych. Przykładem tego zastosowania jest ukazany na listingu~\ref{lst:apijs}
+Warstwa interfejsu użytkownika serwisu aukcyjnego komunikuje się z częścią serwerową za pomocą interfejsu API opartego na protokole HTTP~\cite{http}. Wymiana danych realizowana jest asynchronicznie przy wykorzystaniu metody \texttt{fetch}. W celu uporządkowania komunikacji z częścią serwerową zastosowano wydzieloną warstwę serwisów, odpowiedzialną za realizację zapytań sieciowych. Przykład tego zastosowania przedstawiono na listingu~\ref{lst:apijs}.
 
 \begin{lstlisting}[style=javascript, caption = {Zawartośc pliku api.js}, label = {lst:apijs}]
 import { handleResponse, getAuthHeaders } 

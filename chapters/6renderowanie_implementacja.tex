@@ -42,7 +42,7 @@ init_window() -> std::expected<void, std::string>
 }
 \end{lstlisting}
 Dalsza część kodu w tej funkcji, przedstawiona na listingu \ref{lst:init_window_cursor}, odpowiada za ustawienie asynchronicznych funkcji obsługi zdarzeń, takie jak zmiana rozmiaru okna czy obsługa myszy.
-\begin{lstlisting}[caption={Dalsza część funkcji inicializującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
+\begin{lstlisting}[caption={Dalsza część funkcji inicjalizującej okno - obsługa pozycji myszy}, label={lst:init_window_cursor}]
 auto
 init_window() -> std::expected<void, std::string>
 {
@@ -64,7 +64,7 @@ init_window() -> std::expected<void, std::string>
 Inicjalizacje WebGPU przedstawiono na listingu \ref{lst:init_renderer}. Składa się z trzynastu kroków, które muszą być wykonane w określonej kolejności, aby poprawnie skonfigurować środowisko renderujące. W dalszej części rozdziału przedstawiono poszczególne kroki wraz z opisem ich funkcji. W praktyce są one łączone w potok oparty na \texttt{std::expected} i operacjach \texttt{and\_then}, co umożliwia natychmiastowe przerwanie przy pierwszym błędzie oraz czytelne przesłanie komunikatu o niepowodzeniu.
 %cos dodac
 %init_renderer()
-\begin{lstlisting}[caption={Funkcja inicializująca WebGPU, stworzona jako potok}, label={lst:init_renderer}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca WebGPU, stworzona jako potok}, label={lst:init_renderer}]
 auto
 init_renderer() -> std::expected<void, std::string>
 {
@@ -86,9 +86,9 @@ init_renderer() -> std::expected<void, std::string>
 
 \subsubsection{Adapter}
 %https://www.w3.org/TR/webgpu/#adapters
-Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. Inicjalizajcę przedstawiono na listingu~\ref{lst:init_adapter}. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje~\cite{WebGPU-draft}. Aby móc uzyskać adapter, należy najpierw utworzyć instancję WebGPU (\texttt{WGPUInstance}), która stanowi globalny punkt wejścia do interfejsu WebGPU i reprezentuje implementację tego API w systemie. Następnie tworzona jest powierzchnia renderującą (\texttt{WGPUSurface}), która stanowi abstrakcję powiązaną z wcześniej zainicjalizowanym oknem GLFW i umożliwia prezentację wyrenderowanych obrazów użytkownikowi. Powierzchnia ta jest przekazywana jako parametr opcji adaptera (\texttt{compatibleSurface}), dzięki czemu wybierany adapter będzie kompatybilny z docelową powierzchnią renderowania. Dopiero po utworzeniu instancji i powierzchni możliwe jest wysłanie zapytania o adapter spełniający określone kryteria kompatybilności.
+Adapter to reprezentacja fizycznego lub wirtualnego urządzenia GPU dostępnego w systemie. Inicjalizację przedstawiono na listingu~\ref{lst:init_adapter}. W tym kroku aplikacja wysyła zapytanie do systemu o dostępne adaptery, a następnie wybiera najbardziej odpowiedni na podstawie określonych kryteriów, takich jak wydajność czy obsługiwane funkcje~\cite{WebGPU-draft}. Aby móc uzyskać adapter, należy najpierw utworzyć instancję WebGPU (\texttt{WGPUInstance}), która stanowi globalny punkt wejścia do interfejsu WebGPU i reprezentuje implementację tego API w systemie. Następnie tworzona jest powierzchnia renderującą (\texttt{WGPUSurface}), która stanowi abstrakcję powiązaną z wcześniej zainicjalizowanym oknem GLFW i umożliwia prezentację wyrenderowanych obrazów użytkownikowi. Powierzchnia ta jest przekazywana jako parametr opcji adaptera (\texttt{compatibleSurface}), dzięki czemu wybierany adapter będzie kompatybilny z docelową powierzchnią renderowania. Dopiero po utworzeniu instancji i powierzchni możliwe jest wysłanie zapytania o adapter spełniający określone kryteria kompatybilności.
 %kod init_adapter()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt adapter}, label={lst:init_adapter}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca obiekt adapter}, label={lst:init_adapter}]
 auto
 init_adapter() -> std::expected<void, std::string>
 {
@@ -117,7 +117,7 @@ init_adapter() -> std::expected<void, std::string>
 %https://www.w3.org/TR/webgpu/#devices
 Urządzenie to logiczne przedstawienie wybranego adaptera, które umożliwia tworzenie zasobów procesora graficznego oraz wykonywanie operacji renderujących~\cite{WebGPU-draft}. W tym kroku aplikacja tworzy obiekt \texttt{WGPUDevice}, który będzie używany do komunikacji z procesorem graficznym. Przed jego utworzeniem z adaptera odczytywane są wspierane limity (\texttt{WGPULimits}), a następnie definiowany jest zestaw wymaganych limitów przekazywany w deskryptorze urządzenia. Limity te określają oczekiwania aplikacji względem: organizacji geometrii (np. liczby i struktury atrybutów oraz buforów wierzchołków), poprawnych przesunięć dla operacji na pamięci, przepływu danych między etapami shadera (uniformy), a także modelu powiązań zasobów. Obejmują również ograniczenia dotyczące tekstur i samplerów (wymiary oraz liczebność na etap), tak aby odpowiadały realnym wymaganiom potoku i używanych materiałów. Dzięki zastosowaniu limitów urządzenie jest tworzone tylko wtedy, gdy implementacja WebGPU gwarantuje parametry wystarczające do bezpiecznego i wydajnego działania. W \texttt{WGPUDeviceDescriptor} ustawiane są ponadto etykiety, wskaźnik do wymaganych limitów, opis domyślnej kolejki oraz funkcje zwrotne dla utraty urządzenia i błędów nieprzechwyconych, które służą diagnostyce. Po utworzeniu urządzenia, zgodnie z kodem na listingu~\ref{lst:init_device}, dobierany jest format powierzchni (\texttt{BGRA8Unorm}) i wykonywana jest konfiguracja (\texttt{configure\_surface()}), aby zapewnić poprawne wyświetlanie na utworzonej wcześniej powierzchni.
 %kod init_device()
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt device}, label={lst:init_device}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca obiekt device}, label={lst:init_device}]
 auto
 init_device() -> std::expected<void, std::string>
 {
@@ -147,7 +147,7 @@ Moduł shaderów zawiera skompilowany kod shaderów napisanych w języku WGSL~\c
 
 \paragraph{Tekstura głębi}
 Tekstura głębi to specjalny zasób do przechowywania informacji o odległości każdego piksela od kamery w scenie 3D~\cite{WebGPU-draft}. Jest używana podczas testów głębi w potoku renderowania, aby określić, które fragmenty są widoczne, a które zasłonięte przez bliższe obiekty. W deskryptorze tekstury kluczowe są parametry: \texttt{format} (\texttt{Depth24Plus} - 24-bitowa precyzja głębi), \texttt{usage} (\texttt{RenderAttachment} - użycie jako załącznik renderowania), oraz wymiary odpowiadające wymiarom okna. Po utworzeniu tekstury, tworzony jest także widok tekstury (\texttt{TextureView}) poprzez wywołanie \texttt{texture.createView()}, który jest używany w potoku renderowania (listing~\ref{lst:init_depth_texture}).
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt depth texture}, label={lst:init_depth_texture}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca obiekt depth texture}, label={lst:init_depth_texture}]
 auto
 init_depth_texture() -> std::expected<void, std::string>
 {
@@ -177,7 +177,7 @@ Układ grupy powiązań definiuje interfejs między zbiorem zasobów a ich dost�
 Potok renderowania jest kluczowym elementem procesu renderowania, definiującym wszystkie etapy przetwarzania danych graficznych. Według standardu WebGPU obejmuje on następujące etapy: pobieranie wierzchołków (vertex fetch), shader wierzchołków (vertex shader), składanie prymitywów (primitive assembly), rasteryzacja (rasterization), shader fragmentów (fragment shader), test szablonu i operacje (stencil test and operation), test głębi i zapis (depth test and write), oraz scalanie wyjścia (output merging)~\cite{WebGPU-draft}.
 
 Tworzenie potoku renderowania jest bardziej złożone niż innych zasobów i wymaga wielu struktur konfiguracyjnych. Najpierw tworzony jest układ potoku (\texttt{WGPUPipelineLayout}), który określa ogólną organizację zasobów dostępnych dla shaderów, bazując na wcześniej utworzonym obiekcie \texttt{WGPUBindGroupLayout}. Następnie wypełniany jest deskryptor potoku renderowania (\texttt{WGPURenderPipelineDescriptor}), który zawiera konfigurację wszystkich wyżej wymienionych etapów. W implementacji, przedstawionej na listingu~\ref{lst:init_pipeline}, poszczególne etapy konfigurowane są przez dedykowane funkcje pomocnicze.
-\begin{lstlisting}[caption={Funkcja inicializująca obiekt pipeline}, label={lst:init_pipeline}]
+\begin{lstlisting}[caption={Funkcja inicjalizująca obiekt pipeline}, label={lst:init_pipeline}]
 auto
 init_pipeline() -> std::expected<void, std::string>
 {
