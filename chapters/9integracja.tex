@@ -36,7 +36,7 @@ Integracja komponentu WebGPU z aplikacją React opiera się na wzorcu Provider, 
 
 \subsubsection{Wzorzec Provider}
 
-Komponent \texttt{WebGPUCanvasProvider} implementuje wzorzec Provider z React Context API. Działa jako singleton zarządzający cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
+Komponent \texttt{WebGPUCanvasProvider} (listing \ref{lst:provider}) implementuje wzorzec Provider z React Context API. Działa jako singleton zarządzający cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
 
 \begin{lstlisting}[style=javascript, caption={Struktura komponentu Provider}, label={lst:provider}]
 export function WebGPUCanvasProvider({ children }) {
@@ -57,12 +57,7 @@ export function WebGPUCanvasProvider({ children }) {
 
 \subsubsection{Hooki dostępu do API}
 
-Dostęp do funkcjonalności komponentu renderującego z komponentów potomnych realizowany jest przez dedykowane hooki React:
-
-\begin{itemize}
-  \item \texttt{useWebGPUCanvas()} - publiczny hook zwracający API do kontroli komponentu renderującego (zmiana modelu, status ładowania, informacje o błędach),
-  \item \texttt{useWebGPUCanvasInternal()} - wewnętrzny hook używany przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
-\end{itemize}
+Dostęp do funkcjonalności komponentu renderującego z poziomu komponentów potomnych realizowany jest za pomocą dedykowanych hooków React. Hook \texttt{useWebGPUCanvas()} stanowi publiczny interfejs zwracający API do kontroli komponentu renderującego, którego strukturę przedstawia listing \ref{lst:api}. Dodatkowo dostępny jest wewnętrzny hook \texttt{useWebGPUCanvasInternal()}, wykorzystywany przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
 
 \begin{lstlisting}[style=javascript, caption={Publiczne API komponentu renderującego}, label={lst:api}]
 const publicApi = {
@@ -81,7 +76,7 @@ Kluczowym elementem architektury jest wykorzystanie mechanizmu React Portals do 
 
 \subsubsection{Zasada działania React Portals}
 
-React Portal umożliwia renderowanie komponentu potomnego do węzła DOM znajdującego się poza hierarchią rodzica. W przypadku integracji WebGPU, współdzielony canvas jest renderowany przez Portal do aktualnie aktywnego \enquote{slotu} - kontenera DOM wskazanego przez komponent \texttt{WebGPUCanvas}.
+React Portal umożliwia renderowanie komponentu potomnego do węzła DOM znajdującego się poza hierarchią rodzica. W przypadku integracji WebGPU, współdzielony canvas jest renderowany przez Portal do aktualnie aktywnego \enquote{slotu} - kontenera DOM wskazanego przez komponent \texttt{WebGPUCanvas}, jak przedstawiono na listingu \ref{lst:portal}.
 
 \begin{lstlisting}[style=javascript, caption={Renderowanie canvas przez Portal}, label={lst:portal}]
 {hostNode
@@ -113,7 +108,7 @@ Inicjalizacja modułu WebAssembly odbywa się asynchronicznie podczas pierwszego
 
 \subsubsection{Konfiguracja obiektu Module}
 
-Przed załadowaniem skryptu Emscripten, konfigurowany jest globalny obiekt \texttt{window.Module} z callbackami obsługującymi zdarzenia cyklu życia:
+Przed załadowaniem skryptu Emscripten, konfigurowany jest globalny obiekt \texttt{window.Module} z callbackami obsługującymi zdarzenia cyklu życia, jak przedstawiono na listingu \ref{lst:module}:
 
 \begin{lstlisting}[style=javascript, caption={Konfiguracja obiektu Module}, label={lst:module}]
 const moduleConfig = {
@@ -138,7 +133,7 @@ window.Module = moduleConfig
 
 \subsubsection{Asynchroniczne wstrzykiwanie skryptu}
 
-Skrypt \texttt{main.js} jest dynamicznie dodawany do dokumentu HTML. Mechanizm zapewnia, że skrypt jest ładowany tylko raz, niezależnie od liczby montowań komponentu:
+Skrypt \texttt{main.js} jest dynamicznie dodawany do dokumentu HTML, jak przedstawiono na listingu \ref{lst:script}. Mechanizm zapewnia, że skrypt jest ładowany tylko raz, niezależnie od liczby montowań komponentu.
 
 \begin{lstlisting}[style=javascript, caption={Dynamiczne ładowanie skryptu Emscripten}, label={lst:script}]
 if (!globalState.scriptAppended) {
@@ -161,7 +156,7 @@ Emscripten udostępnia wirtualny system plików (VFS), który emuluje operacje p
 
 \subsubsection{Montowanie systemu plików}
 
-Podczas fazy \texttt{preRun} konfigurowane są punkty montowania dla persystentnych danych:
+Podczas fazy \texttt{preRun} konfigurowane są punkty montowania dla persystentnych danych, jak przedstawiono na listingu \ref{lst:idbfs}.
 
 \begin{lstlisting}[style=javascript, caption={Konfiguracja IDBFS}, label={lst:idbfs}]
 moduleConfig.preRun.push(() => {
@@ -189,7 +184,7 @@ Komunikacja między warstwą JavaScript a skompilowanym kodem C++ odbywa się pr
 Komponent renderujący eksportuje następujące funkcje:
 
 \begin{itemize}
-  \item \texttt{change\_model(modelName)} - zmiana wyświetlanego modelu 3D,
+  \item \texttt{change\_model(modelName)} - zmiana wyświetlanego modelu 3D, której wywołanie przedstawiono na listingu \ref{lst:changemodel},
   \item \texttt{resize\_canvas(width, height)} - aktualizacja wymiarów renderowania,
   \item \texttt{set\_resource\_base(path)} - konfiguracja ścieżki bazowej dla zasobów.
 \end{itemize}
@@ -219,7 +214,7 @@ const changeModel = useCallback((modelName) => {
 
 \subsubsection{Przekazywanie elementu canvas}
 
-Element HTML canvas jest przekazywany do modułu WebAssembly przez właściwość \texttt{Module.canvas}. Emscripten automatycznie używa tego elementu do utworzenia kontekstu WebGPU:
+Element HTML canvas jest przekazywany do modułu WebAssembly przez właściwość \texttt{Module.canvas}, jak przedstawiono na listingu \ref{lst:canvas}. Emscripten automatycznie używa tego elementu do utworzenia kontekstu WebGPU:
 
 \begin{lstlisting}[style=javascript, caption={Przypisanie canvas do modułu}, label={lst:canvas}]
 moduleConfig.canvas = canvasRef.current
@@ -230,7 +225,7 @@ moduleConfig.canvas = canvasRef.current
 
 \subsection{Komponent WebGPUCanvas}
 
-Komponent \texttt{WebGPUCanvas} stanowi publiczny interfejs do osadzania komponentu renderującego 3D w dowolnym miejscu aplikacji. Obsługuje responsywne wymiarowanie oraz automatyczną zmianę modelu.
+Komponent \texttt{WebGPUCanvas} (listing \ref{lst:usage}) stanowi publiczny interfejs do osadzania komponentu renderującego 3D w dowolnym miejscu aplikacji. Obsługuje responsywne wymiarowanie oraz automatyczną zmianę modelu.
 
 \begin{lstlisting}[style=javascript, caption={Użycie komponentu WebGPUCanvas}, label={lst:usage}]
 <WebGPUCanvas

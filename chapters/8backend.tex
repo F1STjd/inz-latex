@@ -4,12 +4,12 @@
 
 Na rysunku~\ref{fig:backend} przedstawiono strukturę części serwerowej systemu aukcyjnego:
 \begin{itemize}
-	\item tests - w tym folderze zawarte są testy: jednostkowe, implementacyjne i funkcjonalne, opisane w rozdziale x.
-	\item Controllers - w tym folderze znajduje się kod opisujący logikę biznesową.
-	\item Middleware - w tym folderze znajduje się kod opisujący autentykacje za pomocą JWT. 
-	\item Models - w tym folderze znajduje się kod opisującymodele: User, Bid i Auction dla bazy danych. 
-	\item	Routes - w tym folderze są opisane trasy URL.
-	\item Utils - w tym folderze są opisane funkcje pomocnicze. 
+  \item tests - w tym folderze zawarte są testy: jednostkowe, implementacyjne i funkcjonalne, opisane w rozdziale x.
+  \item Controllers - w tym folderze znajduje się kod opisujący logikę biznesową.
+  \item Middleware - w tym folderze znajduje się kod opisujący autentykacje za pomocą JWT.
+  \item Models - w tym folderze znajduje się kod opisującymodele: User, Bid i Auction dla bazy danych.
+  \item	Routes - w tym folderze są opisane trasy URL.
+  \item Utils - w tym folderze są opisane funkcje pomocnicze.
 \end{itemize}
 
 \begin{figure}[H]
@@ -23,15 +23,19 @@ Na rysunku~\ref{fig:backend} przedstawiono strukturę części serwerowej system
 
 \subsection{Połączenie z bazą danych}
 
-W celu uproszczenia pracy z projektem zostało użyte rozwiązanie Atlas, czyli rozwiązanie chmurowe bazy danych MongoDB. Dzięki takiemu działaniu udało się ułatwić 
-pracę z projektem. Na listingu~\ref{lst:database_config} przedstawiono proces łączenia. Serwer łączy się z bazą danych, za pomocą zmiennej środowiskowej. Jeżeli połączenie nie nastąpi, wyświetlany jest typ błędu. 
+W celu uproszczenia pracy z projektem zostało użyte rozwiązanie Atlas, czyli chmurowa baza danych MongoDB. MongoDB Atlas oferuje automatyczne skalowanie, kopie zapasowe oraz wbudowane mechanizmy bezpieczeństwa, co znacząco przyspiesza proces tworzenia aplikacji. Dzięki takiemu podejściu zespół mógł skupić się na implementacji logiki biznesowej, zamiast na administracji infrastrukturą bazodanową.
+
+Konfiguracja połączenia wykorzystuje wzorzec asynchroniczny z obsługą błędów. Parametr \texttt{serverSelectionTimeoutMS} określa maksymalny czas oczekiwania na odpowiedź serwera bazy danych. Na listingu~\ref{lst:database_config} przedstawiono proces łączenia. Serwer łączy się z bazą danych za pomocą zmiennej środowiskowej \texttt{MONGODB\_URI}, co pozwala na łatwą zmianę środowiska bez modyfikacji kodu. Jeżeli połączenie nie nastąpi, wyświetlany jest typ błędu, a aplikacja kończy działanie z kodem błędu.
 
 \begin{lstlisting}[style=javascript, caption = {Konfiguracja połączenia z bazą danych}, label = {lst:database_config}]
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
+    const conn = 
+      await mongoose.connect( 
+        process.env.MONGODB_URI, 
+        { serverSelectionTimeoutMS: 5000, }
+      );
+
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     console.log(`Database: ${conn.connection.name}`);
   } catch (error) {
@@ -43,41 +47,36 @@ const connectDB = async () => {
 
 
 \subsection{Rejestracja użytkowników}
-Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik obowiązkowo podaje nazwę użytkownika, email, hasło, a opcjonalnie może podać imię, nazwisko oraz numer telefonu. Jeżeli użytkownik podał istniejący email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzymy model User i token JWT oraz zapisujemy użytkownika w bazie danych. Hasła są hashowane przed zapisem do bazy danych, w celu zabezpieczenia użytkownika. Jeżeli wystąpi jakiś błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu przedstawiono kod dotyczący rejestracji użytkowników. Na listingu~\ref{lst:user_register} przedstawiono ochronę haseł poprzez hashowanie.
+Aby w pełni korzystać z systemu aukcyjnego, użytkownicy muszą najpierw dokonać rejestracji. Użytkownik obowiązkowo podaje nazwę użytkownika, email, hasło, a opcjonalnie może podać imię, nazwisko oraz numer telefonu. Jeżeli użytkownik podał istniejący email bądź nazwę użytkownika, musi dokonać ich zmiany. Jeżeli wszystkie pola są wprowadzone prawidłowo, wtedy tworzymy model User i token JWT oraz zapisujemy użytkownika w bazie danych. Hasła są hashowane przed zapisem do bazy danych, w celu zabezpieczenia użytkownika. Jeżeli wystąpi jakiś błąd podczas rejestracji, cały ten proces jest anulowany. Na listingu ~\ref{lst:user_register} przedstawiono kod dotyczący rejestracji użytkowników.
 
 \begin{lstlisting}[style=javascript, caption = {Implementacja procesu rejestracji użytkownika}, label = {lst:user_register}]
 export const register = async (req, res) => {
   try {
     const {	username, email, password, 
     		firstName, lastName, phone } = req.body;
-    
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Podaj wymagane pola: username, email i password'
+        message: 'Podaj wymagane pola'
       });
     }
-    const existingUser = await User.findOne({ 
-    $or: [{ email }, { username }] });
+    const existingUser = 
+      await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({
         success: false,
         message: existingUser.email === email
           ? 'Uzytkownik z tym adresem email juz istnieje'
-          : 'Nazwa użytkownika jest juz zajeta'
-      });}
+          : 'Nazwa uzytkownika jest juz zajeta'
+      });
+    }
     const newUser = await User.create({
-      username, email,
-      password, firstName,
-      lastName, phone
+      username, email, password, firstName, lastName, phone
     });
-    
     const verificationToken = newUser.createVerificationToken();
     await newUser.save({ validateBeforeSave: false });
-    console.log('Verification token:', verificationToken);
-    createSendToken(newUser, 201, 
-    	res, 'Konto zostalo utworzone pomyslnie');
-    
+    createSendToken(
+      newUser, 201, res, 'Konto zostalo utworzone pomyslnie');  
   } catch (error) {
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
@@ -87,15 +86,15 @@ export const register = async (req, res) => {
         'Nazwa uzytkownika'} jest juz zajeta`
       });
     }    
-    return sendErrorResponse(res, 500, 
-    	'Blad podczas rejestracji', error);
+    return sendErrorResponse(
+      res, 500, 'Blad podczas rejestracji', error);
   }
 };
 \end{lstlisting}
 
 \subsection{Logowanie użytkownika}
 Po dokonaniu rejestracji, użytkownik może się zalogować do systemu aukcyjnego. Przy logowaniu wprowadza email bądź nazwę użytkownika oraz podane hasło podczas rejestracji.
-Podczas procesu logowania porównujemy hashe hasła, które zostało wprowadzone przez użytkownika, z hashem zapisanym w bazie danych. Dzięki takiej praktyce podczas wycieku danych z bazy, użytkownicy nie tracą swojego loginu i hasła. Na listingu~\ref{lst:user_login} przedstawiono kod, który obsługuje logowanie użytkowników. 
+Podczas procesu logowania porównujemy hashe hasła, które zostało wprowadzone przez użytkownika, z hashem zapisanym w bazie danych. Dzięki takiej praktyce podczas wycieku danych z bazy, użytkownicy nie tracą swojego loginu i hasła. Na listingu~\ref{lst:user_login} przedstawiono kod, który obsługuje logowanie użytkowników.
 
 \begin{lstlisting}[style=javascript, caption = {Implementacja procesu logowania użytkownika}, label = {lst:user_login}]
 export const login = async (req, res) => {
@@ -130,7 +129,7 @@ export const login = async (req, res) => {
 \end{lstlisting}
 
 \subsection{Autentykacja użytkownika}
-Użytkownicy są autentykowani poprzez Json Web Token. Ten standard pozwala na bezpieczną wymianę danych pomiędzy klientem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówka, ładunku oraz podpisu. Nagłówek zawiera typ tokenu Na listingu~\ref{lst:user_login} przedstawiono implementacje tokenów JWT. 
+Użytkownicy są autentykowani poprzez Json Web Token. Ten standard pozwala na bezpieczną wymianę danych pomiędzy klientem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówka, ładunku oraz podpisu. Na listingu~\ref{lst:user_login} przedstawiono implementacje tokenów JWT.
 
 \begin{lstlisting}[style=javascript, caption = {Implementacja autentykacji użytkownika}, label = {lst:user_auth}]
 const signToken = (id) => {
@@ -168,56 +167,46 @@ const createSendToken =
 
 \subsubsection{Stworzenie aukcji}
 
-Zalogowany użytkownik może stworzyć wiele aukcji. Swojej aukcji nie może licytować, aby nie zawyżać sztucznie ceny. Przy utworzeniu każdej aukcji przez danego użytkownika, inkrementujemy liczbę wszystkich utworzonych aukcji. Na listingu~\ref{lst:auction_create} przedstawiono funkcje tworzącą aukcję. 
+Zalogowany użytkownik może stworzyć wiele aukcji. Swojej aukcji nie może licytować, aby nie zawyżać sztucznie ceny. Przy utworzeniu każdej aukcji przez danego użytkownika, inkrementujemy liczbę wszystkich utworzonych aukcji. Na listingu~\ref{lst:auction_create} przedstawiono funkcje tworzącą aukcję.
 
 \begin{lstlisting}[style=javascript, caption = {Obsługa utworzenia aukcji}, label = {lst:auction_create}]
 export const createAuction = async (req, res) => {
   try {
-    const auctionData = {
-      ...req.body,
-      seller: req.user._id
-    };
-    const startTime = new Date(auctionData.startTime || Date.now());
+    const auctionData = { ...req.body, seller: req.user._id };
+    const startTime = 
+      new Date(auctionData.startTime || Date.now());
     const endTime = new Date(auctionData.endTime);
-
     if (endTime <= startTime) {
       return res.status(400).json({
-        success: false,
-        message: 'Data zakonczenia musi byc 
-        pozniejsza niz data rozpoczecia'
+        success: false, 
+        message: '...'
       });
     }
-
     const auction = await Auction.create(auctionData);
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { 'stats.totalAuctionsCreated': 1 }
     });
 
     res.status(201).json({
-      success: true,
-      message: 'Aukcja zostala utworzona pomyslnie',
-      data: auction
+      success: true, message: '...', data: auction
     });
   } catch (error) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors)
       	.map(err => err.message);
       return res.status(400).json({
-        success: false,
-        message: messages[0]
+        success: false, message: messages[0]
       });
     }
     res.status(500).json({
-      success: false,
-      message: 'Blad podczas tworzenia aukcji',
-      error: error.message
+      success: false, message: '...', error: error.message
     });
   }
 };
 \end{lstlisting}
 
 \subsubsection{Kategorie aukcji}
-Każda aukcja ma przypisaną jedną z dwunastu kategorii. Dzięki temu podczas wyświetlania wszystkich aukcji możemy filtrować dane w taki sposób, aby użytkownik miał łatwość w szukaniu potrzebnego dla siebie przedmiotu. Listing~\ref{lst:auction_categories} przedstawia kod odpowiadający za opisanie kategorii aukcji. 
+Każda aukcja ma przypisaną jedną z dwunastu kategorii. Dzięki temu podczas wyświetlania wszystkich aukcji możemy filtrować dane w taki sposób, aby użytkownik miał łatwość w szukaniu potrzebnego dla siebie przedmiotu. Listing~\ref{lst:auction_categories} przedstawia kod odpowiadający za opisanie kategorii aukcji.
 \begin{lstlisting}[style=javascript, caption = {Obsługa wyświetlania aukcji}, label = {lst:auction_categories}]
 export const getCategories = async (req, res) => {
   try {
@@ -254,7 +243,7 @@ export const getCategories = async (req, res) => {
 \end{lstlisting}
 
 \subsubsection{Licytowanie aukcji}
-Użytkownik może licytować wiele aukcji na raz. Każda aukcja ma cene wywoławczą i najmniejszą cenę o jaką można podbić aukcje. Po utworzeniu zgodnego podbicia, aktualizujemy cene aukcji, poprzednie podbicia ustawiamy jako przebite i zatwierdzamy transakcję. Na listingu~\ref{lst:bidding} został przedstawiony proces licytowania aukcji przez jednego użytkownika. 
+Użytkownik może licytować wiele aukcji na raz. Każda aukcja ma cene wywoławczą i najmniejszą cenę o jaką można podbić aukcje. Po utworzeniu zgodnego podbicia, aktualizujemy cene aukcji, poprzednie podbicia ustawiamy jako przebite i zatwierdzamy transakcję. Na listingu~\ref{lst:bidding} został przedstawiony proces licytowania aukcji przez jednego użytkownika.
 \begin{lstlisting}[style=javascript, caption = {Proces licytowania aukcji}, label = {lst:bidding}]
 export const placeBid = async (req, res) => {
   const mongoose = (await import('mongoose')).default;
@@ -278,10 +267,11 @@ export const placeBid = async (req, res) => {
       status: 'active'
     }], { session });
     
-    const minimumBid = auction.currentPrice + auction.bidIncrement;
-        if (amount < minimumBid) {
-          throw new Error(`Minimalna oferta to ${minimumBid} zl`);
-        }
+    const minimumBid = 
+      auction.currentPrice + auction.bidIncrement;
+    if (amount < minimumBid) {
+      throw new Error(`Minimalna oferta to ${minimumBid} zl`);
+    }
         
     const bid = bidArray[0];
     await Auction.findOneAndUpdate(
@@ -341,7 +331,7 @@ export const placeBid = async (req, res) => {
 
 \subsubsection{Wyświetlanie wszystkich aukcji}
 
-Niezalogowani użytkownicy mogą wyświetlać wszystkie aukcje. Aukcje mogą być sortowane po kategorii, cenie albo po czasie aukcji. Na listingu~\ref{lst:all_auctions} przedstawiono funkcje, która pozwala na pobranie wszystkich aukcji. 
+Niezalogowani użytkownicy mogą wyświetlać wszystkie aukcje. Aukcje mogą być sortowane po kategorii, cenie albo po czasie aukcji. Na listingu~\ref{lst:all_auctions} przedstawiono funkcje, która pozwala na pobranie wszystkich aukcji.
 
 \begin{lstlisting}[style=javascript, caption = {Obsługa mechanizmu wyświetlania wszystkich aukcji}, label = {lst:all_auctions}]
 export const getAllAuctions = async (req, res) => {
@@ -364,8 +354,10 @@ export const getAllAuctions = async (req, res) => {
 
     if (minPrice || maxPrice) {
       query.currentPrice = {};
-      if (minPrice) query.currentPrice.$gte = parseFloat(minPrice);
-      if (maxPrice) query.currentPrice.$lte = parseFloat(maxPrice);
+      if (minPrice) 
+        query.currentPrice.$gte = parseFloat(minPrice);
+      if (maxPrice) 
+        query.currentPrice.$lte = parseFloat(maxPrice);
     }
 
     if (status === 'active') {
@@ -397,5 +389,5 @@ export const getAllAuctions = async (req, res) => {
       message: 'Blad podczas pobierania aukcji',
       error: error.message
     });}};
-\end{lstlisting} 
+\end{lstlisting}
 
