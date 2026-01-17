@@ -2,11 +2,11 @@
 
 Celem pracy było zaprojektowanie i implementacja systemu informatycznego, składającego się z dwóch części: komponentu renderującego obiektów 3D oraz internetowego systemu aukcyjnego.
 
-Pierwszym etapem prac nad systemem, było przygotowanie projektu. Projekt zawierał wymagania funkcjonalne, niefunkcjonalne oraz diagramy ERD i BPMN. Zdefiniowanie wymagań funkcjonalnych i niefunkcjonalnych pozwoliło jednoznacznie określić zakres działania systemu. Diagram ERD ułatwił proces implementacji bazy danych, a diagramy BPMN pozwoliły na szybkie zrozumienie i wdrożenie procesów biznesowych w systemie aukcyjnym.
+Pierwszym etapem prac nad systemem, było przygotowanie projektu. Projekt zawierał wymagania funkcjonalne, niefunkcjonalne oraz diagramy  BPMN. Zdefiniowanie wymagań funkcjonalnych i niefunkcjonalnych pozwoliło jednoznacznie określić zakres działania systemu. Diagramy BPMN pozwoliły na szybkie zrozumienie i wdrożenie procesów biznesowych w systemie aukcyjnym.
 
 Kolejnym etapem pracy była implementacja komponentu renderującego. Proces ten wymagał dogłębnego zrozumienia niskopoziomowej komunikacji z procesorem graficznym poprzez API WebGPU. Zastosowanie wzorca potoku opartego na \texttt{std::expected} ze standardu C++23 pozwoliło na przyzwoitą i spójną obsługę błędów podczas inicjalizacji trzynastu wymaganych zasobów GPU. Implementacja shaderów w języku WGSL umożliwiła realizację zaawansowanego modelu oświetlenia z mapami normalnych oraz wieloma źródłami światła. Szczególnym wyzwaniem okazała się kompilacja kodu do formatu WebAssembly przy użyciu narzędzia Emscripten, co wymagało odpowiedniej konfiguracji flag kompilacji oraz zrozumienia ograniczeń wirtualnego systemu plików przeglądarki. Dzięki temu osiągnięto wydajność renderowania porównywalną z aplikacjami natywnymi, zachowując jednocześnie pełną kompatybilność z ekosystemem internetowym.
 
-Następnym etapem była implementacja systemu aukcyjnego. System ten został podzielony na część internetową oraz serwerową. Część internetowa została stworzona zgodnie z początkowym projektem wizualnym. Podczas tworzenia części serwerowej instotnym wsparciem były diagramy BPMN i ERD, dzięki którym możliwe było wdrożenie zaprojektowane rozwiązania.
+Następnym etapem była implementacja systemu aukcyjnego. System ten został podzielony na część internetową oraz serwerową. Część internetowa została stworzona zgodnie z początkowym projektem wizualnym. Podczas tworzenia części serwerowej instotnym wsparciem były diagramy BPMN, dzięki którym możliwe było wdrożenie zaprojektowane rozwiązania.
 
 Końcowym etapem było sprawdzenie działania aplikacji. Do każdej funkcjonalności systemu aukcyjnego opisano pakiet testów. Wykryte w ten sposób niepoprawne działania zostały naprawiane na bieżąco.
 
