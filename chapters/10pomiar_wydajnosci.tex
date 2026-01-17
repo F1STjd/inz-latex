@@ -99,7 +99,7 @@ Na rysunku \ref{fig:time_scaling} przedstawiono zależność czasu wykonania od 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth]{img/benchmark/benchmark_time_scaling.png}
-  \caption{Zależność czasu ładowania od rozmiaru modelu (skala logarytmiczna)}
+  \caption{Zależność czasu ładowania od rozmiaru modelu 3D (skala logarytmiczna)}
   \label{fig:time_scaling}
 \end{figure}
 
@@ -120,7 +120,7 @@ Obliczenia macierzy TBN stanowią stały procent całkowitego czasu ładowania -
 
 \subsubsection{Przepustowość operacji ładowania}
 
-Przepustowość operacji ładowania, wyrażona jako liczba przetworzonych wierzchołków na sekundę, utrzymuje się na stabilnym poziomie około 1,4 miliona wierzchołków na sekundę dla modeli powyżej 10 tysięcy wierzchołków (rysunek \ref{fig:throughput}). Niższa przepustowość dla najmniejszego modelu 3D s(1,19 mln wierzch./s) wynika z narzutu związanego z inicjalizacją operacji wejścia/wyjścia.
+Przepustowość operacji ładowania, wyrażona jako liczba przetworzonych wierzchołków na sekundę, utrzymuje się na stabilnym poziomie około 1,4 miliona wierzchołków na sekundę dla modeli powyżej 10 tysięcy wierzchołków (rysunek \ref{fig:throughput}). Niższa przepustowość dla najmniejszego modelu 3D (1,19 mln wierzch./s) wynika z narzutu związanego z inicjalizacją operacji wejścia/wyjścia.
 
 \begin{figure}[h!]
   \centering
@@ -135,7 +135,9 @@ W celu oceny wiarygodności wyników obliczono współczynnik zmienności (CV, a
 \begin{equation}
   CV = \frac{\sigma}{\mu} \cdot 100\%
 \end{equation}
-gdzie $\sigma$ oznacza odchylenie standardowe, a $\mu$ średnią arytmetyczną. Niższa wartość współczynnika zmienności świadczy o większej stabilności i powtarzalności pomiarów~\cite{Brown1998}.
+gdzie: $\sigma$ oznacza odchylenie standardowe, a $\mu$ średnią arytmetyczną.
+
+Niższa wartość współczynnika zmienności świadczy o większej stabilności i powtarzalności pomiarów~\cite{Brown1998}.
 
 \begin{figure}[h!]
   \centering
