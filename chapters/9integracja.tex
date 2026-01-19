@@ -1,4 +1,4 @@
-\section{Integracja komponentu renderującego z systemem aukcyjnym.}
+\section{Integracja komponentu renderującego z systemem aukcyjnym}
 
 Proces integracji obejmuje kilka warstw technicznych: kompilację kodu natywnego do formatu WebAssembly przy użyciu kompilatora Emscripten, zaprojektowanie architektury komponentów React umożliwiającej efektywne zarządzanie pojedynczą instancją komponentu renderującego oraz implementację mechanizmów komunikacji między kodem JavaScript a skompilowanym kodem C++.
 
@@ -12,7 +12,7 @@ Konfiguracja projektu dla Emscripten wymaga zdefiniowania specyficznych flag kom
 
 \begin{itemize}
   \item \texttt{-sUSE\_WEBGPU=1} - włączenie wsparcia dla API WebGPU w skompilowanym module,
-  \item \texttt{-sASYNCIFY} - umożliwienie asynchronicznego wykonywania kodu, niezbędne dla operacji WebGPU,
+  \item \texttt{-sASYNCIFY} - umożliwienie asynchronicznego wykonywania kodu, niezbędne dla WebGPU,
   \item \texttt{-sEXPORTED\_FUNCTIONS} - lista funkcji C++ eksportowanych do JavaScript,
   \item \texttt{-sEXPORTED\_RUNTIME\_METHODS} - metody runtime Emscripten dostępne z poziomu JavaScript,
   \item \texttt{-sFETCH} - wsparcie dla asynchronicznego pobierania zasobów,
@@ -36,7 +36,7 @@ Integracja komponentu WebGPU z aplikacją React opiera się na wzorcu Provider, 
 
 \subsubsection{Wzorzec Provider}
 
-Komponent \texttt{WebGPUCanvasProvider} (listing \ref{lst:provider}) implementuje wzorzec Provider z React Context API. Działa jako pojedyncza instancja zarządzająca cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider opakowuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
+Komponent \texttt{WebGPUCanvasProvider} (listing \ref{lst:provider}), który implementuje wzorzec Provider z React Context API, działa jako pojedyncza instancja zarządzająca cyklem życia modułu WebAssembly oraz elementem canvas, na którym wykonywane jest renderowanie. Provider obejmuje całą aplikację, zapewniając dostęp do API komponentu renderującego z dowolnego miejsca w drzewie komponentów.
 
 \begin{lstlisting}[style=javascript, caption={Struktura komponentu Provider}, label={lst:provider}]
 export function WebGPUCanvasProvider({ children }) {
@@ -57,7 +57,7 @@ export function WebGPUCanvasProvider({ children }) {
 
 \subsubsection{Funkcje pomocnicze dostępu do API}
 
-Dostęp do funkcjonalności komponentu renderującego z poziomu komponentów potomnych realizowany jest za pomocą dedykowanych funkcji pomocniczych React (ang. \textit{hooks}). Funkcja \texttt{useWebGPUCanvas()} stanowi publiczny interfejs zwracający API do kontroli komponentu renderującego, którego strukturę przedstawia listing \ref{lst:api}. Dodatkowo dostępna jest wewnętrzna funkcja \texttt{useWebGPUCanvasInternal()}, wykorzystywana przez komponent \texttt{WebGPUCanvas} do zarządzania slotami wyświetlania.
+Dostęp do funkcjonalności komponentu renderującego z poziomu komponentów potomnych realizowany jest za pomocą dedykowanych funkcji pomocniczych React (ang. \textit{hooks}). Funkcja \texttt{useWebGPUCanvas()} stanowi publiczny interfejs zwracający API do kontroli komponentu renderującego, którego strukturę przedstawia listing \ref{lst:api}.
 
 \begin{lstlisting}[style=javascript, caption={Publiczne API komponentu renderującego}, label={lst:api}]
 const publicApi = {
@@ -104,11 +104,11 @@ Funkcje zarządzania slotami:
 
 \subsection{Ładowanie modułu WebAssembly}
 
-Inicjalizacja modułu WebAssembly odbywa się asynchronicznie podczas pierwszego montowania komponentu canvas. Proces ten obejmuje wstrzyknięcie skryptu \texttt{main.js}, konfigurację obiektu \texttt{Module} oraz obsługę stanów ładowania.
+Inicjalizacja modułu WebAssembly odbywa się w sposób asynchroniczny podczas pierwszego stworzenia komponentu canvas. Proces ten obejmuje wstrzyknięcie skryptu \texttt{main.js}, konfigurację obiektu \texttt{Module} oraz obsługę stanów ładowania.
 
 \subsubsection{Konfiguracja obiektu Module}
 
-Przed załadowaniem skryptu Emscripten konfigurowany jest globalny obiekt \texttt{window.Module} z funkcjami zwrotnymi obsługującymi zdarzenia cyklu życia, jak przedstawiono na listingu \ref{lst:module}:
+Przed załadowaniem skryptu Emscripten tworzy się i ustawia globalny obiekt \texttt{window.\hspace{0pt}Module}, który zawiera funkcje zwrotne obsługujące zdarzenia cyklu życia (listing \ref{lst:module}).
 
 \begin{lstlisting}[style=javascript, caption={Konfiguracja obiektu Module}, label={lst:module}]
 const moduleConfig = {

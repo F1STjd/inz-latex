@@ -61,7 +61,7 @@ Wymagania niefunkcjonalne opisują działanie systemu od strony wydajności i je
           \end{itemize}
 \end{itemize}
 
-\subsection{Diagramy bpmn:}
+\subsection{Diagramy BPMN}
 Diagramy BPMN (Business Process Model and Notation) służą do modelowania procesów biznesowych. Opisują sekwencje działań i przepływów w procesach danej organizacji. Na rysunku \ref{fig:tworzenie_aukcji} przedstawiono proces tworzenia aukcji, rysunek \ref{fig:proces_licytacji} ilustruje proces licytacji, natomiast rysunek \ref{fig:konczenie_aukcji} pokazuje proces kończenia aukcji.
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/tworzenie aukcji.png}
@@ -91,7 +91,7 @@ Diagramy pakietów to diagramy UML grupujące przypadki użycia w grupy nazywane
 \end{center}
 
 \subsection{Diagramy przypadków użycia}
-Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje pomiędzy aktorami, a funkcjonalnościami systemu. Na rysunku \ref{fig:diagram_przypadkow_uzycia} przedstawiono diagram przypadków użycia zarządzania użytkownikami, rysunek \ref{fig:zdj6} ilustruje zarządzanie aukcjami, rysunek \ref{fig:zdj8} pokazuje przeglądanie aukcji, natomiast rysunek \ref{fig:zdj9} prezentuje wizualizację modelu 3D.
+Diagramy przypadków użycia to diagramy UML ukazujące funkcjonalności systemu od strony użytkownika. Diagram pokazuje jacy użytkownicy mogą wykonywać dane czynności w systemie. Ilustrują relacje aktorów i funkcjonalności systemu. Na rysunku \ref{fig:diagram_przypadkow_uzycia} przedstawiono diagram przypadków użycia zarządzania użytkownikami, rysunek \ref{fig:zdj6} ilustruje zarządzanie aukcjami, rysunek \ref{fig:zdj8} pokazuje przeglądanie aukcji, natomiast rysunek \ref{fig:zdj9} prezentuje wizualizację modelu 3D.
 \begin{center}
     \includegraphics[width=\linewidth]{img/schematy/zarzadzanie-uzytkownikami.png}
     \captionof{figure}{Diagram przypadków użycia zarządzania użytkownikami}
@@ -217,15 +217,15 @@ Historyjki użytkownika to opis funkcjonalności systemu, widziany przez użytko
 
 
     \item \textbf{Jako} dom aukcyjny,\\
-          \textbf{Chciałbym} wystawiać nowe aukcje ze szczegółowym opisem i modelami 3D przedmiotów \\
-          \textbf{Aby} prezentować oferowane przedmioty w atrakcyjny sposób potencjalnym klientom\\
+          \textbf{Chciałbym} wystawiać nowe aukcje ze szczegółowym opisem i modelami 3D przedmiotów, \\
+          \textbf{Aby} prezentować oferowane przedmioty w atrakcyjny sposób potencjalnym klientom.\\
           \textbf{Zakładając}, że jestem zalogowany jako dom aukcyjny i mam wszystkie dane przedmiotu (opis, zdjęcia, model 3D),\\
           \textbf{Jeśli} wypełnię formularz tworzenia aukcji i potwierdzę jego dodanie, \\
           \textbf{To wtedy} nowa aukcja pojawi się na liście dostępnych aukcji na platformie.
 \end{itemize}
 
 \subsection{Diagramy sekwencji}
-Diagramy sekwencji pokazują współprace obiektów w systemie podczas działania danego procesu. Obiekty lub aktorzy są przedstawieni na górze diagramu, pionowe linie, zwane liniami życia, odzwierciedlają ich istnienie. Strzałki pomiędzy obiektami, pokazują jak zachodzi komunikacja w systemie pomiędzy poszczególnymi obiektami. Na rysunku \ref{fig:zdj13} przedstawiono diagram sekwencji logowania, rysunek \ref{fig:zdj15} ilustruje wizualizację modelu 3D, rysunek \ref{fig:zdj16} pokazuje proces rejestracji, natomiast rysunek \ref{fig:zdj17} prezentuje system licytowania.
+Diagramy sekwencji pokazują współprace obiektów w systemie podczas działania procesów. Obiekty lub aktorzy są przedstawieni na górze diagramu, pionowe linie, zwane liniami życia, odzwierciedlają ich istnienie. Strzałki pomiędzy obiektami, pokazują jak zachodzi komunikacja w systemie pomiędzy poszczególnymi obiektami. Na rysunku \ref{fig:zdj13} przedstawiono diagram sekwencji logowania, rysunek \ref{fig:zdj15} ilustruje wizualizację modelu 3D, rysunek \ref{fig:zdj16} pokazuje proces rejestracji, natomiast rysunek \ref{fig:zdj17} prezentuje system licytowania.
 
 \begin{figure}[htbp]
     \centering
@@ -257,7 +257,7 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
     \label{fig:zdj16}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[
         width=\dimexpr\textwidth\relax,
@@ -267,9 +267,8 @@ Diagramy sekwencji pokazują współprace obiektów w systemie podczas działani
     \label{fig:zdj17}
 \end{figure}
 
-\clearpage
 \subsection{Projekt interfejsu użytkownika}
-W celu łatwiejszej pracy nad implementacją części klienckiej serwisu aukcyjnego, utworzono widoki, które pokazują ogólny zamysł wyglądu aplikacji. Poniższe zdjęcia przedstawiają widoki strony głównej (rysunki \ref{fig:mockup1}, \ref{fig:mockup2}, \ref{fig:mockup3}, \ref{fig:mockup4}), widoku aukcji (rysunki \ref{fig:mockup5}, \ref{fig:mockup6}), panelu użytkownika (rysunek \ref{fig:mockup7}).
+W celu łatwiejszej pracy nad implementacją części klienckiej serwisu aukcyjnego, utworzono widoki, które pokazują ogólny zamysł wyglądu aplikacji. Poniższe zdjęcia przedstawiają widoki strony głównej (rysunki \ref{fig:mockup1}--\ref{fig:mockup4}), widoku aukcji (rysunki \ref{fig:mockup5}--\ref{fig:mockup6}), panelu użytkownika (rysunek \ref{fig:mockup7}).
 
 \begin{landscape}
     \begin{figure}[p]

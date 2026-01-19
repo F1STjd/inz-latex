@@ -2,20 +2,20 @@
 
 \subsection{Rola warstwy interfejsu użytkownika w systemie aukcyjnym}
 
-Struktura części klienckiej odpowiedzialna jest za interakcję użytkownika z systemem aukcyjnym. Jej głównym zadaniem jest przedstawienie danych dostarczanych przez strukturę części serwerowej. Istotnym aspektem jest, aby interfejs użytkownika zapewniał odpowiednią użyteczność oraz spójny interfejs, poprzez przejrzyste układy stron. Ze względu na dążenie do większej przejrzystości interfejsu oraz ujednolicenia wyglądu aplikacji, w trakcie implementacji zmieniono wygląd niektórych widoków w stosunku do projektu przedstawionego w rozdziale~\ref{sec:projekt}.
+Struktura części klienckiej odpowiedzialna jest za interakcję użytkownika z systemem aukcyjnym. Jej głównym zadaniem jest przedstawienie danych dostarczanych przez strukturę części serwerowej. Istotnym aspektem jest, aby interfejs użytkownika zapewniał odpowiednią użyteczność oraz spójny interfejs, poprzez przejrzyste układy stron.
 
 \subsection{Struktura części interfejsu użytkownika}
 
 Na rysunku~\ref{fig:frontend} przedstawiono strukturę części odpowiedzialnej za interfejs użytkownika:
 
 \begin{itemize}
-  \item public - w tym folderze zawarte są pliki statyczne oraz zasoby 3D, wykorzystywane w aplikacji do renderowania obiektów.
-  \item src/components - w tym folderze zadeklarowane są komponenty wielokrotnego użytku takie jak: Navbar, Footer, AuctionCard.
-  \item src/contexts - w tym folderze znajdują się konteksty React, które są odpowiedzialne za zarządzanie stanem autoryzacji użytkownika.
-  \item src/pages - w tym folderze zawarte są wszystkie widoki w aplikacji widoczne dla użytkownika.
-  \item	src/services - w tym folderze opisana jest komunikacja części interfejsu użytkownika z częścią serwerową.
-  \item src/styles - w tym folderze znajdują się pliki stylów CSS aplikacji.
-  \item src/utils - w tym folderze opisane są funkcje pomocnicze.
+  \item public - folder z plikami statycznymi oraz zasobami 3D, wykorzystywane w aplikacji do renderowania obiektów.
+  \item src/components - folder z komponentami wielokrotnego użytku takie jak: Navbar, Footer, AuctionCard.
+  \item src/contexts - folder z kontekstami React, które są odpowiedzialne za zarządzanie stanem autoryzacji użytkownika.
+  \item src/pages - folder ze wszystkimi widokami w aplikacji widocznymi dla użytkownika.
+  \item	src/services - folder z opisem komunikacji części interfejsu użytkownika z częścią serwerową.
+  \item src/styles - folder z plikami stylów CSS aplikacji.
+  \item src/utils - folder z funkcjami pomocniczymi.
 \end{itemize}
 
 \begin{figure}[H]
@@ -29,7 +29,7 @@ Na rysunku~\ref{fig:frontend} przedstawiono strukturę części odpowiedzialnej 
 
 \subsection{Trasowanie i nawigacja w aplikacji}
 
-W aplikacji zastosowano mechanizm trasowania React Router DOM~\cite{react-router}, który jest przedstawiony na listingu~\ref{lst:routing}. Umożliwia on korzystanie z aplikacji internetowej bez konieczności ciągłego przeładowywania całej strony przy odświeżeniu. Dzięki temu rozwiązaniu usprawniono działanie aplikacji, poprawiając komfort użytkowania.
+W aplikacji zastosowano mechanizm trasowania React Router DOM~\cite{react-router}, który został przedstawiony na listingu~\ref{lst:routing}. Umożliwia on korzystanie z aplikacji internetowej bez konieczności ciągłego przeładowywania całej strony przy odświeżeniu. Dzięki temu rozwiązaniu usprawniono działanie aplikacji, poprawiając komfort użytkowania.
 
 \begin{lstlisting}[style=javascript, caption = {Mechanizm routingu React Router DOM}, label = {lst:routing}]
 createRoot(document.getElementById('root')).render(
@@ -173,3 +173,8 @@ W przypadku formularza rejestracyjnego zastosowano asynchroniczną funkcję, kt�
     }
   };
 \end{lstlisting}
+
+\subsection{Wynikowe widoki systemu}
+Ze względu na dążenie do większej przejrzystości interfejsu oraz ujednolicenia wyglądu aplikacji, w trakcie implementacji zmieniono wygląd niektórych widoków w stosunku do projektu przedstawionego w rozdziale~\ref{sec:projekt}. Na rysunkach~\ref{asd1}--\ref{asdN} przedstawiono ostateczny wygląd widoków aplikacji.
+
+% wstawic zdjecia widokow
