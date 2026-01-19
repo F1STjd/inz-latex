@@ -129,7 +129,7 @@ export const login = async (req, res) => {
 \end{lstlisting}
 
 \subsection{Autentykacja użytkownika}
-Użytkownicy są autentykowani poprzez Json Web Token. Ten standard pozwala na bezpieczną wymianę danych pomiędzy klientem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówka, ładunku oraz podpisu. Na listingu~\ref{lst:user_login} przedstawiono implementacje tokenów JWT.
+Użytkownicy są autentykowani poprzez Json Web Token. Ten standard pozwala na bezpieczną wymianę danych pomiędzy klientem a serwerem jako obiekt JSON oraz na kontrolowanie sesji użytkowników.  JSON Web Token składa się z 3 części: nagłówka, ładunku oraz podpisu. Nagłówek zawiera typ tokenu i algorytm podpisu, ładunek - dane użytkownika, z kolei podpis - podpis kryptograficzny. Na listingu~\ref{lst:user_login} przedstawiono implementacje tokenów JWT.
 
 \begin{lstlisting}[style=javascript, caption = {Implementacja autentykacji użytkownika}, label = {lst:user_auth}]
 const signToken = (id) => {
